@@ -1,0 +1,7 @@
+
+# Environment variables (create these files manually if needed)
+.env
+.env.local
+
+.agents
+node_modules

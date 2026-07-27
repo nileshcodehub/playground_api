@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Playground API Documentation' %></title>
+  <link rel="stylesheet" href="/public/css/docs.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/docs" class="nav-brand">Playground API</a>
+      <nav class="nav-links">
+        <a href="/docs/users" class="nav-link">users</a>
+        <a href="/docs/posts" class="nav-link">posts</a>
+        <a href="/docs/comments" class="nav-link">comments</a>
+        <a href="/docs/todos" class="nav-link">todos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="hero-section">
+      <h1>Playground API Documentation</h1>
+      <p class="hero-subtitle">
+        A JSONPlaceholder-style REST API with per-identity sandboxed mutations. 
+        Read operations merge shared global data with your session's creates, updates, and deletes.
+      </p>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <% if (typeof info !== 'undefined' && info) { %>
+      <div class="alert alert-info"><%= info %></div>
+    <% } %>
+
+    <div class="resources-grid">
+      <% if (typeof resources !== 'undefined' && resources) { %>
+        <% resources.forEach(resource => { %>
+          <div class="resource-card">
+            <h2><a href="/docs/<%= resource %>">/<%= resource %></a></h2>
+            <p>Interactive REST API documentation and endpoints for <%= resource %>.</p>
+            <a href="/docs/<%= resource %>" class="btn btn-secondary">Explore <%= resource %> &rarr;</a>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <p>Playground API — Built with Node.js, Express, Prisma, and EJS.</p>
+    </div>
+  </footer>
+
+  <script src="/public/js/try-it.js"></script>
+</body>
+</html>

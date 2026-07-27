@@ -1,0 +1,86 @@
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import config from './config/env.js';
+import { identityMiddleware } from './middleware/identity.js';
+import { generalLimiter } from './middleware/rateLimit.js';
+import { errorHandler, AppError } from './middleware/errorHandler.js';
+import { makeResourceRouter } from './routes/resourceRoutes.js';
+import docsRouter from './routes/docsRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const rootDir = path.resolve(__dirname, '..');
+
+const app = express();
+
+// Configure view engine (EJS)
+app.set('view engine', 'ejs');
+app.set('views', path.join(rootDir, 'views'));
+
+// Proxy trust setting if configured
+if (config.trustProxy) {
+  app.set('trust proxy', true);
+}
+
+// Global Core Middleware
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+if (!config.isProduction) {
+  app.use(morgan('dev'));
+}
+
+// Identity Cookie Middleware & Global Rate Limiter
+app.use(identityMiddleware);
+app.use(generalLimiter);
+
+// Static file serving
+app.use('/public', express.static(path.join(rootDir, 'public')));
+
+// Root Endpoint
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Playground API',
+    description: 'JSONPlaceholder-style mock REST API with per-identity sandboxed mutations',
+    version: '1.0.0',
+    documentation: '/docs',
+    resources: {
+      users: '/users',
+      posts: '/posts',
+      comments: '/comments',
+      todos: '/todos',
+      custom: '/custom (placeholder)'
+    },
+    identityId: req.identityId
+  });
+});
+
+// Resource API Routes
+app.use('/users', makeResourceRouter('users'));
+app.use('/posts', makeResourceRouter('posts'));
+app.use('/comments', makeResourceRouter('comments'));
+app.use('/todos', makeResourceRouter('todos'));
+
+// Placeholder mount point for custom resource
+app.use('/custom', (req, res) => {
+  res.json({ message: 'Custom resource placeholder. Logic will be added in future tasks.' });
+});
+
+// Hosted Documentation Routes
+app.use('/docs', docsRouter);
+
+// 404 Route Handler
+app.use((req, res, next) => {
+  next(new AppError(`Cannot find ${req.originalUrl} on this server.`, 404));
+});
+
+// Centralized Error Handling Middleware
+app.use(errorHandler);
+
+export default app;

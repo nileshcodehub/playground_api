@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum OperationType {
+  create
+  update
+  delete
+}
+
+model Identities {
+  id             String           @id @default(uuid()) @db.Uuid
+  ip_hash        String?          @map("ip_hash")
+  created_at     DateTime         @default(now()) @map("created_at")
+  last_seen_at   DateTime         @default(now()) @map("last_seen_at")
+  overlayRecords OverlayRecords[]
+
+  @@index([last_seen_at])
+  @@index([ip_hash])
+  @@map("identities")
+}
+
+model OverlayRecords {
+  id          String        @id @default(uuid()) @db.Uuid
+  identity_id String        @map("identity_id") @db.Uuid
+  resource    String
+  target_id   Int?          @map("target_id")
+  op          OperationType
+  data        Json?
+  created_at  DateTime      @default(now()) @map("created_at")
+
+  identity Identities @relation(fields: [identity_id], references: [id], onDelete: Cascade)
+
+  @@unique([identity_id, resource, target_id])
+  @@map("overlay_records")
+}
+
+model UsersGlobal {
+  id       Int    @id @default(autoincrement())
+  name     String
+  username String
+  email    String
+  phone    String?
+  website  String?
+  address  Json?
+  company  Json?
+
+  @@map("users_global")
+}
+
+model PostsGlobal {
+  id      Int    @id @default(autoincrement())
+  user_id Int    @map("user_id")
+  title   String
+  body    String
+
+  @@map("posts_global")
+}
+
+model CommentsGlobal {
+  id      Int    @id @default(autoincrement())
+  post_id Int    @map("post_id")
+  name    String
+  email   String
+  body    String
+
+  @@map("comments_global")
+}
+
+model TodosGlobal {
+  id        Int     @id @default(autoincrement())
+  user_id   Int     @map("user_id")
+  title     String
+  completed Boolean @default(false)
+
+  @@map("todos_global")
+}

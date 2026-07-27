@@ -1,0 +1,91 @@
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="badge badge-<%= method.toLowerCase() %>"><%= method %></span>
+    <code class="endpoint-path"><%= path %></code>
+  </div>
+
+  <p class="endpoint-summary"><%= summary %></p>
+
+  <% if (typeof params !== 'undefined' && params && params.length > 0) { %>
+    <div class="params-section">
+      <h4>Parameters</h4>
+      <table class="params-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>In</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% params.forEach(param => { %>
+            <tr>
+              <td><code><%= param.name %></code></td>
+              <td><span class="param-in"><%= param.in %></span></td>
+              <td><code><%= param.type %></code></td>
+              <td><%= param.description %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+
+  <div class="examples-grid">
+    <% if (typeof bodyExample !== 'undefined' && bodyExample) { %>
+      <div class="example-box">
+        <h4>Request Body Example</h4>
+        <pre><code><%= bodyExample %></code></pre>
+      </div>
+    <% } %>
+
+    <% if (typeof responseExample !== 'undefined' && responseExample) { %>
+      <div class="example-box">
+        <h4>Response Example</h4>
+        <pre><code><%= responseExample %></code></pre>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Interactive Try It Form -->
+  <div class="try-it-container">
+    <details class="try-it-details">
+      <summary class="try-it-summary">Try it out</summary>
+      <form class="try-it__form" data-method="<%= method %>" data-path="<%= path %>">
+        <% if (typeof params !== 'undefined' && params) { %>
+          <% params.filter(p => p.in === 'path' || p.in === 'query').forEach(p => { %>
+            <div class="form-group">
+              <label for="param-<%= method %>-<%= path %>-<%= p.name %>">
+                <%= p.name %> (<%= p.in %>):
+              </label>
+              <input 
+                type="text" 
+                id="param-<%= method %>-<%= path %>-<%= p.name %>" 
+                data-param-name="<%= p.name %>" 
+                data-param-in="<%= p.in %>" 
+                placeholder="<%= p.description %>"
+                class="form-control"
+              >
+            </div>
+          <% }); %>
+        <% } %>
+
+        <% if (typeof bodyExample !== 'undefined' && bodyExample) { %>
+          <div class="form-group">
+            <label for="body-<%= method %>-<%= path %>">Request Body (JSON):</label>
+            <textarea 
+              id="body-<%= method %>-<%= path %>" 
+              class="form-control body-input" 
+              rows="5"
+            ><%= bodyExample %></textarea>
+          </div>
+        <% } %>
+
+        <button type="submit" class="btn btn-primary">Execute Request</button>
+      </form>
+
+      <pre class="try-it__result" hidden></pre>
+    </details>
+  </div>
+</div>
