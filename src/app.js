@@ -36,12 +36,12 @@ if (!config.isProduction) {
   app.use(morgan('dev'));
 }
 
+// Static file serving (bypasses DB identity check for speed)
+app.use('/public', express.static(path.join(rootDir, 'public')));
+
 // Identity Cookie Middleware & Global Rate Limiter
 app.use(identityMiddleware);
 app.use(generalLimiter);
-
-// Static file serving
-app.use('/public', express.static(path.join(rootDir, 'public')));
 
 // Resource API Routes (REST Data Endpoints)
 app.use('/users', makeResourceRouter('users'));
