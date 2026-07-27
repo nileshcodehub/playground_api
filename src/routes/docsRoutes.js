@@ -11,47 +11,72 @@ const GLOBAL_MODELS = {
   todos: 'todosGlobal'
 };
 
-router.get('/', async (req, res) => {
+// In-memory cache for sample records to eliminate database latency on page loads
+const sampleCache = new Map();
+
+// Documentation Hub Landing Page
+router.get('/', (req, res) => {
   res.render('docs-index', {
-    title: 'Playground API Documentation',
-    resources: RESOURCES
+    title: 'Playground API — Developer Documentation',
+    resources: RESOURCES,
+    currentNav: 'overview',
+    identityId: req.identityId
   });
 });
 
-router.get('/:resource', async (req, res, next) => {
+// Alias for /docs
+router.get('/docs', (req, res) => {
+  res.redirect('/');
+});
+
+// Resource specific documentation page
+router.get('/docs/:resource', async (req, res, next) => {
   const { resource } = req.params;
   if (!RESOURCES.includes(resource)) {
     return res.status(404).render('docs-index', {
       title: 'Documentation - Not Found',
       resources: RESOURCES,
+      currentNav: 'overview',
+      identityId: req.identityId,
       error: `Documentation page for resource "${resource}" not found.`
     });
   }
 
-  let sampleRecord = null;
+  let sampleRecord = sampleCache.get(resource) || null;
   const modelName = GLOBAL_MODELS[resource];
-  if (modelName && prisma[modelName]) {
+
+  if (!sampleRecord && modelName && prisma[modelName]) {
     try {
       sampleRecord = await prisma[modelName].findFirst();
+      if (sampleRecord) {
+        sampleCache.set(resource, sampleRecord);
+      }
     } catch (err) {
       console.warn(`[Docs] Could not fetch sample data for ${resource}: ${err.message}`);
     }
   }
 
-  res.render(resource, {
-    title: `${resource.toUpperCase()} - Playground API Docs`,
+  const locals = {
+    title: `${resource.toUpperCase()} — Playground API Docs`,
     resource,
     resources: RESOURCES,
-    sampleRecord
-  }, (err, html) => {
+    currentNav: resource,
+    sampleRecord,
+    identityId: req.identityId
+  };
+
+  res.render(resource, locals, (err, htmlContent) => {
     if (err) {
       return res.render('docs-index', {
+        ...locals,
         title: `${resource.toUpperCase()} Docs Coming Soon`,
-        resources: RESOURCES,
         info: `Documentation for "${resource}" is currently being prepared.`
       });
     }
-    res.send(html);
+    res.render('layouts/base', {
+      ...locals,
+      body: htmlContent
+    });
   });
 });
 

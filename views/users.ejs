@@ -1,186 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title : 'Users API Documentation' %></title>
-  <link rel="stylesheet" href="/public/css/docs.css">
-</head>
-<body>
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="/docs" class="nav-brand">Playground API</a>
-      <nav class="nav-links">
-        <a href="/docs/users" class="nav-link active">users</a>
-        <a href="/docs/posts" class="nav-link">posts</a>
-        <a href="/docs/comments" class="nav-link">comments</a>
-        <a href="/docs/todos" class="nav-link">todos</a>
-      </nav>
-    </div>
-  </header>
+<div class="hero">
+  <h1 class="hero-title">Users Resource Documentation</h1>
+  <p class="hero-subtitle">
+    Read operations merge shared global users data with your session's overlay (creates appear at the top, deletes are removed, updates preserve position).
+    All mutations are session-scoped via an HTTP cookie and never affect shared global data or other visitors.
+  </p>
+</div>
 
-  <main class="main-content">
-    <div class="hero-section">
-      <h1>Users Resource Documentation</h1>
-      <p class="hero-subtitle">
-        Read operations merge shared global users data with your session's overlay (creates appear on top, deletes are removed, updates preserve position).
-        All mutations are session-scoped via an HTTP cookie and never affect shared global data or other visitors.
-      </p>
-    </div>
+<% 
+  const fallbackUser = {
+    id: 1,
+    name: "User 1",
+    username: "user_1",
+    email: "user1@example.com",
+    phone: "+1-555-01001",
+    website: "https://user1.dev",
+    address: { street: "1 Main St", city: "Metro City", zipcode: "10001" },
+    company: { name: "Tech Corp 1", catchPhrase: "Innovative solutions for all" }
+  };
 
-    <% 
-      const fallbackUser = {
-        id: 1,
-        name: "User 1",
-        username: "user_1",
-        email: "user1@example.com",
-        phone: "+1-555-01001",
-        website: "https://user1.dev",
-        address: { street: "1 Main St", city: "Metro City", zipcode: "10001" },
-        company: { name: "Tech Corp 1", catchPhrase: "Innovative solutions for all" }
-      };
+  const realUser = (typeof sampleRecord !== 'undefined' && sampleRecord) ? sampleRecord : fallbackUser;
+  const sampleUserResponse = JSON.stringify(realUser, null, 2);
 
-      const realUser = (typeof sampleRecord !== 'undefined' && sampleRecord) ? sampleRecord : fallbackUser;
-      const sampleUserResponse = JSON.stringify(realUser, null, 2);
+  const sampleUserPostPayload = JSON.stringify({
+    name: realUser.name || "Jane Doe",
+    username: realUser.username || "janedoe",
+    email: realUser.email || "jane.doe@example.com",
+    phone: realUser.phone || "+1-555-01999",
+    website: realUser.website || "https://janedoe.dev",
+    address: realUser.address || { street: "42 Wallaby Way", city: "Sydney", zipcode: "20000" },
+    company: realUser.company || { name: "Acme Corp", catchPhrase: "Building the future" }
+  }, null, 2);
 
-      const sampleUserPostPayload = JSON.stringify({
-        name: realUser.name || "Jane Doe",
-        username: realUser.username || "janedoe",
-        email: realUser.email || "jane.doe@example.com",
-        phone: realUser.phone || "+1-555-01999",
-        website: realUser.website || "https://janedoe.dev",
-        address: realUser.address || { street: "42 Wallaby Way", city: "Sydney", zipcode: "20000" },
-        company: realUser.company || { name: "Acme Corp", catchPhrase: "Building the future" }
-      }, null, 2);
+  const sampleCreatedUserResponse = JSON.stringify({
+    id: "local-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    name: realUser.name || "Jane Doe",
+    username: realUser.username || "janedoe",
+    email: realUser.email || "jane.doe@example.com",
+    phone: realUser.phone || "+1-555-01999",
+    website: realUser.website || "https://janedoe.dev",
+    address: realUser.address || { street: "42 Wallaby Way", city: "Sydney", zipcode: "20000" },
+    company: realUser.company || { name: "Acme Corp", catchPhrase: "Building the future" },
+    _sandbox: "created"
+  }, null, 2);
 
-      const sampleCreatedUserResponse = JSON.stringify({
-        id: "local-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        name: realUser.name || "Jane Doe",
-        username: realUser.username || "janedoe",
-        email: realUser.email || "jane.doe@example.com",
-        phone: realUser.phone || "+1-555-01999",
-        website: realUser.website || "https://janedoe.dev",
-        address: realUser.address || { street: "42 Wallaby Way", city: "Sydney", zipcode: "20000" },
-        company: realUser.company || { name: "Acme Corp", catchPhrase: "Building the future" },
-        _sandbox: "created"
-      }, null, 2);
+  const samplePatchPayload = JSON.stringify({
+    name: `${realUser.name} (Updated)`,
+    website: "https://updated-user.dev"
+  }, null, 2);
 
-      const samplePatchPayload = JSON.stringify({
-        name: `${realUser.name} (Updated)`,
-        website: "https://updated-user.dev"
-      }, null, 2);
+  const sampleUpdatedUserResponse = JSON.stringify({
+    ...realUser,
+    name: `${realUser.name} (Updated)`,
+    website: "https://updated-user.dev",
+    _sandbox: "updated"
+  }, null, 2);
 
-      const sampleUpdatedUserResponse = JSON.stringify({
-        ...realUser,
-        name: `${realUser.name} (Updated)`,
-        website: "https://updated-user.dev",
-        _sandbox: "updated"
-      }, null, 2);
+  const samplePaginatedResponse = JSON.stringify({
+    data: [
+      JSON.parse(sampleCreatedUserResponse),
+      realUser
+    ],
+    pagination: {
+      page: 1,
+      limit: 10,
+      total: 26,
+      totalPages: 3,
+      hasNextPage: true,
+      hasPrevPage: false
+    }
+  }, null, 2);
 
-      const samplePaginatedResponse = JSON.stringify({
-        data: [
-          JSON.parse(sampleCreatedUserResponse),
-          realUser
-        ],
-        pagination: {
-          page: 1,
-          limit: 10,
-          total: 26,
-          totalPages: 3,
-          hasNextPage: true,
-          hasPrevPage: false
-        }
-      }, null, 2);
+  const endpoints = [
+    {
+      method: "GET",
+      path: "/users",
+      summary: "Retrieve a paginated list of users. Results merge shared global user records with session sandbox overlays (newly created users appear at the top).",
+      params: [
+        { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
+        { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." }
+      ],
+      bodyExample: null,
+      responseExample: samplePaginatedResponse
+    },
+    {
+      method: "GET",
+      path: "/users/:id",
+      summary: `Retrieve a single user by ID. Supports plain integer IDs for global records (e.g. ${realUser.id}) and string IDs formatted as local-<uuid> for session sandbox records.`,
+      params: [
+        { name: "id", in: "path", type: "string | integer", description: `User ID (e.g. ${realUser.id} for global user or local-<uuid> for sandbox user).` }
+      ],
+      bodyExample: null,
+      responseExample: sampleUserResponse
+    },
+    {
+      method: "POST",
+      path: "/users",
+      summary: "Create a new session sandbox user record. Returns a local-<uuid> formatted ID with _sandbox: 'created'. Each session identity is capped at 30 created records.",
+      params: [
+        { name: "name", in: "body", type: "string", description: "Full name of the user." },
+        { name: "username", in: "body", type: "string", description: "Username." },
+        { name: "email", in: "body", type: "string", description: "Email address." },
+        { name: "phone", in: "body", type: "string", description: "Phone number." },
+        { name: "website", in: "body", type: "string", description: "Website URL." },
+        { name: "address", in: "body", type: "object", description: "JSON object containing street, city, zipcode." },
+        { name: "company", in: "body", type: "object", description: "JSON object containing company name and catchPhrase." }
+      ],
+      bodyExample: sampleUserPostPayload,
+      responseExample: sampleCreatedUserResponse
+    },
+    {
+      method: "PUT",
+      path: "/users/:id",
+      summary: "Replace an existing user record in the session overlay. Global records remain untouched for other visitors and preserve original list position.",
+      params: [
+        { name: "id", in: "path", type: "string | integer", description: `User ID to update (e.g. ${realUser.id} or local-<uuid>).` }
+      ],
+      bodyExample: sampleUserPostPayload,
+      responseExample: sampleUpdatedUserResponse
+    },
+    {
+      method: "PATCH",
+      path: "/users/:id",
+      summary: "Partially update specific fields of a user record in the session overlay.",
+      params: [
+        { name: "id", in: "path", type: "string | integer", description: `User ID to patch (e.g. ${realUser.id} or local-<uuid>).` }
+      ],
+      bodyExample: samplePatchPayload,
+      responseExample: sampleUpdatedUserResponse
+    },
+    {
+      method: "DELETE",
+      path: "/users/:id",
+      summary: "Remove a user record from the requesting session view. The underlying global record is unaffected for other visitors.",
+      params: [
+        { name: "id", in: "path", type: "string | integer", description: `User ID to delete (e.g. ${realUser.id} or local-<uuid>).` }
+      ],
+      bodyExample: null,
+      responseExample: "204 No Content"
+    }
+  ];
+%>
 
-      const endpoints = [
-        {
-          method: "GET",
-          path: "/users",
-          summary: "Retrieve a paginated list of users. Results merge shared global user records with session sandbox overlays (newly created users appear at the top).",
-          params: [
-            { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
-            { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." }
-          ],
-          bodyExample: null,
-          responseExample: samplePaginatedResponse
-        },
-        {
-          method: "GET",
-          path: "/users/:id",
-          summary: `Retrieve a single user by ID. Supports plain integer IDs for global records (e.g. ${realUser.id}) and string IDs formatted as local-<uuid> for session sandbox records.`,
-          params: [
-            { name: "id", in: "path", type: "string | integer", description: `User ID (e.g. ${realUser.id} for global user or local-<uuid> for sandbox user).` }
-          ],
-          bodyExample: null,
-          responseExample: sampleUserResponse
-        },
-        {
-          method: "POST",
-          path: "/users",
-          summary: "Create a new session sandbox user record. Returns a local-<uuid> formatted ID with _sandbox: 'created'. Each session identity is capped at 30 created records.",
-          params: [
-            { name: "name", in: "body", type: "string", description: "Full name of the user." },
-            { name: "username", in: "body", type: "string", description: "Username." },
-            { name: "email", in: "body", type: "string", description: "Email address." },
-            { name: "phone", in: "body", type: "string", description: "Phone number." },
-            { name: "website", in: "body", type: "string", description: "Website URL." },
-            { name: "address", in: "body", type: "object", description: "JSON object containing street, city, zipcode." },
-            { name: "company", in: "body", type: "object", description: "JSON object containing company name and catchPhrase." }
-          ],
-          bodyExample: sampleUserPostPayload,
-          responseExample: sampleCreatedUserResponse
-        },
-        {
-          method: "PUT",
-          path: "/users/:id",
-          summary: "Replace an existing user record in the session overlay. Global records remain untouched for other visitors and preserve original list position.",
-          params: [
-            { name: "id", in: "path", type: "string | integer", description: `User ID to update (e.g. ${realUser.id} or local-<uuid>).` }
-          ],
-          bodyExample: sampleUserPostPayload,
-          responseExample: sampleUpdatedUserResponse
-        },
-        {
-          method: "PATCH",
-          path: "/users/:id",
-          summary: "Partially update specific fields of a user record in the session overlay.",
-          params: [
-            { name: "id", in: "path", type: "string | integer", description: `User ID to patch (e.g. ${realUser.id} or local-<uuid>).` }
-          ],
-          bodyExample: samplePatchPayload,
-          responseExample: sampleUpdatedUserResponse
-        },
-        {
-          method: "DELETE",
-          path: "/users/:id",
-          summary: "Remove a user record from the requesting session view. The underlying global record is unaffected for other visitors.",
-          params: [
-            { name: "id", in: "path", type: "string | integer", description: `User ID to delete (e.g. ${realUser.id} or local-<uuid>).` }
-          ],
-          bodyExample: null,
-          responseExample: "204 No Content"
-        }
-      ];
-    %>
-
-    <% endpoints.forEach(ep => { %>
-      <%- include('partials/endpoint', { 
-        method: ep.method, 
-        path: ep.path, 
-        summary: ep.summary, 
-        params: ep.params, 
-        bodyExample: ep.bodyExample, 
-        responseExample: ep.responseExample 
-      }) %>
-    <% }); %>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-container">
-      <p>Playground API — Users Resource Documentation</p>
-    </div>
-  </footer>
-
-  <script src="/public/js/try-it.js"></script>
-</body>
-</html>
+<% endpoints.forEach(ep => { %>
+  <%- include('partials/endpoint', { 
+    method: ep.method, 
+    path: ep.path, 
+    summary: ep.summary, 
+    params: ep.params, 
+    bodyExample: ep.bodyExample, 
+    responseExample: ep.responseExample 
+  }) %>
+<% }); %>

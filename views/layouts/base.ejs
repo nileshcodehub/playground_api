@@ -3,31 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title : 'Playground API Docs' %></title>
+  <title><%= typeof title !== 'undefined' ? title : 'Playground API Documentation' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/public/css/docs.css">
 </head>
 <body>
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="/docs" class="nav-brand">Playground API</a>
-      <nav class="nav-links">
-        <a href="/docs/users" class="nav-link">users</a>
-        <a href="/docs/posts" class="nav-link">posts</a>
-        <a href="/docs/comments" class="nav-link">comments</a>
-        <a href="/docs/todos" class="nav-link">todos</a>
+  <div class="app-layout">
+    <!-- Left Sidebar (Desktop 2-Column) -->
+    <aside class="sidebar">
+      <a href="/" class="brand">
+        <div class="brand-icon">P</div>
+        <div>
+          <div class="brand-title">Playground API</div>
+        </div>
+        <span class="brand-version">v1.0</span>
+      </a>
+
+      <!-- Identity Session Status Card -->
+      <div class="session-card">
+        <div class="session-card-header">
+          <span>Identity Session</span>
+          <span class="status-dot" title="Session Active"></span>
+        </div>
+        <div class="session-id">
+          <%= (typeof identityId !== 'undefined' && identityId) ? identityId : 'Cookie Active (pg_identity)' %>
+        </div>
+        <div class="session-note">
+          Mutations are session-isolated via HTTP cookie. Global datasets remain pristine.
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="nav-section">
+        <div class="nav-section-title">Documentation</div>
+        <a href="/" class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'overview') ? 'active' : '' %>">
+          <span>Overview</span>
+        </a>
+
+        <div class="nav-section-title" style="margin-top: 1rem;">API Resources</div>
+        <a href="/docs/users" class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'users') ? 'active' : '' %>">
+          <span>users</span>
+          <span class="nav-count">REST</span>
+        </a>
+        <a href="/docs/posts" class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'posts') ? 'active' : '' %>">
+          <span>posts</span>
+          <span class="nav-count">REST</span>
+        </a>
+        <a href="/docs/comments" class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'comments') ? 'active' : '' %>">
+          <span>comments</span>
+          <span class="nav-count">REST</span>
+        </a>
+        <a href="/docs/todos" class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'todos') ? 'active' : '' %>">
+          <span>todos</span>
+          <span class="nav-count">REST</span>
+        </a>
       </nav>
-    </div>
-  </header>
+    </aside>
 
-  <main class="main-content">
-    <%- body %>
-  </main>
+    <!-- Right Main Area -->
+    <main class="main-area">
+      <%- body %>
 
-  <footer class="footer">
-    <div class="footer-container">
-      <p>Playground API — A JSONPlaceholder-style REST API with per-identity sandboxed mutations.</p>
-    </div>
-  </footer>
+      <footer class="footer">
+        <p>Playground API — Built with Node.js, Express, Prisma ORM, and EJS.</p>
+      </footer>
+    </main>
+  </div>
 
   <script src="/public/js/try-it.js"></script>
 </body>

@@ -4,56 +4,159 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof title !== 'undefined' ? title : 'Playground API Documentation' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/public/css/docs.css">
 </head>
 <body>
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="/docs" class="nav-brand">Playground API</a>
-      <nav class="nav-links">
-        <a href="/docs/users" class="nav-link">users</a>
-        <a href="/docs/posts" class="nav-link">posts</a>
-        <a href="/docs/comments" class="nav-link">comments</a>
-        <a href="/docs/todos" class="nav-link">todos</a>
+  <div class="app-layout">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <a href="/" class="brand">
+        <div class="brand-icon">P</div>
+        <div>
+          <div class="brand-title">Playground API</div>
+        </div>
+        <span class="brand-version">v1.0</span>
+      </a>
+
+      <!-- Identity Session Card -->
+      <div class="session-card">
+        <div class="session-card-header">
+          <span>Identity Session</span>
+          <span class="status-dot"></span>
+        </div>
+        <div class="session-id">
+          <%= (typeof identityId !== 'undefined' && identityId) ? identityId : 'Cookie Active (pg_identity)' %>
+        </div>
+        <div class="session-note">
+          Mutations are session-isolated via HTTP cookie. Global database datasets remain pristine.
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="nav-section">
+        <div class="nav-section-title">Documentation</div>
+        <a href="/" class="nav-item active">
+          <span>Overview</span>
+        </a>
+
+        <div class="nav-section-title" style="margin-top: 1rem;">API Resources</div>
+        <a href="/docs/users" class="nav-item">
+          <span>users</span>
+          <span class="nav-count">REST</span>
+        </a>
+        <a href="/docs/posts" class="nav-item">
+          <span>posts</span>
+          <span class="nav-count">REST</span>
+        </a>
+        <a href="/docs/comments" class="nav-item">
+          <span>comments</span>
+          <span class="nav-count">REST</span>
+        </a>
+        <a href="/docs/todos" class="nav-item">
+          <span>todos</span>
+          <span class="nav-count">REST</span>
+        </a>
       </nav>
-    </div>
-  </header>
+    </aside>
 
-  <main class="main-content">
-    <div class="hero-section">
-      <h1>Playground API Documentation</h1>
-      <p class="hero-subtitle">
-        A JSONPlaceholder-style REST API with per-identity sandboxed mutations. 
-        Read operations merge shared global data with your session's creates, updates, and deletes.
-      </p>
-    </div>
+    <!-- Main Content Area -->
+    <main class="main-area">
+      <div class="hero">
+        <h1 class="hero-title">Developer API Documentation</h1>
+        <p class="hero-subtitle">
+          Welcome to Playground API — a JSONPlaceholder-style REST API with per-visitor sandboxed mutations overlaid on shared read-only global data.
+        </p>
+      </div>
 
-    <% if (typeof error !== 'undefined' && error) { %>
-      <div class="alert alert-error"><%= error %></div>
-    <% } %>
-
-    <% if (typeof info !== 'undefined' && info) { %>
-      <div class="alert alert-info"><%= info %></div>
-    <% } %>
-
-    <div class="resources-grid">
-      <% if (typeof resources !== 'undefined' && resources) { %>
-        <% resources.forEach(resource => { %>
-          <div class="resource-card">
-            <h2><a href="/docs/<%= resource %>">/<%= resource %></a></h2>
-            <p>Interactive REST API documentation and endpoints for <%= resource %>.</p>
-            <a href="/docs/<%= resource %>" class="btn btn-secondary">Explore <%= resource %> &rarr;</a>
-          </div>
-        <% }); %>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="example-box" style="margin-bottom: 1.5rem; border-color: var(--delete-badge);">
+          <h4 style="color: var(--delete-badge);"><%= error %></h4>
+        </div>
       <% } %>
-    </div>
-  </main>
 
-  <footer class="footer">
-    <div class="footer-container">
-      <p>Playground API — Built with Node.js, Express, Prisma, and EJS.</p>
-    </div>
-  </footer>
+      <% if (typeof info !== 'undefined' && info) { %>
+        <div class="example-box" style="margin-bottom: 1.5rem; border-color: var(--primary-accent);">
+          <h4 style="color: var(--primary-accent);"><%= info %></h4>
+        </div>
+      <% } %>
+
+      <!-- Architecture Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
+        <div class="endpoint-card" style="margin: 0;">
+          <div style="font-weight: 700; font-size: 1.1rem; color: var(--get-badge); margin-bottom: 0.5rem;">
+            🔄 Virtual Merging Engine
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            <code>GET</code> requests construct a virtual list merging global database records with your session's creates (on top), updates (in-place), and deletes.
+          </p>
+        </div>
+
+        <div class="endpoint-card" style="margin: 0;">
+          <div style="font-weight: 700; font-size: 1.1rem; color: var(--post-badge); margin-bottom: 0.5rem;">
+            🛡️ 30-Record Quota Cap
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Each identity session is allowed up to 30 self-created sandbox records per resource. Local records receive <code>local-&lt;uuid&gt;</code> formatted string IDs.
+          </p>
+        </div>
+
+        <div class="endpoint-card" style="margin: 0;">
+          <div style="font-weight: 700; font-size: 1.1rem; color: var(--put-badge); margin-bottom: 0.5rem;">
+            🔒 Cookie-Based Identity
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Identity is tied to the <code>pg_identity</code> HTTP-only cookie. IP addresses are hashed using SHA-256 strictly for rate limiting (60 req/min).
+          </p>
+        </div>
+      </div>
+
+      <!-- Quickstart Code Example -->
+      <div class="endpoint-card">
+        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Quickstart Code Snippet</h3>
+        <pre><code>// JavaScript Fetch Example with session credentials
+fetch('http://localhost:3000/users?page=1&limit=10', {
+  method: 'GET',
+  credentials: 'include' // Sends pg_identity cookie for sandbox overlay
+})
+  .then(res => res.json())
+  .then(data => console.log(data));</code></pre>
+      </div>
+
+      <!-- Available Resources Section -->
+      <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; margin-top: 2rem;">Available API Resources</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+        <% if (typeof resources !== 'undefined' && resources) { %>
+          <% resources.forEach(resName => { %>
+            <div class="endpoint-card" style="margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                  <span style="font-family: 'Fira Code', monospace; font-size: 1.2rem; font-weight: 700; color: var(--primary-accent);">
+                    /<%= resName %>
+                  </span>
+                  <span class="badge badge-get">REST</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                  Interactive endpoints and live tester for the <%= resName %> resource.
+                </p>
+              </div>
+              <div>
+                <a href="/docs/<%= resName %>" class="btn btn-primary" style="width: 100%;">
+                  Explore /<%= resName %> Docs &rarr;
+                </a>
+              </div>
+            </div>
+          <% }); %>
+        <% } %>
+      </div>
+
+      <footer class="footer">
+        <p>Playground API — Built with Node.js, Express, Prisma ORM, and EJS.</p>
+      </footer>
+    </main>
+  </div>
 
   <script src="/public/js/try-it.js"></script>
 </body>

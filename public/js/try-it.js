@@ -1,4 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // 1. Interactive Code Snippet Tabs & Copy Button
+  const snippetContainers = document.querySelectorAll('.snippet-container');
+
+  snippetContainers.forEach(container => {
+    const tabBtns = container.querySelectorAll('.snippet-tab-btn');
+    const codeBlocks = container.querySelectorAll('.snippet-code-block');
+    const copyBtn = container.querySelector('.copy-btn');
+
+    // Tab switcher
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-target');
+
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        codeBlocks.forEach(block => {
+          if (block.getAttribute('data-snippet') === target) {
+            block.hidden = false;
+          } else {
+            block.hidden = true;
+          }
+        });
+      });
+    });
+
+    // Copy to clipboard
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const visibleBlock = Array.from(codeBlocks).find(b => !b.hidden);
+        if (visibleBlock) {
+          const codeText = visibleBlock.textContent;
+          navigator.clipboard.writeText(codeText).then(() => {
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<span>✅ Copied!</span>';
+            setTimeout(() => {
+              copyBtn.innerHTML = originalText;
+            }, 2000);
+          }).catch(err => {
+            console.error('Copy error:', err);
+          });
+        }
+      });
+    }
+  });
+
+  // 2. Interactive Try It Request Tester
   const forms = document.querySelectorAll('.try-it__form');
 
   forms.forEach(form => {
@@ -12,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!resultBlock) return;
 
       resultBlock.hidden = false;
-      resultBlock.textContent = 'Executing request...';
+      resultBlock.textContent = '⏳ Executing request...';
 
       const pathInputs = form.querySelectorAll('input[data-param-in="path"]');
       const queryInputs = form.querySelectorAll('input[data-param-in="query"]');
@@ -78,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const response = await fetch(fullUrl, options);
-        const statusText = `Status: ${response.status} ${response.statusText}`;
+        const statusText = `HTTP Status: ${response.status} ${response.statusText}`;
 
         if (response.status === 204) {
           resultBlock.textContent = `${statusText}\n\n204 No Content`;

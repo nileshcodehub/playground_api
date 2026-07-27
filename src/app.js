@@ -43,25 +43,7 @@ app.use(generalLimiter);
 // Static file serving
 app.use('/public', express.static(path.join(rootDir, 'public')));
 
-// Root Endpoint
-app.get('/', (req, res) => {
-  res.json({
-    name: 'Playground API',
-    description: 'JSONPlaceholder-style mock REST API with per-identity sandboxed mutations',
-    version: '1.0.0',
-    documentation: '/docs',
-    resources: {
-      users: '/users',
-      posts: '/posts',
-      comments: '/comments',
-      todos: '/todos',
-      custom: '/custom (placeholder)'
-    },
-    identityId: req.identityId
-  });
-});
-
-// Resource API Routes
+// Resource API Routes (REST Data Endpoints)
 app.use('/users', makeResourceRouter('users'));
 app.use('/posts', makeResourceRouter('posts'));
 app.use('/comments', makeResourceRouter('comments'));
@@ -72,8 +54,8 @@ app.use('/custom', (req, res) => {
   res.json({ message: 'Custom resource placeholder. Logic will be added in future tasks.' });
 });
 
-// Hosted Documentation Routes
-app.use('/docs', docsRouter);
+// Hosted Developer Documentation Routes (Served directly at root / and /docs)
+app.use('/', docsRouter);
 
 // 404 Route Handler
 app.use((req, res, next) => {
