@@ -1,3 +1,5 @@
+import config from '../config/env.js';
+
 export class AppError extends Error {
   constructor(message, statusCode = 500) {
     super(message);
@@ -12,7 +14,7 @@ export const errorHandler = (err, req, res, next) => {
   const statusCode = err.statusCode || err.status || 500;
   const message = err.message || 'Internal Server Error';
 
-  if (process.env.NODE_ENV !== 'test') {
+  if (config.env !== 'test') {
     console.error(`[Error] ${req.method} ${req.originalUrl}: ${statusCode} - ${message}`);
     if (statusCode === 500 && err.stack) {
       console.error(err.stack);
@@ -21,6 +23,6 @@ export const errorHandler = (err, req, res, next) => {
 
   res.status(statusCode).json({
     error: message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    ...(config.isDevelopment && { stack: err.stack })
   });
 };
