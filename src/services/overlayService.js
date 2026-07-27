@@ -4,7 +4,8 @@ import { AppError } from '../middleware/errorHandler.js';
 
 export const MAX_USER_CREATED_RECORDS = 30;
 
-const GLOBAL_MODELS = {
+// Exported so other modules (e.g. docsRoutes.js) can reference it without duplication
+export const GLOBAL_MODELS = {
   users: 'usersGlobal',
   posts: 'postsGlobal',
   comments: 'commentsGlobal',
@@ -58,7 +59,8 @@ export const getVirtualList = async (identityId, resource) => {
     orderBy: { id: 'asc' }
   });
 
-  const { deletedIds, created } = await loadOverlay(identityId, resource);
+  const overlay = await loadOverlay(identityId, resource);
+  const { deletedIds, created } = overlay;
 
   const createdIds = created.map(item => item.id);
   const globalIds = globalRows
@@ -66,14 +68,17 @@ export const getVirtualList = async (identityId, resource) => {
     .filter(id => !deletedIds.has(id));
 
   // Virtual list order: created items top (newest first), then global items preserving DB order
-  return [...createdIds, ...globalIds];
+  // Also return the full overlay so callers can reuse it without a second DB query
+  return { virtualList: [...createdIds, ...globalIds], overlay };
 };
 
 export const getPaginatedResource = async (identityId, resource, { page = 1, limit = 10 } = {}) => {
   const pageNum = Math.max(1, parseInt(page, 10) || 1);
   const limitNum = Math.min(30, Math.max(1, parseInt(limit, 10) || 10));
 
-  const virtualList = await getVirtualList(identityId, resource);
+  // getVirtualList now returns both the ID list AND the overlay data so we
+  // don't need to call loadOverlay a second time (eliminates one DB round-trip)
+  const { virtualList, overlay } = await getVirtualList(identityId, resource);
   const total = virtualList.length;
   const totalPages = Math.ceil(total / limitNum) || 1;
 
@@ -94,7 +99,8 @@ export const getPaginatedResource = async (identityId, resource, { page = 1, lim
     };
   }
 
-  const { updatesById, created } = await loadOverlay(identityId, resource);
+  // Reuse overlay from getVirtualList — no second DB query needed
+  const { updatesById, created } = overlay;
   const createdMap = new Map(created.map(item => [item.id, item]));
 
   const globalIntIds = pageSliceIds

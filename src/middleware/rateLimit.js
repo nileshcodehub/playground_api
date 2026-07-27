@@ -1,7 +1,7 @@
-import { rateLimit } from 'express-rate-limit';
+import { rateLimit, ipKeyGenerator } from 'express-rate-limit';
 
-const keyGenerator = (req) => {
-  return req.ipHash || req.ip || '127.0.0.1';
+const keyGenerator = (req, res) => {
+  return req.ipHash || ipKeyGenerator(req, res);
 };
 
 export const generalLimiter = rateLimit({
@@ -10,6 +10,7 @@ export const generalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator,
+  validate: { keyGeneratorIpFallback: false },
   message: { error: 'Too many requests, please try again later.' }
 });
 
@@ -19,5 +20,7 @@ export const mutationLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator,
+  validate: { keyGeneratorIpFallback: false },
   message: { error: 'Mutation limit reached. You can only perform 15 mutations per hour.' }
 });
+

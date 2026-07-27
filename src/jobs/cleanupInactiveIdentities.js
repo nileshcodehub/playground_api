@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import prisma from '../db/prismaClient.js';
 
 export const scheduleCleanupJob = () => {
-  // Run every day at 3:00 AM
+  // Run every day at 3:00 AM IST
   cron.schedule('0 3 * * *', async () => {
     console.log('[Cron Job] Starting inactive identities cleanup...');
     try {
@@ -18,7 +18,7 @@ export const scheduleCleanupJob = () => {
     } catch (error) {
       console.error('[Cron Job] Error purging inactive identities:', error.message);
     }
-  });
+  }, { timezone: 'Asia/Kolkata' });
 
-  console.log('[Cron Job] Cleanup schedule initialized (0 3 * * *).');
+  console.log('[Cron Job] Cleanup schedule initialized (0 3 * * * IST).');
 };

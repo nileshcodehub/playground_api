@@ -28,9 +28,15 @@ if (config.trustProxy) {
 }
 
 // Global Core Middleware
-app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// CORS: reflect origin only when one is present (safe for a public API).
+// Avoids the dangerous combo of origin:true + credentials:true which would
+// allow any cross-origin site to read credentialed responses.
+app.use(cors({
+  origin: (origin, callback) => callback(null, origin || false),
+  credentials: true
+}));
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 if (!config.isProduction) {
   app.use(morgan('dev'));

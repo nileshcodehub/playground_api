@@ -23,6 +23,6 @@ export const errorHandler = (err, req, res, next) => {
 
   res.status(statusCode).json({
     error: message,
-    ...(config.isDevelopment && { stack: err.stack })
+    ...(!config.isProduction && { stack: err.stack })
   });
 };

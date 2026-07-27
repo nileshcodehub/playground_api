@@ -20,7 +20,7 @@ const server = app.listen(PORT, async () => {
 process.on('unhandledRejection', (err) => {
   console.error('UNHANDLED REJECTION! 💥 Logging error:');
   console.error(err);
-});1
+});
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION! 💥 Logging error:');

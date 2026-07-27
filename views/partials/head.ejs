@@ -12,10 +12,8 @@
 <!-- Canonical URL -->
 <link rel="canonical" href="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : 'http://localhost:3000/' %>" />
 
-<!-- Favicon & Touch Icons -->
+<!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/public/favicon.svg" />
-<link rel="icon" type="image/png" sizes="32x32" href="/public/favicon.png" />
-<link rel="apple-touch-icon" sizes="180x180" href="/public/apple-touch-icon.png" />
 <link rel="manifest" href="/public/site.webmanifest" />
 
 <!-- Open Graph / Facebook Meta Tags -->
@@ -23,14 +21,14 @@
 <meta property="og:url" content="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : 'http://localhost:3000/' %>" />
 <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'Playground API — Free Stateful Fake REST API' %>" />
 <meta property="og:description" content="<%= typeof metaDescription !== 'undefined' ? metaDescription : 'Free stateful fake REST API for prototyping and testing. Merges shared global datasets with per-identity sandbox overlays.' %>" />
-<meta property="og:image" content="/public/favicon.png" />
+<meta property="og:image" content="/public/favicon.svg" />
 <meta property="og:site_name" content="Playground API" />
 
 <!-- Twitter Card Meta Tags -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="<%= typeof title !== 'undefined' ? title : 'Playground API — Free Stateful Fake REST API' %>" />
 <meta name="twitter:description" content="<%= typeof metaDescription !== 'undefined' ? metaDescription : 'Free stateful fake REST API for prototyping and testing with live interactive request runner.' %>" />
-<meta name="twitter:image" content="/public/favicon.png" />
+<meta name="twitter:image" content="/public/favicon.svg" />
 
 <!-- Fonts and Styles -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,8 +43,8 @@
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "http://localhost:3000/#website",
-      "url": "http://localhost:3000/",
+      "@id": "<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl.replace(/\/[^/]*$/, '/') : '/' %>#website",
+      "url": "<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl.replace(/\/docs.*$/, '/') : '/' %>",
       "name": "Playground API",
       "description": "Free Stateful Fake REST API for Prototyping & Testing",
       "publisher": {
@@ -56,7 +54,7 @@
     },
     {
       "@type": "SoftwareApplication",
-      "@id": "http://localhost:3000/#application",
+      "@id": "<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl.replace(/\/docs.*$/, '/') : '/' %>#application",
       "name": "Playground API",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "All",

@@ -194,7 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusHeader = `HTTP ${response.status} ${response.statusText}`;
 
         if (response.status === 204) {
-          resultBlock.innerHTML = `<span class="status-badge-pill ${statusPillClass}">${statusHeader}</span>\n\n204 No Content (Record updated/deleted in session overlay)`;
+          resultBlock.textContent = '';
+          const badge = document.createElement('span');
+          badge.className = `status-badge-pill ${statusPillClass}`;
+          badge.textContent = statusHeader;
+          resultBlock.appendChild(badge);
+          resultBlock.appendChild(document.createTextNode('\n\n204 No Content (Record updated/deleted in session overlay)'));
           return;
         }
 
@@ -202,11 +207,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           data = await response.json();
-          resultBlock.innerHTML = `<span class="status-badge-pill ${statusPillClass}">${statusHeader}</span>\n\n${JSON.stringify(data, null, 2)}`;
         } else {
-          const text = await response.text();
-          resultBlock.innerHTML = `<span class="status-badge-pill ${statusPillClass}">${statusHeader}</span>\n\n${text}`;
+          data = await response.text();
         }
+        // Build output safely using DOM methods (no innerHTML with untrusted content)
+        resultBlock.textContent = '';
+        const badge = document.createElement('span');
+        badge.className = `status-badge-pill ${statusPillClass}`;
+        badge.textContent = statusHeader;
+        resultBlock.appendChild(badge);
+        const body = typeof data === 'object'
+          ? JSON.stringify(data, null, 2)
+          : String(data);
+        resultBlock.appendChild(document.createTextNode('\n\n' + body));
       } catch (err) {
         resultBlock.textContent = `❌ Network Error: ${err.message}`;
       }

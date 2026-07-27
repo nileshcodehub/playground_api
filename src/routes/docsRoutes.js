@@ -1,15 +1,15 @@
 import { Router } from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import prisma from '../db/prismaClient.js';
+import { GLOBAL_MODELS } from '../services/overlayService.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.resolve(__dirname, '../../public');
 
 const router = Router();
 export const RESOURCES = ['users', 'posts', 'comments', 'todos'];
-
-const GLOBAL_MODELS = {
-  users: 'usersGlobal',
-  posts: 'postsGlobal',
-  comments: 'commentsGlobal',
-  todos: 'todosGlobal'
-};
 
 // In-memory cache for sample records to eliminate database latency on page loads
 const sampleCache = new Map();
@@ -17,13 +17,13 @@ const sampleCache = new Map();
 // Robots.txt handler
 router.get('/robots.txt', (req, res) => {
   res.type('text/plain');
-  res.sendFile('robots.txt', { root: './public' });
+  res.sendFile('robots.txt', { root: publicDir });
 });
 
 // Sitemap.xml handler
 router.get('/sitemap.xml', (req, res) => {
   res.type('application/xml');
-  res.sendFile('sitemap.xml', { root: './public' });
+  res.sendFile('sitemap.xml', { root: publicDir });
 });
 
 // Documentation Hub Landing Page

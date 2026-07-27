@@ -8,6 +8,16 @@ const verifiedIdentitiesCache = new Map();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const UPDATE_THRESHOLD_MS = 10 * 60 * 1000; // Update last_seen_at in DB at most once every 10 mins
 
+// Periodically prune expired entries to prevent unbounded Map growth (memory leak fix)
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, entry] of verifiedIdentitiesCache) {
+    if (now - entry.verifiedAt > CACHE_TTL_MS) {
+      verifiedIdentitiesCache.delete(id);
+    }
+  }
+}, CACHE_TTL_MS);
+
 export const identityMiddleware = async (req, res, next) => {
   try {
     // Determine client IP safely
@@ -39,7 +49,9 @@ export const identityMiddleware = async (req, res, next) => {
           prisma.identities.update({
             where: { id: identityId },
             data: { last_seen_at: new Date(), ip_hash: ipHash }
-          }).catch(() => {});
+          }).catch((err) => {
+            console.warn('[Identity] Background last_seen_at update failed:', err.message);
+          });
         }
       } else {
         try {
@@ -53,10 +65,13 @@ export const identityMiddleware = async (req, res, next) => {
             prisma.identities.update({
               where: { id: identityId },
               data: { last_seen_at: new Date(), ip_hash: ipHash }
-            }).catch(() => {});
+            }).catch((err) => {
+              console.warn('[Identity] Background last_seen_at update failed:', err.message);
+            });
           }
         } catch (err) {
-          // DB unreachable fallback
+          // DB unreachable — log and fall through to create a new identity
+          console.warn('[Identity] DB error during identity lookup, will create new identity:', err.message);
         }
       }
     }
@@ -74,12 +89,14 @@ export const identityMiddleware = async (req, res, next) => {
           }
         }).catch(() => {});
       } catch (err) {
-        // DB unreachable fallback
+        // DB unreachable — identity lives in cache only for this session
+        console.warn('[Identity] DB error during identity creation, running in cache-only mode:', err.message);
       }
 
       res.cookie('pg_identity', identityId, {
         httpOnly: true,
         sameSite: 'lax',
+        secure: config.isProduction, // Only send over HTTPS in production
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
       });
     }
