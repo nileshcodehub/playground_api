@@ -27,8 +27,8 @@ router.get('/sitemap.xml', (req, res) => {
 });
 
 // Documentation Hub Landing Page
-router.get('/', (req, res) => {
-  res.render('docs-index', {
+router.get('/', (req, res, next) => {
+  const locals = {
     title: 'Playground API — Free Stateful Fake REST API for Prototyping & Testing',
     metaDescription: 'Playground API is a free stateful fake REST API for frontend prototyping & QA testing. Experience zero-config, session-isolated CRUD sandbox overlays on realistic mock data.',
     keywords: 'free fake rest api, mock api, jsonplaceholder alternative, sandbox rest api, frontend testing, mock data api, stateful mock api',
@@ -36,6 +36,14 @@ router.get('/', (req, res) => {
     resources: RESOURCES,
     currentNav: 'overview',
     identityId: req.identityId
+  };
+
+  res.render('docs-index', locals, (err, htmlContent) => {
+    if (err) return next(err);
+    res.render('layouts/base', {
+      ...locals,
+      body: htmlContent
+    });
   });
 });
 
