@@ -10,7 +10,21 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 30).' }
     ],
     bodyExample: null,
-    responseExample: JSON.stringify({ data: [{ id: 1, name: "User 1", username: "user_1" }], pagination: { page: 1, limit: 10, total: 26, totalPages: 3 } }, null, 2)
+    responseExample: JSON.stringify({
+      data: [
+        {
+          id: 1,
+          name: "Leanne Graham",
+          username: "bret",
+          email: "sincere@april.biz",
+          phone: "+1-770-555-0123",
+          website: "hildegard.org",
+          address: { street: "Kulas Light", city: "Gwenborough", zipcode: "92998-3874" },
+          company: { name: "Romaguera-Crona", catchPhrase: "Multi-layered client-server neural-net" }
+        }
+      ],
+      pagination: { page: 1, limit: 10, total: 25, totalPages: 3, hasNextPage: true, hasPrevPage: false }
+    }, null, 2)
   },
   {
     resource: 'users',
@@ -21,7 +35,16 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'id', in: 'path', type: 'string | integer', description: 'User ID (e.g. 1 for global user or local-<uuid> for sandbox user).' }
     ],
     bodyExample: null,
-    responseExample: JSON.stringify({ id: 1, name: "Leanne Graham", username: "Bret", email: "Sincere@april.biz" }, null, 2)
+    responseExample: JSON.stringify({
+      id: 1,
+      name: "Leanne Graham",
+      username: "bret",
+      email: "sincere@april.biz",
+      phone: "+1-770-555-0123",
+      website: "hildegard.org",
+      address: { street: "Kulas Light", city: "Gwenborough", zipcode: "92998-3874" },
+      company: { name: "Romaguera-Crona", catchPhrase: "Multi-layered client-server neural-net" }
+    }, null, 2)
   },
   {
     resource: 'users',
@@ -33,8 +56,26 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'username', in: 'body', type: 'string', description: 'Username.' },
       { name: 'email', in: 'body', type: 'string', description: 'Email address.' }
     ],
-    bodyExample: JSON.stringify({ name: "Jane Doe", username: "janedoe", email: "jane.doe@example.com" }, null, 2),
-    responseExample: JSON.stringify({ id: "local-a1b2c3d4-e5f6-7890-abcd-ef1234567890", name: "Jane Doe", username: "janedoe", email: "jane.doe@example.com", _sandbox: "created" }, null, 2)
+    bodyExample: JSON.stringify({
+      name: "Alexander Wright",
+      username: "alex_w",
+      email: "alexander.wright@techflow.io",
+      phone: "+1-415-555-0182",
+      website: "alexwright.dev",
+      address: { street: "Market St", city: "San Francisco", zipcode: "94103" },
+      company: { name: "TechFlow Labs", catchPhrase: "Distributed cloud infrastructure" }
+    }, null, 2),
+    responseExample: JSON.stringify({
+      id: "local-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      name: "Alexander Wright",
+      username: "alex_w",
+      email: "alexander.wright@techflow.io",
+      phone: "+1-415-555-0182",
+      website: "alexwright.dev",
+      address: { street: "Market St", city: "San Francisco", zipcode: "94103" },
+      company: { name: "TechFlow Labs", catchPhrase: "Distributed cloud infrastructure" },
+      _sandbox: "created"
+    }, null, 2)
   },
   {
     resource: 'users',
@@ -44,8 +85,20 @@ window.ALL_ENDPOINTS_CATALOG = [
     params: [
       { name: 'id', in: 'path', type: 'string | integer', description: 'User ID to update (e.g. 1 or local-<uuid>).' }
     ],
-    bodyExample: JSON.stringify({ name: "Jane Doe", username: "janedoe", email: "jane.doe@example.com" }, null, 2),
-    responseExample: JSON.stringify({ id: 1, name: "Jane Doe", username: "janedoe", email: "jane.doe@example.com", _sandbox: "updated" }, null, 2)
+    bodyExample: JSON.stringify({
+      name: "Leanne Graham (Updated)",
+      username: "bret",
+      email: "sincere@april.biz",
+      website: "hildegard-updated.org"
+    }, null, 2),
+    responseExample: JSON.stringify({
+      id: 1,
+      name: "Leanne Graham (Updated)",
+      username: "bret",
+      email: "sincere@april.biz",
+      website: "hildegard-updated.org",
+      _sandbox: "updated"
+    }, null, 2)
   },
   {
     resource: 'users',
@@ -55,8 +108,13 @@ window.ALL_ENDPOINTS_CATALOG = [
     params: [
       { name: 'id', in: 'path', type: 'string | integer', description: 'User ID to patch (e.g. 1 or local-<uuid>).' }
     ],
-    bodyExample: JSON.stringify({ name: "Jane Doe (Updated)" }, null, 2),
-    responseExample: JSON.stringify({ id: 1, name: "Jane Doe (Updated)", _sandbox: "updated" }, null, 2)
+    bodyExample: JSON.stringify({ website: "https://updated-portfolio.dev" }, null, 2),
+    responseExample: JSON.stringify({
+      id: 1,
+      name: "Leanne Graham",
+      website: "https://updated-portfolio.dev",
+      _sandbox: "updated"
+    }, null, 2)
   },
   {
     resource: 'users',
@@ -81,7 +139,17 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 30).' }
     ],
     bodyExample: null,
-    responseExample: JSON.stringify({ data: [{ id: 1, user_id: 1, title: "Post Title 1" }], pagination: { page: 1, limit: 10, total: 100 } }, null, 2)
+    responseExample: JSON.stringify({
+      data: [
+        {
+          id: 1,
+          user_id: 1,
+          title: "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+          body: "quia et suscipit suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto"
+        }
+      ],
+      pagination: { page: 1, limit: 10, total: 100, totalPages: 10, hasNextPage: true, hasPrevPage: false }
+    }, null, 2)
   },
   {
     resource: 'posts',
@@ -92,7 +160,12 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'id', in: 'path', type: 'string | integer', description: 'Post ID (e.g. 1 or local-<uuid>).' }
     ],
     bodyExample: null,
-    responseExample: JSON.stringify({ id: 1, user_id: 1, title: "Sample Post Title", body: "Post body content..." }, null, 2)
+    responseExample: JSON.stringify({
+      id: 1,
+      user_id: 1,
+      title: "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+      body: "quia et suscipit suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto"
+    }, null, 2)
   },
   {
     resource: 'posts',
@@ -104,8 +177,18 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'title', in: 'body', type: 'string', description: 'Post title.' },
       { name: 'body', in: 'body', type: 'string', description: 'Post body content.' }
     ],
-    bodyExample: JSON.stringify({ user_id: 1, title: "My New Post Title", body: "Detailed content body for the new post." }, null, 2),
-    responseExample: JSON.stringify({ id: "local-b2c3d4e5-f6a7-8901-bcde-f12345678901", user_id: 1, title: "My New Post Title", body: "Detailed content body for the new post.", _sandbox: "created" }, null, 2)
+    bodyExample: JSON.stringify({
+      user_id: 1,
+      title: "optimizing database indexing strategies for large scale applications",
+      body: "database indexing is one of the most critical factors in query performance. by creating proper B-tree and GIN indexes, read latency can drop from seconds to milliseconds during peak concurrency loads."
+    }, null, 2),
+    responseExample: JSON.stringify({
+      id: "local-b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      user_id: 1,
+      title: "optimizing database indexing strategies for large scale applications",
+      body: "database indexing is one of the most critical factors in query performance. by creating proper B-tree and GIN indexes, read latency can drop from seconds to milliseconds during peak concurrency loads.",
+      _sandbox: "created"
+    }, null, 2)
   },
   {
     resource: 'posts',
@@ -115,8 +198,18 @@ window.ALL_ENDPOINTS_CATALOG = [
     params: [
       { name: 'id', in: 'path', type: 'string | integer', description: 'Post ID to update (e.g. 1 or local-<uuid>).' }
     ],
-    bodyExample: JSON.stringify({ user_id: 1, title: "Updated Post Title", body: "Updated body content." }, null, 2),
-    responseExample: JSON.stringify({ id: 1, user_id: 1, title: "Updated Post Title", body: "Updated body content.", _sandbox: "updated" }, null, 2)
+    bodyExample: JSON.stringify({
+      user_id: 1,
+      title: "sunt aut facere repellat provident occaecati (Updated)",
+      body: "quia et suscipit suscipit recusandae consequuntur expedita..."
+    }, null, 2),
+    responseExample: JSON.stringify({
+      id: 1,
+      user_id: 1,
+      title: "sunt aut facere repellat provident occaecati (Updated)",
+      body: "quia et suscipit suscipit recusandae consequuntur expedita...",
+      _sandbox: "updated"
+    }, null, 2)
   },
   {
     resource: 'posts',
@@ -126,8 +219,12 @@ window.ALL_ENDPOINTS_CATALOG = [
     params: [
       { name: 'id', in: 'path', type: 'string | integer', description: 'Post ID to patch (e.g. 1 or local-<uuid>).' }
     ],
-    bodyExample: JSON.stringify({ title: "Updated Post Title" }, null, 2),
-    responseExample: JSON.stringify({ id: 1, title: "Updated Post Title", _sandbox: "updated" }, null, 2)
+    bodyExample: JSON.stringify({ title: "sunt aut facere (Patched)" }, null, 2),
+    responseExample: JSON.stringify({
+      id: 1,
+      title: "sunt aut facere (Patched)",
+      _sandbox: "updated"
+    }, null, 2)
   },
   {
     resource: 'posts',
@@ -152,7 +249,18 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 30).' }
     ],
     bodyExample: null,
-    responseExample: JSON.stringify({ data: [{ id: 1, post_id: 1, name: "Comment Title 1" }], pagination: { page: 1, limit: 10, total: 500 } }, null, 2)
+    responseExample: JSON.stringify({
+      data: [
+        {
+          id: 1,
+          post_id: 1,
+          name: "id labore ex et quam laborum",
+          email: "Eliseo@gardner.biz",
+          body: "laudantium enim quasi est quidem magnam voluptatem aut eveniet quas aliquid sint expedita consequuntur alias ea quam expedita possimus"
+        }
+      ],
+      pagination: { page: 1, limit: 10, total: 300, totalPages: 30, hasNextPage: true, hasPrevPage: false }
+    }, null, 2)
   },
   {
     resource: 'comments',
@@ -163,7 +271,13 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'id', in: 'path', type: 'string | integer', description: 'Comment ID (e.g. 1 or local-<uuid>).' }
     ],
     bodyExample: null,
-    responseExample: JSON.stringify({ id: 1, post_id: 1, name: "id labore ex et quam laborum", email: "Eliseo@gardner.biz", body: "laudantium enim quasi est quidem magnam voluptatem" }, null, 2)
+    responseExample: JSON.stringify({
+      id: 1,
+      post_id: 1,
+      name: "id labore ex et quam laborum",
+      email: "Eliseo@gardner.biz",
+      body: "laudantium enim quasi est quidem magnam voluptatem aut eveniet quas aliquid sint expedita consequuntur alias ea quam expedita possimus"
+    }, null, 2)
   },
   {
     resource: 'comments',
@@ -176,8 +290,20 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'email', in: 'body', type: 'string', description: 'Author email address.' },
       { name: 'body', in: 'body', type: 'string', description: 'Comment text content.' }
     ],
-    bodyExample: JSON.stringify({ post_id: 1, name: "Great post!", email: "reader@example.com", body: "Loved reading this article." }, null, 2),
-    responseExample: JSON.stringify({ id: "local-c3d4e5f6-7890-abcd-ef12-345678901234", post_id: 1, name: "Great post!", email: "reader@example.com", body: "Loved reading this article.", _sandbox: "created" }, null, 2)
+    bodyExample: JSON.stringify({
+      post_id: 1,
+      name: "super helpful post on JWT security",
+      email: "dev_reviewer@tech.net",
+      body: "This article helped our team fix an identity cookie validation issue in production. Thanks for sharing these clear code snippets!"
+    }, null, 2),
+    responseExample: JSON.stringify({
+      id: "local-c3d4e5f6-7890-abcd-ef12-345678901234",
+      post_id: 1,
+      name: "super helpful post on JWT security",
+      email: "dev_reviewer@tech.net",
+      body: "This article helped our team fix an identity cookie validation issue in production. Thanks for sharing these clear code snippets!",
+      _sandbox: "created"
+    }, null, 2)
   },
   {
     resource: 'comments',
@@ -187,8 +313,20 @@ window.ALL_ENDPOINTS_CATALOG = [
     params: [
       { name: 'id', in: 'path', type: 'string | integer', description: 'Comment ID to update (e.g. 1 or local-<uuid>).' }
     ],
-    bodyExample: JSON.stringify({ post_id: 1, name: "Updated comment title", email: "reader@example.com", body: "Updated comment text." }, null, 2),
-    responseExample: JSON.stringify({ id: 1, post_id: 1, name: "Updated comment title", email: "reader@example.com", body: "Updated comment text.", _sandbox: "updated" }, null, 2)
+    bodyExample: JSON.stringify({
+      post_id: 1,
+      name: "id labore ex et quam laborum (Updated)",
+      email: "Eliseo@gardner.biz",
+      body: "Updated comment text body content."
+    }, null, 2),
+    responseExample: JSON.stringify({
+      id: 1,
+      post_id: 1,
+      name: "id labore ex et quam laborum (Updated)",
+      email: "Eliseo@gardner.biz",
+      body: "Updated comment text body content.",
+      _sandbox: "updated"
+    }, null, 2)
   },
   {
     resource: 'comments',
@@ -198,8 +336,12 @@ window.ALL_ENDPOINTS_CATALOG = [
     params: [
       { name: 'id', in: 'path', type: 'string | integer', description: 'Comment ID to patch (e.g. 1 or local-<uuid>).' }
     ],
-    bodyExample: JSON.stringify({ body: "Partially updated comment text." }, null, 2),
-    responseExample: JSON.stringify({ id: 1, body: "Partially updated comment text.", _sandbox: "updated" }, null, 2)
+    bodyExample: JSON.stringify({ body: "Partially updated comment text body content." }, null, 2),
+    responseExample: JSON.stringify({
+      id: 1,
+      body: "Partially updated comment text body content.",
+      _sandbox: "updated"
+    }, null, 2)
   },
   {
     resource: 'comments',
@@ -224,7 +366,12 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 30).' }
     ],
     bodyExample: null,
-    responseExample: JSON.stringify({ data: [{ id: 1, user_id: 1, title: "delectus aut autem", completed: false }], pagination: { page: 1, limit: 10, total: 200 } }, null, 2)
+    responseExample: JSON.stringify({
+      data: [
+        { id: 1, user_id: 1, title: "delectus aut autem", completed: false }
+      ],
+      pagination: { page: 1, limit: 10, total: 125, totalPages: 13, hasNextPage: true, hasPrevPage: false }
+    }, null, 2)
   },
   {
     resource: 'todos',
@@ -247,8 +394,18 @@ window.ALL_ENDPOINTS_CATALOG = [
       { name: 'title', in: 'body', type: 'string', description: 'Todo item title.' },
       { name: 'completed', in: 'body', type: 'boolean', description: 'Completion status (true/false).' }
     ],
-    bodyExample: JSON.stringify({ user_id: 1, title: "Complete API testing", completed: false }, null, 2),
-    responseExample: JSON.stringify({ id: "local-d4e5f6a7-8901-bcde-f123-456789012345", user_id: 1, title: "Complete API testing", completed: false, _sandbox: "created" }, null, 2)
+    bodyExample: JSON.stringify({
+      user_id: 1,
+      title: "Review and merge pull request #142 for identity middleware",
+      completed: true
+    }, null, 2),
+    responseExample: JSON.stringify({
+      id: "local-d4e5f6a7-8901-bcde-f123-456789012345",
+      user_id: 1,
+      title: "Review and merge pull request #142 for identity middleware",
+      completed: true,
+      _sandbox: "created"
+    }, null, 2)
   },
   {
     resource: 'todos',
@@ -258,8 +415,8 @@ window.ALL_ENDPOINTS_CATALOG = [
     params: [
       { name: 'id', in: 'path', type: 'string | integer', description: 'Todo ID to update (e.g. 1 or local-<uuid>).' }
     ],
-    bodyExample: JSON.stringify({ user_id: 1, title: "Complete API testing", completed: true }, null, 2),
-    responseExample: JSON.stringify({ id: 1, user_id: 1, title: "Complete API testing", completed: true, _sandbox: "updated" }, null, 2)
+    bodyExample: JSON.stringify({ user_id: 1, title: "delectus aut autem", completed: true }, null, 2),
+    responseExample: JSON.stringify({ id: 1, user_id: 1, title: "delectus aut autem", completed: true, _sandbox: "updated" }, null, 2)
   },
   {
     resource: 'todos',

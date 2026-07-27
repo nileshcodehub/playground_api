@@ -1,5 +1,12 @@
 import prisma from './prismaClient.js';
 import { initDb } from './initDb.js';
+import {
+  REALISTIC_USERS,
+  REALISTIC_POST_TITLES,
+  REALISTIC_POST_BODIES,
+  REALISTIC_COMMENT_ENTRIES,
+  REALISTIC_TODOS
+} from './seedData.js';
 
 export async function seedDatabase() {
   console.log('Initializing database schema and seeding global datasets via Prisma...');
@@ -12,63 +19,66 @@ export async function seedDatabase() {
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE "users_global", "posts_global", "comments_global", "todos_global" RESTART IDENTITY CASCADE;`).catch(() => {});
 
     // Seed Users (25 users)
-    const usersData = Array.from({ length: 25 }).map((_, i) => ({
-      name: `User ${i + 1}`,
-      username: `user_${i + 1}`,
-      email: `user${i + 1}@example.com`,
-      phone: `+1-555-010${(i + 1).toString().padStart(2, '0')}`,
-      website: `https://user${i + 1}.dev`,
-      address: { street: `${i + 1} Main St`, city: 'Metro City', zipcode: '10001' },
-      company: { name: `Tech Corp ${i + 1}`, catchPhrase: 'Innovative solutions for all' }
-    }));
-
+    const usersData = REALISTIC_USERS;
     await prisma.usersGlobal.createMany({ data: usersData });
-    console.log('Seeded 25 global users.');
+    console.log('Seeded 25 global users with genuine data.');
 
     // Seed Posts (4 posts per user = 100 posts)
     const postsData = [];
+    let titleIdx = 0;
+    let bodyIdx = 0;
     for (let u = 1; u <= 25; u++) {
       for (let p = 1; p <= 4; p++) {
+        const title = REALISTIC_POST_TITLES[titleIdx % REALISTIC_POST_TITLES.length];
+        const body = REALISTIC_POST_BODIES[bodyIdx % REALISTIC_POST_BODIES.length];
         postsData.push({
           user_id: u,
-          title: `Post ${p} by User ${u}`,
-          body: `This is the body content of sample post #${p} written by user #${u} on Playground API.`
+          title: p === 1 ? title : `${title} (Part ${p})`,
+          body
         });
+        titleIdx++;
+        bodyIdx++;
       }
     }
     await prisma.postsGlobal.createMany({ data: postsData });
-    console.log('Seeded 100 global posts.');
+    console.log('Seeded 100 global posts with genuine content.');
 
     // Seed Comments (3 comments per post = 300 comments)
     const commentsData = [];
+    let commentIdx = 0;
     for (let postId = 1; postId <= 100; postId++) {
       for (let c = 1; c <= 3; c++) {
+        const template = REALISTIC_COMMENT_ENTRIES[commentIdx % REALISTIC_COMMENT_ENTRIES.length];
         commentsData.push({
           post_id: postId,
-          name: `Commenter ${c} on post ${postId}`,
-          email: `commenter${c}_post${postId}@example.com`,
-          body: `Insightful comment #${c} on post #${postId}.`
+          name: template.name,
+          email: template.email,
+          body: template.body
         });
+        commentIdx++;
       }
     }
     await prisma.commentsGlobal.createMany({ data: commentsData });
-    console.log('Seeded 300 global comments.');
+    console.log('Seeded 300 global comments with genuine data.');
 
     // Seed Todos (5 todos per user = 125 todos)
     const todosData = [];
+    let todoIdx = 0;
     for (let u = 1; u <= 25; u++) {
       for (let t = 1; t <= 5; t++) {
+        const template = REALISTIC_TODOS[todoIdx % REALISTIC_TODOS.length];
         todosData.push({
           user_id: u,
-          title: `Task #${t} for user #${u}`,
-          completed: t % 2 === 0
+          title: template.title,
+          completed: template.completed
         });
+        todoIdx++;
       }
     }
     await prisma.todosGlobal.createMany({ data: todosData });
-    console.log('Seeded 125 global todos.');
+    console.log('Seeded 125 global todos with genuine data.');
 
-    console.log('Database seeding complete successfully!');
+    console.log('Database seeding completed successfully with genuine data!');
   } catch (error) {
     console.error('Error during seeding:', error.message);
   } finally {
@@ -76,6 +86,6 @@ export async function seedDatabase() {
   }
 }
 
-if (process.argv[1].endsWith('seed.js')) {
+if (process.argv[1] && process.argv[1].endsWith('seed.js')) {
   seedDatabase();
 }

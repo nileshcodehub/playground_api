@@ -2,6 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import prisma from './prismaClient.js';
+import {
+  REALISTIC_USERS,
+  REALISTIC_POST_TITLES,
+  REALISTIC_POST_BODIES,
+  REALISTIC_COMMENT_ENTRIES,
+  REALISTIC_TODOS
+} from './seedData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,63 +85,71 @@ export async function initDb() {
     }
   }
 
-  // Auto-seed baseline global data if database is empty
+  // Auto-seed baseline global data if database is empty or contains old dummy data ("User 1")
   try {
-    const userCount = await prisma.usersGlobal.count();
-    if (userCount === 0) {
-      console.log('[Database Init] Global tables are empty. Auto-seeding base data...');
-      
-      const usersData = Array.from({ length: 25 }).map((_, i) => ({
-        name: `User ${i + 1}`,
-        username: `user_${i + 1}`,
-        email: `user${i + 1}@example.com`,
-        phone: `+1-555-010${(i + 1).toString().padStart(2, '0')}`,
-        website: `https://user${i + 1}.dev`,
-        address: { street: `${i + 1} Main St`, city: 'Metro City', zipcode: '10001' },
-        company: { name: `Tech Corp ${i + 1}`, catchPhrase: 'Innovative solutions for all' }
-      }));
+    const firstUser = await prisma.usersGlobal.findFirst();
+    const isDummyData = !firstUser || (firstUser.name && firstUser.name.startsWith('User '));
+
+    if (isDummyData) {
+      console.log('[Database Init] Old dummy data or empty database detected. Truncating & re-seeding NeonDB with genuine data...');
+      await prisma.$executeRawUnsafe(`TRUNCATE TABLE "users_global", "posts_global", "comments_global", "todos_global" RESTART IDENTITY CASCADE;`).catch(() => {});
+
+      const usersData = REALISTIC_USERS;
       await prisma.usersGlobal.createMany({ data: usersData });
 
       const postsData = [];
+      let titleIdx = 0;
+      let bodyIdx = 0;
       for (let u = 1; u <= 25; u++) {
         for (let p = 1; p <= 4; p++) {
+          const title = REALISTIC_POST_TITLES[titleIdx % REALISTIC_POST_TITLES.length];
+          const body = REALISTIC_POST_BODIES[bodyIdx % REALISTIC_POST_BODIES.length];
           postsData.push({
             user_id: u,
-            title: `Post ${p} by User ${u}`,
-            body: `This is the body content of sample post #${p} written by user #${u} on Playground API.`
+            title: p === 1 ? title : `${title} (Part ${p})`,
+            body
           });
+          titleIdx++;
+          bodyIdx++;
         }
       }
       await prisma.postsGlobal.createMany({ data: postsData });
 
       const commentsData = [];
+      let commentIdx = 0;
       for (let postId = 1; postId <= 100; postId++) {
         for (let c = 1; c <= 3; c++) {
+          const template = REALISTIC_COMMENT_ENTRIES[commentIdx % REALISTIC_COMMENT_ENTRIES.length];
           commentsData.push({
             post_id: postId,
-            name: `Commenter ${c} on post ${postId}`,
-            email: `commenter${c}_post${postId}@example.com`,
-            body: `Insightful comment #${c} on post #${postId}.`
+            name: template.name,
+            email: template.email,
+            body: template.body
           });
+          commentIdx++;
         }
       }
       await prisma.commentsGlobal.createMany({ data: commentsData });
 
       const todosData = [];
+      let todoIdx = 0;
       for (let u = 1; u <= 25; u++) {
         for (let t = 1; t <= 5; t++) {
+          const template = REALISTIC_TODOS[todoIdx % REALISTIC_TODOS.length];
           todosData.push({
             user_id: u,
-            title: `Task #${t} for user #${u}`,
-            completed: t % 2 === 0
+            title: template.title,
+            completed: template.completed
           });
+          todoIdx++;
         }
       }
       await prisma.todosGlobal.createMany({ data: todosData });
 
-      console.log('[Database Init] Auto-seeding complete! 25 users, 100 posts, 300 comments, 125 todos created.');
+      console.log('[Database Init] Auto-seeding complete! 25 users, 100 posts, 300 comments, 125 todos created with genuine content.');
     } else {
-      console.log(`[Database Init] Found ${userCount} existing global users in database.`);
+      const userCount = await prisma.usersGlobal.count();
+      console.log(`[Database Init] Found ${userCount} existing genuine global users in NeonDB.`);
     }
   } catch (seedErr) {
     console.error('[Database Init Error] Auto-seeding failed:', seedErr.message);
