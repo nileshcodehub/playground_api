@@ -5,12 +5,11 @@ let dbInitialized = false;
 
 export default async function handler(req, res) {
   if (!dbInitialized) {
-    try {
-      await initDb();
-      dbInitialized = true;
-    } catch (err) {
+    dbInitialized = true;
+    // Run DB schema check asynchronously in background so cold starts respond immediately
+    initDb().catch((err) => {
       console.warn('[Vercel Init DB Warning]:', err.message);
-    }
+    });
   }
   return app(req, res);
 }
