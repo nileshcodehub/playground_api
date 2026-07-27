@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Comments API Documentation' %></title>
+  <link rel="stylesheet" href="/public/css/docs.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/docs" class="nav-brand">Playground API</a>
+      <nav class="nav-links">
+        <a href="/docs/users" class="nav-link">users</a>
+        <a href="/docs/posts" class="nav-link">posts</a>
+        <a href="/docs/comments" class="nav-link active">comments</a>
+        <a href="/docs/todos" class="nav-link">todos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="hero-section">
+      <h1>Comments Resource Documentation</h1>
+      <p class="hero-subtitle">
+        Read operations merge shared global comments with your session's overlay (creates on top, deletes removed, updates in-place).
+        Each comment belongs to a post (`post_id` foreign key). Mutations are session-scoped and capped at 30 created records.
+      </p>
+    </div>
+
+    <% 
+      const fallbackComment = {
+        id: 1,
+        post_id: 1,
+        name: "Commenter 1 on post 1",
+        email: "commenter1_post1@example.com",
+        body: "Insightful comment #1 on post #1."
+      };
+
+      const realComment = (typeof sampleRecord !== 'undefined' && sampleRecord) ? sampleRecord : fallbackComment;
+      const sampleCommentResponse = JSON.stringify(realComment, null, 2);
+
+      const sampleCommentPayload = JSON.stringify({
+        post_id: realComment.post_id || 1,
+        name: realComment.name || "Alice Smith",
+        email: realComment.email || "alice@example.com",
+        body: realComment.body || "Great post! Really enjoyed reading this analysis."
+      }, null, 2);
+
+      const sampleCreatedCommentResponse = JSON.stringify({
+        id: "local-c3d4e5f6-a7b8-9012-cdef-123456789012",
+        post_id: realComment.post_id || 1,
+        name: realComment.name || "Alice Smith",
+        email: realComment.email || "alice@example.com",
+        body: realComment.body || "Great post! Really enjoyed reading this analysis.",
+        _sandbox: "created"
+      }, null, 2);
+
+      const samplePatchPayload = JSON.stringify({
+        body: `${realComment.body} (Updated)`
+      }, null, 2);
+
+      const sampleUpdatedCommentResponse = JSON.stringify({
+        ...realComment,
+        body: `${realComment.body} (Updated)`,
+        _sandbox: "updated"
+      }, null, 2);
+
+      const samplePaginatedResponse = JSON.stringify({
+        data: [
+          JSON.parse(sampleCreatedCommentResponse),
+          realComment
+        ],
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 301,
+          totalPages: 31,
+          hasNextPage: true,
+          hasPrevPage: false
+        }
+      }, null, 2);
+
+      const endpoints = [
+        {
+          method: "GET",
+          path: "/comments",
+          summary: "Retrieve a paginated list of comments. Results merge shared global comments with session sandbox overlays.",
+          params: [
+            { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
+            { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." }
+          ],
+          bodyExample: null,
+          responseExample: samplePaginatedResponse
+        },
+        {
+          method: "GET",
+          path: "/comments/:id",
+          summary: `Retrieve a single comment by ID. Supports plain integer IDs for global records (e.g. ${realComment.id}) and string IDs formatted as local-<uuid> for session sandbox records.`,
+          params: [
+            { name: "id", in: "path", type: "string | integer", description: `Comment ID (e.g. ${realComment.id} for global comment or local-<uuid> for sandbox comment).` }
+          ],
+          bodyExample: null,
+          responseExample: sampleCommentResponse
+        },
+        {
+          method: "POST",
+          path: "/comments",
+          summary: "Create a new session sandbox comment record. Returns a local-<uuid> formatted ID with _sandbox: 'created'. Each session identity is capped at 30 created records.",
+          params: [
+            { name: "post_id", in: "body", type: "integer", description: "Target post ID." },
+            { name: "name", in: "body", type: "string", description: "Commenter name." },
+            { name: "email", in: "body", type: "string", description: "Commenter email." },
+            { name: "body", in: "body", type: "string", description: "Comment text content." }
+          ],
+          bodyExample: sampleCommentPayload,
+          responseExample: sampleCreatedCommentResponse
+        },
+        {
+          method: "PUT",
+          path: "/comments/:id",
+          summary: "Replace an existing comment record in the session overlay. Global records remain untouched for other visitors and preserve original list position.",
+          params: [
+            { name: "id", in: "path", type: "string | integer", description: `Comment ID to update (e.g. ${realComment.id} or local-<uuid>).` }
+          ],
+          bodyExample: sampleCommentPayload,
+          responseExample: sampleUpdatedCommentResponse
+        },
+        {
+          method: "PATCH",
+          path: "/comments/:id",
+          summary: "Partially update specific fields of a comment record in the session overlay.",
+          params: [
+            { name: "id", in: "path", type: "string | integer", description: `Comment ID to patch (e.g. ${realComment.id} or local-<uuid>).` }
+          ],
+          bodyExample: samplePatchPayload,
+          responseExample: sampleUpdatedCommentResponse
+        },
+        {
+          method: "DELETE",
+          path: "/comments/:id",
+          summary: "Remove a comment record from the requesting session view. The underlying global record is unaffected for other visitors.",
+          params: [
+            { name: "id", in: "path", type: "string | integer", description: `Comment ID to delete (e.g. ${realComment.id} or local-<uuid>).` }
+          ],
+          bodyExample: null,
+          responseExample: "204 No Content"
+        }
+      ];
+    %>
+
+    <% endpoints.forEach(ep => { %>
+      <%- include('partials/endpoint', { 
+        method: ep.method, 
+        path: ep.path, 
+        summary: ep.summary, 
+        params: ep.params, 
+        bodyExample: ep.bodyExample, 
+        responseExample: ep.responseExample 
+      }) %>
+    <% }); %>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <p>Playground API — Comments Resource Documentation</p>
+    </div>
+  </footer>
+
+  <script src="/public/js/try-it.js"></script>
+</body>
+</html>

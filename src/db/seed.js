@@ -1,9 +1,13 @@
 import prisma from './prismaClient.js';
+import { initDb } from './initDb.js';
 
 export async function seedDatabase() {
-  console.log('Seeding Playground API global datasets via Prisma...');
+  console.log('Initializing database schema and seeding global datasets via Prisma...');
 
   try {
+    // Ensure all tables exist in database
+    await initDb();
+
     // Truncate existing global tables
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE "users_global", "posts_global", "comments_global", "todos_global" RESTART IDENTITY CASCADE;`).catch(() => {});
 
