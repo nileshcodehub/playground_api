@@ -38,8 +38,8 @@ describe('App & Core Routes', () => {
     const response = await fetch(`${baseUrl}/non-existent-route`);
     assert.equal(response.status, 404);
     const json = await response.json();
-    assert.equal(json.status, 'fail');
-    assert.match(json.message, /Cannot find \/non-existent-route/);
+    assert.ok(json.error);
+    assert.match(json.error, /Cannot find \/non-existent-route/);
   });
 
   test('Sets identity cookie pg_identity on initial request', async () => {
