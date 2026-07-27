@@ -8,6 +8,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/public/css/docs.css">
+  <script>
+    (function() {
+      var t = localStorage.getItem('playground_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
   <div class="app-layout">
@@ -20,6 +26,15 @@
         </div>
         <span class="brand-version">v1.0</span>
       </a>
+
+      <!-- Theme Switcher Controller -->
+      <div class="theme-controller">
+        <span class="theme-label">Theme</span>
+        <div class="theme-toggle-group">
+          <button type="button" class="theme-btn" data-theme-val="dark" title="Dark Obsidian">🌙 Dark</button>
+          <button type="button" class="theme-btn" data-theme-val="light" title="Light Mode">☀️ Light</button>
+        </div>
+      </div>
 
       <!-- Identity Session Card -->
       <div class="session-card">
@@ -153,7 +168,7 @@ fetch('http://localhost:3000/users?page=1&limit=10', {
       </div>
 
       <footer class="footer">
-        <p>Playground API — Built with Node.js, Express, Prisma ORM, and EJS.</p>
+        <p>Playground API — Built with 💖 by Nilesh Kumar.</p>
       </footer>
     </main>
   </div>

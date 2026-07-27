@@ -25,10 +25,15 @@
     : `import requests\n\npayload = ${sampleBodyStr || '{}'}\nresponse = requests.${method.toLowerCase()}('http://localhost:3000${path}', json=payload)\nprint(response.json())`;
 %>
 
-<div class="endpoint-card">
+<div class="endpoint-card" data-endpoint-text="<%= method %> <%= path %> <%= summary %>">
   <div class="endpoint-header">
-    <span class="badge badge-<%= method.toLowerCase() %>"><%= method %></span>
-    <span class="endpoint-path"><%= path %></span>
+    <div class="endpoint-header-left">
+      <span class="badge badge-<%= method.toLowerCase() %>"><%= method %></span>
+      <span class="endpoint-path"><%= path %></span>
+    </div>
+    <button type="button" class="copy-url-btn" data-url="http://localhost:3000<%= path %>">
+      <span>🔗 Copy URL</span>
+    </button>
   </div>
 
   <p class="endpoint-summary"><%= summary %></p>

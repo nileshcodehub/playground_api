@@ -1,5 +1,74 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Interactive Code Snippet Tabs & Copy Button
+  // 0. Theme Controller Switcher
+  const themeBtns = document.querySelectorAll('.theme-btn');
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+
+  themeBtns.forEach(btn => {
+    if (btn.getAttribute('data-theme-val') === currentTheme) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+
+    btn.addEventListener('click', () => {
+      const selectedTheme = btn.getAttribute('data-theme-val');
+      document.documentElement.setAttribute('data-theme', selectedTheme);
+      localStorage.setItem('playground_theme', selectedTheme);
+
+      themeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // 1. Live Sidebar Search Filter
+  const searchInput = document.getElementById('sidebar-search');
+  const endpointCards = document.querySelectorAll('.endpoint-card');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+
+      // Filter endpoint cards
+      endpointCards.forEach(card => {
+        const text = card.getAttribute('data-endpoint-text') || card.textContent;
+        if (text.toLowerCase().includes(query)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Filter nav items
+      navItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(query) || query === '') {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // 2. Copy Endpoint URL Button
+  const copyUrlBtns = document.querySelectorAll('.copy-url-btn');
+  copyUrlBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const url = btn.getAttribute('data-url');
+      if (url) {
+        navigator.clipboard.writeText(url).then(() => {
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<span>✅ Copied URL!</span>';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+          }, 2000);
+        }).catch(err => console.error('Copy URL error:', err));
+      }
+    });
+  });
+
+  // 3. Interactive Code Snippet Tabs & Copy Button
   const snippetContainers = document.querySelectorAll('.snippet-container');
 
   snippetContainers.forEach(container => {
@@ -7,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const codeBlocks = container.querySelectorAll('.snippet-code-block');
     const copyBtn = container.querySelector('.copy-btn');
 
-    // Tab switcher
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const target = btn.getAttribute('data-target');
@@ -25,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Copy to clipboard
     if (copyBtn) {
       copyBtn.addEventListener('click', () => {
         const visibleBlock = Array.from(codeBlocks).find(b => !b.hidden);
@@ -37,15 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
               copyBtn.innerHTML = originalText;
             }, 2000);
-          }).catch(err => {
-            console.error('Copy error:', err);
-          });
+          }).catch(err => console.error('Copy error:', err));
         }
       });
     }
   });
 
-  // 2. Interactive Try It Request Tester
+  // 4. Interactive Try It Request Tester with HTTP Status Badges
   const forms = document.querySelectorAll('.try-it__form');
 
   forms.forEach(form => {
@@ -79,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (missingPathParam && pathTemplate.includes(':')) {
-        resultBlock.textContent = 'Error: Please provide values for all path parameters.';
+        resultBlock.textContent = '❌ Error: Please provide values for all path parameters.';
         return;
       }
 
@@ -104,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
           try {
             requestBody = JSON.parse(bodyText);
           } catch (err) {
-            resultBlock.textContent = `JSON Parse Error: Invalid request body JSON.\n${err.message}`;
+            resultBlock.textContent = `❌ JSON Parse Error: Invalid request body JSON.\n${err.message}`;
             return;
           }
         }
@@ -125,10 +190,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const response = await fetch(fullUrl, options);
-        const statusText = `HTTP Status: ${response.status} ${response.statusText}`;
+        const statusPillClass = response.ok ? 'status-2xx' : 'status-4xx';
+        const statusHeader = `HTTP ${response.status} ${response.statusText}`;
 
         if (response.status === 204) {
-          resultBlock.textContent = `${statusText}\n\n204 No Content`;
+          resultBlock.innerHTML = `<span class="status-badge-pill ${statusPillClass}">${statusHeader}</span>\n\n204 No Content (Record updated/deleted in session overlay)`;
           return;
         }
 
@@ -136,13 +202,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           data = await response.json();
-          resultBlock.textContent = `${statusText}\n\n${JSON.stringify(data, null, 2)}`;
+          resultBlock.innerHTML = `<span class="status-badge-pill ${statusPillClass}">${statusHeader}</span>\n\n${JSON.stringify(data, null, 2)}`;
         } else {
           const text = await response.text();
-          resultBlock.textContent = `${statusText}\n\n${text}`;
+          resultBlock.innerHTML = `<span class="status-badge-pill ${statusPillClass}">${statusHeader}</span>\n\n${text}`;
         }
       } catch (err) {
-        resultBlock.textContent = `Network Error: ${err.message}`;
+        resultBlock.textContent = `❌ Network Error: ${err.message}`;
       }
     });
   });
