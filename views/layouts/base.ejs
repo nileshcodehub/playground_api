@@ -1,32 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      <%= typeof title !== 'undefined' ? title : 'Playground API Documentation'
-      %>
-    </title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/public/css/docs.css" />
-    <script>
-      (function() {
-        var t = localStorage.getItem('playground_theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', t);
-      })();
-    </script>
+    <%- include('../partials/head') %>
   </head>
   <body>
     <div class="app-layout">
       <!-- Left Sidebar (Desktop 2-Column) -->
       <aside class="sidebar">
         <a href="/" class="brand">
-          <div class="brand-icon">P</div>
+          <img src="/public/favicon.svg" alt="Playground API Logo" class="brand-icon" style="width: 32px; height: 32px; border-radius: 8px;" />
           <div>
             <div class="brand-title">Playground API</div>
           </div>

@@ -1,26 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title : 'Playground API Documentation' %></title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/public/css/docs.css">
-  <script>
-    (function() {
-      var t = localStorage.getItem('playground_theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
+  <%- include('partials/head') %>
 </head>
 <body>
   <div class="app-layout">
     <!-- Left Sidebar -->
     <aside class="sidebar">
       <a href="/" class="brand">
-        <div class="brand-icon">P</div>
+        <img src="/public/favicon.svg" alt="Playground API Logo" class="brand-icon" style="width: 32px; height: 32px; border-radius: 8px;" />
         <div>
           <div class="brand-title">Playground API</div>
         </div>
@@ -80,9 +68,9 @@
     <!-- Main Content Area -->
     <main class="main-area">
       <div class="hero">
-        <h1 class="hero-title">Developer API Documentation</h1>
+        <h1 class="hero-title">Free Stateful Fake REST API for Prototyping & Testing</h1>
         <p class="hero-subtitle">
-          Welcome to Playground API — a JSONPlaceholder-style REST API with per-visitor sandboxed mutations overlaid on shared read-only global data.
+          Playground API is a zero-configuration, JSONPlaceholder-compatible mock REST API with instant, per-visitor session sandbox overlays. Prototype frontend applications, test HTTP clients, and execute realistic CRUD operations without breaking shared global seed data.
         </p>
       </div>
 
@@ -105,7 +93,7 @@
             🔄 Virtual Merging Engine
           </div>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
-            <code>GET</code> requests construct a virtual list merging global database records with your session's creates (on top), updates (in-place), and deletes.
+            <code>GET</code> requests dynamically construct a virtual list merging global database records with your session's creates (on top), updates (in-place), and deletes.
           </p>
         </div>
 
@@ -114,7 +102,7 @@
             🛡️ 30-Record Quota Cap
           </div>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
-            Each identity session is allowed up to 30 self-created sandbox records per resource. Local records receive <code>local-&lt;uuid&gt;</code> formatted string IDs.
+            Each identity session is allowed up to 30 self-created sandbox records per resource. Local sandbox records receive <code>local-&lt;uuid&gt;</code> string IDs.
           </p>
         </div>
 
@@ -123,26 +111,78 @@
             🔒 Cookie-Based Identity
           </div>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
-            Identity is tied to the <code>pg_identity</code> HTTP-only cookie. IP addresses are hashed using SHA-256 strictly for rate limiting (60 req/min).
+            Identity is securely tied to the <code>pg_identity</code> HTTP cookie. IP addresses are hashed using SHA-256 strictly for rate limiting backstop (60 req/min).
           </p>
         </div>
       </div>
 
-      <!-- Quickstart Code Example -->
-      <div class="endpoint-card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Quickstart Code Snippet</h3>
-        <pre><code>// JavaScript Fetch Example with session credentials
+      <!-- Feature Comparison: Why Playground API vs Competitors -->
+      <section style="margin-bottom: 2.5rem;">
+        <h2 style="font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-primary);">Why Choose Playground API? (Feature Comparison)</h2>
+        <div class="endpoint-card" style="padding: 1.25rem; overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-primary);">
+                <th style="padding: 0.75rem 0.5rem;">Feature</th>
+                <th style="padding: 0.75rem 0.5rem; color: var(--primary-accent);">Playground API</th>
+                <th style="padding: 0.75rem 0.5rem;">JSONPlaceholder</th>
+                <th style="padding: 0.75rem 0.5rem;">DummyJSON / ReqRes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+                <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: var(--text-primary);">Per-Session Stateful Mutations</td>
+                <td style="padding: 0.75rem 0.5rem; color: #22c55e; font-weight: 700;">✅ Yes (`pg_identity` Sandbox)</td>
+                <td style="padding: 0.75rem 0.5rem; color: var(--delete-badge);">❌ Stateless (Fake Response)</td>
+                <td style="padding: 0.75rem 0.5rem; color: var(--delete-badge);">❌ Stateless / Static Mock</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+                <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: var(--text-primary);">Interactive Live Request Tester</td>
+                <td style="padding: 0.75rem 0.5rem; color: #22c55e; font-weight: 700;">✅ Built-in per endpoint</td>
+                <td style="padding: 0.75rem 0.5rem;">⚠️ Basic code examples</td>
+                <td style="padding: 0.75rem 0.5rem;">⚠️ Static snippets</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+                <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: var(--text-primary);">Zero Configuration / Registration</td>
+                <td style="padding: 0.75rem 0.5rem; color: #22c55e; font-weight: 700;">✅ 100% Free & Open</td>
+                <td style="padding: 0.75rem 0.5rem; color: #22c55e;">✅ Free</td>
+                <td style="padding: 0.75rem 0.5rem; color: #22c55e;">✅ Free</td>
+              </tr>
+              <tr style="color: var(--text-secondary);">
+                <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: var(--text-primary);">Pagination & Field Filtering</td>
+                <td style="padding: 0.75rem 0.5rem; color: #22c55e; font-weight: 700;">✅ `page`, `limit`, virtual ID slice</td>
+                <td style="padding: 0.75rem 0.5rem;">✅ Supported</td>
+                <td style="padding: 0.75rem 0.5rem;">✅ Supported</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Quickstart Code Examples -->
+      <section style="margin-bottom: 2.5rem;">
+        <h2 style="font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-primary);">Quickstart Integration Snippets</h2>
+        <div class="endpoint-card">
+          <h3 style="font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--primary-accent);">JavaScript (Fetch API)</h3>
+          <pre><code>// Send GET request with credentials to include pg_identity sandbox cookie
 fetch('http://localhost:3000/users?page=1&limit=10', {
   method: 'GET',
-  credentials: 'include' // Sends pg_identity cookie for sandbox overlay
+  credentials: 'include'
 })
   .then(res => res.json())
   .then(data => console.log(data));</code></pre>
-      </div>
+
+          <h3 style="font-size: 1.05rem; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--post-badge);">cURL Command</h3>
+          <pre><code>curl -i -b "pg_identity=local-sandbox" \
+  -H "Content-Type: application/json" \
+  -X POST -d '{"name":"Leanne Graham","username":"Bret","email":"Sincere@april.biz"}' \
+  http://localhost:3000/users</code></pre>
+        </div>
+      </section>
 
       <!-- Available Resources Section -->
-      <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; margin-top: 2rem;">Available API Resources</h3>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+      <h2 style="font-size: 1.4rem; margin-bottom: 1.25rem;">Available Mock API Resources</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
         <% if (typeof resources !== 'undefined' && resources) { %>
           <% resources.forEach(resName => { %>
             <div class="endpoint-card" style="margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
@@ -154,7 +194,7 @@ fetch('http://localhost:3000/users?page=1&limit=10', {
                   <span class="badge badge-get">REST</span>
                 </div>
                 <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-                  Interactive endpoints and live tester for the <%= resName %> resource.
+                  Interactive mock endpoints, JSON schemas, and live request runner for <code>/<%= resName %></code>.
                 </p>
               </div>
               <div>
@@ -166,6 +206,39 @@ fetch('http://localhost:3000/users?page=1&limit=10', {
           <% }); %>
         <% } %>
       </div>
+
+      <!-- Developer Frequently Asked Questions (FAQ) for Search Engines -->
+      <section style="margin-bottom: 2.5rem;">
+        <h2 style="font-size: 1.4rem; margin-bottom: 1.25rem; color: var(--text-primary);">Frequently Asked Questions (FAQ)</h2>
+
+        <div class="endpoint-card" style="margin-bottom: 1rem;">
+          <h3 style="font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">What makes Playground API different from JSONPlaceholder?</h3>
+          <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
+            While standard mock APIs like JSONPlaceholder return fake responses when you send a POST, PUT, or DELETE request without saving your changes, Playground API saves your mutations into a <strong>per-session sandbox overlay</strong> tied to your HTTP cookie. When you perform subsequent GET requests, your created, updated, or deleted items persist specifically for you without altering global seed data for other developers.
+          </p>
+        </div>
+
+        <div class="endpoint-card" style="margin-bottom: 1rem;">
+          <h3 style="font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">Do I need an API key or registration to use Playground API?</h3>
+          <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
+            No. Playground API is 100% free and open. No API keys, sign-ups, or authentication headers are required. Simply make standard HTTP requests using <code>fetch</code>, <code>axios</code>, <code>cURL</code>, or Postman.
+          </p>
+        </div>
+
+        <div class="endpoint-card" style="margin-bottom: 1rem;">
+          <h3 style="font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">How long do sandbox session mutations persist?</h3>
+          <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
+            Your session overlay data persists via the <code>pg_identity</code> cookie and is maintained in our database for up to 10 days of inactivity. An automated daily cron job cleans up inactive identity sessions automatically.
+          </p>
+        </div>
+
+        <div class="endpoint-card" style="margin-bottom: 1rem;">
+          <h3 style="font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">What are the rate limits on Playground API?</h3>
+          <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
+            General read requests are limited to 60 requests per minute per salted IP hash. Mutation requests (POST, PUT, DELETE) are limited to 15 requests per hour per IP hash with a quota cap of 30 custom sandbox records per identity session.
+          </p>
+        </div>
+      </section>
 
       <footer class="footer">
         <p>Playground API — Built with 💖 by Nilesh Kumar.</p>

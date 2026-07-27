@@ -14,10 +14,25 @@ const GLOBAL_MODELS = {
 // In-memory cache for sample records to eliminate database latency on page loads
 const sampleCache = new Map();
 
+// Robots.txt handler
+router.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.sendFile('robots.txt', { root: './public' });
+});
+
+// Sitemap.xml handler
+router.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml');
+  res.sendFile('sitemap.xml', { root: './public' });
+});
+
 // Documentation Hub Landing Page
 router.get('/', (req, res) => {
   res.render('docs-index', {
-    title: 'Playground API — Developer Documentation',
+    title: 'Playground API — Free Stateful Fake REST API for Prototyping & Testing',
+    metaDescription: 'Playground API is a free stateful fake REST API for frontend prototyping & QA testing. Experience zero-config, session-isolated CRUD sandbox overlays on realistic mock data.',
+    keywords: 'free fake rest api, mock api, jsonplaceholder alternative, sandbox rest api, frontend testing, mock data api, stateful mock api',
+    canonicalUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
     resources: RESOURCES,
     currentNav: 'overview',
     identityId: req.identityId
@@ -57,7 +72,10 @@ router.get('/docs/:resource', async (req, res, next) => {
   }
 
   const locals = {
-    title: `${resource.toUpperCase()} — Playground API Docs`,
+    title: `Fake ${resource.charAt(0).toUpperCase() + resource.slice(1)} REST API Endpoints & Docs — Playground API`,
+    metaDescription: `Free mock REST API for /${resource}. Test GET, POST, PUT, and DELETE HTTP requests with session-isolated sandbox mutations and live interactive request runner.`,
+    keywords: `fake ${resource} api, mock ${resource} endpoints, ${resource} rest api, jsonplaceholder ${resource}, test ${resource} api`,
+    canonicalUrl: `${req.protocol}://${req.get('host')}/docs/${resource}`,
     resource,
     resources: RESOURCES,
     currentNav: resource,

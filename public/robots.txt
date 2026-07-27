@@ -1,0 +1,7 @@
+# Playground API Robots File
+User-agent: *
+Allow: /
+Allow: /docs/
+Allow: /public/
+
+Sitemap: https://playground-api.com/sitemap.xml
