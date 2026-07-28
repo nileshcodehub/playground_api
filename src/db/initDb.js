@@ -11,13 +11,28 @@ function splitSqlStatements(sql) {
   let current = '';
   let inDollarQuote = false;
   let dollarTag = '';
+  let inSingleQuote = false;
 
   let i = 0;
   while (i < sql.length) {
     const char = sql[i];
 
-    // Check for dollar quotes ($$ or $tag$)
-    if (char === '$') {
+    // Handle single-quoted string literals (ignoring inside dollar quotes)
+    if (char === "'" && !inDollarQuote) {
+      if (inSingleQuote && sql[i + 1] === "'") {
+        // Escaped single quote in SQL ('')
+        current += "''";
+        i += 2;
+        continue;
+      }
+      inSingleQuote = !inSingleQuote;
+      current += char;
+      i++;
+      continue;
+    }
+
+    // Check for dollar quotes ($$ or $tag$) when not inside a single-quoted string
+    if (char === '$' && !inSingleQuote) {
       const match = sql.slice(i).match(/^(\$[a-zA-Z0-9_]*\$)/);
       if (match) {
         const tag = match[1];
@@ -34,7 +49,7 @@ function splitSqlStatements(sql) {
       }
     }
 
-    if (char === ';' && !inDollarQuote) {
+    if (char === ';' && !inDollarQuote && !inSingleQuote) {
       if (current.trim().length > 0) {
         statements.push(current.trim());
       }
@@ -57,8 +72,7 @@ function splitSqlStatements(sql) {
 export async function initDb() {
   const schemaPath = path.join(__dirname, 'schema.sql');
   if (!fs.existsSync(schemaPath)) {
-    console.error(`[Database Init] schema.sql not found at ${schemaPath}`);
-    return;
+    throw new Error(`[Database Init] schema.sql not found at ${schemaPath}. Cannot initialize database schema.`);
   }
 
   const sqlContent = fs.readFileSync(schemaPath, 'utf-8');

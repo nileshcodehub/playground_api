@@ -1,5 +1,6 @@
 import prisma from './prismaClient.js';
 import { initDb } from './initDb.js';
+import config from '../config/env.js';
 import {
   REALISTIC_USERS,
   REALISTIC_POST_TITLES,
@@ -9,6 +10,11 @@ import {
 } from './seedData.js';
 
 export async function seedDatabase() {
+  if (config.isProduction) {
+    console.error('❌ Database seeding is disabled in production.');
+    return;
+  }
+
   console.log('🌱 Initializing database schema and seeding global datasets...');
 
   try {

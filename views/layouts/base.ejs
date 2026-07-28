@@ -41,7 +41,7 @@
             <span class="status-dot" title="Session Active"></span>
           </div>
           <div class="session-id">
-            <%= (typeof identityId !== 'undefined' && identityId) ? identityId :
+            <%= (typeof identityId !== 'undefined' && identityId) ? (identityId.slice(0, 8) + '...') :
             'Cookie Active (pg_identity)' %>
           </div>
           <div class="session-note">

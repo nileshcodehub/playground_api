@@ -19,16 +19,17 @@ describe('Resource API Routes', () => {
     server.close(done);
   });
 
-  test('GET /users returns array of users', async () => {
+  test('GET /users returns paginated list of users', async () => {
     const response = await fetch(`${baseUrl}/users`);
     assert.equal(response.status, 200);
     const setCookie = response.headers.get('set-cookie');
     if (setCookie) {
       identityCookie = setCookie.split(';')[0];
     }
-    const data = await response.json();
-    assert.ok(Array.isArray(data));
-    assert.ok(data.length > 0);
+    const json = await response.json();
+    assert.ok(Array.isArray(json.data), 'Expected json.data to be an array');
+    assert.ok(json.pagination, 'Expected json.pagination object');
+    assert.ok(json.data.length > 0, 'Expected non-empty data array');
   });
 
   test('GET /users/1 returns single user', async () => {
@@ -63,30 +64,33 @@ describe('Resource API Routes', () => {
     assert.equal(created.name, 'Test User');
   });
 
-  test('GET /posts returns array of posts', async () => {
+  test('GET /posts returns paginated list of posts', async () => {
     const response = await fetch(`${baseUrl}/posts`, {
       headers: { Cookie: identityCookie }
     });
     assert.equal(response.status, 200);
-    const data = await response.json();
-    assert.ok(Array.isArray(data));
+    const json = await response.json();
+    assert.ok(Array.isArray(json.data));
+    assert.ok(json.pagination);
   });
 
-  test('GET /comments returns array of comments', async () => {
+  test('GET /comments returns paginated list of comments', async () => {
     const response = await fetch(`${baseUrl}/comments`, {
       headers: { Cookie: identityCookie }
     });
     assert.equal(response.status, 200);
-    const data = await response.json();
-    assert.ok(Array.isArray(data));
+    const json = await response.json();
+    assert.ok(Array.isArray(json.data));
+    assert.ok(json.pagination);
   });
 
-  test('GET /todos returns array of todos', async () => {
+  test('GET /todos returns paginated list of todos', async () => {
     const response = await fetch(`${baseUrl}/todos`, {
       headers: { Cookie: identityCookie }
     });
     assert.equal(response.status, 200);
-    const data = await response.json();
-    assert.ok(Array.isArray(data));
+    const json = await response.json();
+    assert.ok(Array.isArray(json.data));
+    assert.ok(json.pagination);
   });
 });
