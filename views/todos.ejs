@@ -1,135 +1,20 @@
 <div class="hero">
   <h1 class="hero-title">Todos Resource Documentation</h1>
   <p class="hero-subtitle">
-    Read operations merge shared global todos with your session's overlay (creates on top, deletes removed, updates in-place).
+    Read operations merge shared global todos with your session's overlay (newly created todos appear at the top, updates apply in-place, deletes are filtered).
     Each todo belongs to a user (`user_id` foreign key). Mutations are session-scoped and capped at 30 created records.
   </p>
 </div>
 
-<% 
-  const fallbackTodo = {
-    id: 1,
-    user_id: 1,
-    title: "delectus aut autem",
-    completed: false
-  };
-
-  const realTodo = (typeof sampleRecord !== 'undefined' && sampleRecord) ? sampleRecord : fallbackTodo;
-  const sampleTodoResponse = JSON.stringify(realTodo, null, 2);
-
-  const sampleTodoPayload = JSON.stringify({
-    user_id: realTodo.user_id || 1,
-    title: realTodo.title || "Buy groceries for dinner",
-    completed: false
-  }, null, 2);
-
-  const sampleCreatedTodoResponse = JSON.stringify({
-    id: "local-d4e5f6a7-b890-1234-def1-234567890123",
-    user_id: realTodo.user_id || 1,
-    title: realTodo.title || "Buy groceries for dinner",
-    completed: false,
-    _sandbox: "created"
-  }, null, 2);
-
-  const samplePatchPayload = JSON.stringify({
-    completed: !realTodo.completed
-  }, null, 2);
-
-  const sampleUpdatedTodoResponse = JSON.stringify({
-    ...realTodo,
-    completed: !realTodo.completed,
-    _sandbox: "updated"
-  }, null, 2);
-
-  const samplePaginatedResponse = JSON.stringify({
-    data: [
-      JSON.parse(sampleCreatedTodoResponse),
-      realTodo
-    ],
-    pagination: {
-      page: 1,
-      limit: 10,
-      total: 126,
-      totalPages: 13,
-      hasNextPage: true,
-      hasPrevPage: false
-    }
-  }, null, 2);
-
-  const endpoints = [
-    {
-      method: "GET",
-      path: "/todos",
-      summary: "Retrieve a paginated list of todos. Results merge shared global todo records with session sandbox overlays (newly created todos appear at the top).",
-      params: [
-        { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
-        { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." }
-      ],
-      bodyExample: null,
-      responseExample: samplePaginatedResponse
-    },
-    {
-      method: "GET",
-      path: "/todos/:id",
-      summary: `Retrieve a single todo by ID. Supports plain integer IDs for global records (e.g. ${realTodo.id}) and string IDs formatted as local-<uuid> for session sandbox records.`,
-      params: [
-        { name: "id", in: "path", type: "string | integer", description: `Todo ID (e.g. ${realTodo.id} for global todo or local-<uuid> for sandbox todo).` }
-      ],
-      bodyExample: null,
-      responseExample: sampleTodoResponse
-    },
-    {
-      method: "POST",
-      path: "/todos",
-      summary: "Create a new session sandbox todo record. Returns a local-<uuid> formatted ID with _sandbox: 'created'. Each session identity is capped at 30 created records.",
-      params: [
-        { name: "user_id", in: "body", type: "integer", description: "Assignee user ID." },
-        { name: "title", in: "body", type: "string", description: "Todo item title." },
-        { name: "completed", in: "body", type: "boolean", description: "Completion status (default false)." }
-      ],
-      bodyExample: sampleTodoPayload,
-      responseExample: sampleCreatedTodoResponse
-    },
-    {
-      method: "PUT",
-      path: "/todos/:id",
-      summary: "Replace an existing todo record in the session overlay. Global records remain untouched for other visitors and preserve original list position.",
-      params: [
-        { name: "id", in: "path", type: "string | integer", description: `Todo ID to update (e.g. ${realTodo.id} or local-<uuid>).` }
-      ],
-      bodyExample: sampleTodoPayload,
-      responseExample: sampleUpdatedTodoResponse
-    },
-    {
-      method: "PATCH",
-      path: "/todos/:id",
-      summary: "Partially update specific fields of a todo record in the session overlay (ideal for toggling completed status alone).",
-      params: [
-        { name: "id", in: "path", type: "string | integer", description: `Todo ID to patch (e.g. ${realTodo.id} or local-<uuid>).` }
-      ],
-      bodyExample: samplePatchPayload,
-      responseExample: sampleUpdatedTodoResponse
-    },
-    {
-      method: "DELETE",
-      path: "/todos/:id",
-      summary: "Remove a todo record from the requesting session view. The underlying global record is unaffected for other visitors.",
-      params: [
-        { name: "id", in: "path", type: "string | integer", description: `Todo ID to delete (e.g. ${realTodo.id} or local-<uuid>).` }
-      ],
-      bodyExample: null,
-      responseExample: "204 No Content"
-    }
-  ];
-%>
-
-<% endpoints.forEach(ep => { %>
-  <%- include('partials/endpoint', { 
-    method: ep.method, 
-    path: ep.path, 
-    summary: ep.summary, 
-    params: ep.params, 
-    bodyExample: ep.bodyExample, 
-    responseExample: ep.responseExample 
-  }) %>
-<% }); %>
+<% if (typeof endpoints !== 'undefined' && endpoints && endpoints.length > 0) { %>
+  <% endpoints.forEach(ep => { %>
+    <%- include('partials/endpoint', { 
+      method: ep.method, 
+      path: ep.path, 
+      summary: ep.summary, 
+      params: ep.params, 
+      bodyExample: ep.bodyExample, 
+      responseExample: ep.responseExample 
+    }) %>
+  <% }); %>
+<% } %>

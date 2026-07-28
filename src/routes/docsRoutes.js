@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import prisma from '../db/prismaClient.js';
 import { GLOBAL_MODELS } from '../services/overlayService.js';
+import { getEndpointsForResource } from '../config/endpointsCatalog.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,16 +69,16 @@ router.get('/docs/:resource', async (req, res, next) => {
   let sampleRecord = sampleCache.get(resource) || null;
   const modelName = GLOBAL_MODELS[resource];
 
+  // Populate sampleCache in the background if not cached yet, without blocking HTML render
   if (!sampleRecord && modelName && prisma[modelName]) {
-    try {
-      sampleRecord = await prisma[modelName].findFirst();
-      if (sampleRecord) {
-        sampleCache.set(resource, sampleRecord);
-      }
-    } catch (err) {
-      console.warn(`[Docs] Could not fetch sample data for ${resource}: ${err.message}`);
-    }
+    prisma[modelName].findFirst().then((rec) => {
+      if (rec) sampleCache.set(resource, rec);
+    }).catch((err) => {
+      console.warn(`[Docs] Background sample fetch warning for ${resource}: ${err.message}`);
+    });
   }
+
+  const endpoints = getEndpointsForResource(resource, sampleRecord);
 
   const locals = {
     title: `Fake ${resource.charAt(0).toUpperCase() + resource.slice(1)} REST API Endpoints & Docs — Playground API`,
@@ -88,6 +89,7 @@ router.get('/docs/:resource', async (req, res, next) => {
     resources: RESOURCES,
     currentNav: resource,
     sampleRecord,
+    endpoints,
     identityId: req.identityId
   };
 

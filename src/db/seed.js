@@ -9,19 +9,21 @@ import {
 } from './seedData.js';
 
 export async function seedDatabase() {
-  console.log('Initializing database schema and seeding global datasets via Prisma...');
+  console.log('🌱 Initializing database schema and seeding global datasets...');
 
   try {
-    // Ensure all tables exist in database
+    // Ensure all tables exist in database before attempting to insert
     await initDb();
 
     // Truncate existing global tables
-    await prisma.$executeRawUnsafe(`TRUNCATE TABLE "users_global", "posts_global", "comments_global", "todos_global" RESTART IDENTITY CASCADE;`).catch(() => {});
+    await prisma.$executeRawUnsafe(
+      `TRUNCATE TABLE "users_global", "posts_global", "comments_global", "todos_global" RESTART IDENTITY CASCADE;`
+    ).catch(() => {});
 
     // Seed Users (25 users)
     const usersData = REALISTIC_USERS;
     await prisma.usersGlobal.createMany({ data: usersData });
-    console.log('Seeded 25 global users with genuine data.');
+    console.log('✅ Seeded 25 global users with genuine data.');
 
     // Seed Posts (4 posts per user = 100 posts)
     const postsData = [];
@@ -41,7 +43,7 @@ export async function seedDatabase() {
       }
     }
     await prisma.postsGlobal.createMany({ data: postsData });
-    console.log('Seeded 100 global posts with genuine content.');
+    console.log('✅ Seeded 100 global posts with genuine content.');
 
     // Seed Comments (3 comments per post = 300 comments)
     const commentsData = [];
@@ -59,7 +61,7 @@ export async function seedDatabase() {
       }
     }
     await prisma.commentsGlobal.createMany({ data: commentsData });
-    console.log('Seeded 300 global comments with genuine data.');
+    console.log('✅ Seeded 300 global comments with genuine data.');
 
     // Seed Todos (5 todos per user = 125 todos)
     const todosData = [];
@@ -76,11 +78,11 @@ export async function seedDatabase() {
       }
     }
     await prisma.todosGlobal.createMany({ data: todosData });
-    console.log('Seeded 125 global todos with genuine data.');
+    console.log('✅ Seeded 125 global todos with genuine data.');
 
-    console.log('Database seeding completed successfully with genuine data!');
+    console.log('🎉 Database manual seeding completed successfully!');
   } catch (error) {
-    console.error('Error during seeding:', error.message);
+    console.error('❌ Error during seeding:', error.message);
   } finally {
     await prisma.$disconnect();
   }
