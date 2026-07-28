@@ -82,19 +82,19 @@ export const identityMiddleware = async (req, res, next) => {
     if (!validIdentity) {
       identityId = uuidv4();
       verifiedIdentitiesCache.set(identityId, { verifiedAt: now, lastUpdated: now });
-      try {
-        await prisma.identities.create({
-          data: {
-            id: identityId,
-            ip_hash: ipHash,
-            created_at: new Date(),
-            last_seen_at: new Date()
-          }
-        }).catch(() => {});
-      } catch (err) {
-        // DB unreachable — identity lives in cache only for this session
-        console.warn('[Identity] DB error during identity creation, running in cache-only mode:', err.message);
-      }
+
+      // Non-blocking background database creation so page loads respond instantly
+      prisma.identities.create({
+        data: {
+          id: identityId,
+          ip_hash: ipHash,
+          created_at: new Date(),
+          last_seen_at: new Date()
+        }
+      }).catch((err) => {
+        // DB unreachable or latency — identity lives in in-memory cache for this session
+        console.warn('[Identity] Background DB identity creation warning:', err.message);
+      });
 
       res.cookie('pg_identity', identityId, {
         httpOnly: true,

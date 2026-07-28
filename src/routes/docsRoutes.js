@@ -69,15 +69,13 @@ router.get('/docs/:resource', async (req, res, next) => {
   let sampleRecord = sampleCache.get(resource) || null;
   const modelName = GLOBAL_MODELS[resource];
 
+  // Populate sampleCache in the background if not cached yet, without blocking HTML render
   if (!sampleRecord && modelName && prisma[modelName]) {
-    try {
-      sampleRecord = await prisma[modelName].findFirst();
-      if (sampleRecord) {
-        sampleCache.set(resource, sampleRecord);
-      }
-    } catch (err) {
-      console.warn(`[Docs] Could not fetch sample data for ${resource}: ${err.message}`);
-    }
+    prisma[modelName].findFirst().then((rec) => {
+      if (rec) sampleCache.set(resource, rec);
+    }).catch((err) => {
+      console.warn(`[Docs] Background sample fetch warning for ${resource}: ${err.message}`);
+    });
   }
 
   const endpoints = getEndpointsForResource(resource, sampleRecord);
