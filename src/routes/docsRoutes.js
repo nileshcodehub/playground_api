@@ -12,8 +12,9 @@ const publicDir = path.resolve(__dirname, '../../public');
 const router = Router();
 export const RESOURCES = ['users', 'posts', 'comments', 'todos'];
 
-// In-memory cache for sample records to eliminate database latency on page loads
+// In-memory cache for sample records with 1-hour TTL
 const sampleCache = new Map();
+const SAMPLE_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 // Robots.txt handler
 router.get('/robots.txt', (req, res) => {
@@ -57,22 +58,31 @@ router.get('/docs', (req, res) => {
 router.get('/docs/:resource', async (req, res, next) => {
   const { resource } = req.params;
   if (!RESOURCES.includes(resource)) {
-    return res.status(404).render('docs-index', {
+    const locals = {
       title: 'Documentation - Not Found',
       resources: RESOURCES,
       currentNav: 'overview',
       identityId: req.identityId,
       error: `Documentation page for resource "${resource}" not found.`
+    };
+    return res.render('docs-index', locals, (err, htmlContent) => {
+      if (err) return next(err);
+      res.status(404).render('layouts/base', {
+        ...locals,
+        body: htmlContent
+      });
     });
   }
 
-  let sampleRecord = sampleCache.get(resource) || null;
+  const cached = sampleCache.get(resource);
+  const now = Date.now();
+  let sampleRecord = (cached && (now - cached.cachedAt < SAMPLE_CACHE_TTL_MS)) ? cached.record : null;
   const modelName = GLOBAL_MODELS[resource];
 
   // Populate sampleCache in the background if not cached yet, without blocking HTML render
   if (!sampleRecord && modelName && prisma[modelName]) {
     prisma[modelName].findFirst().then((rec) => {
-      if (rec) sampleCache.set(resource, rec);
+      if (rec) sampleCache.set(resource, { record: rec, cachedAt: Date.now() });
     }).catch((err) => {
       console.warn(`[Docs] Background sample fetch warning for ${resource}: ${err.message}`);
     });

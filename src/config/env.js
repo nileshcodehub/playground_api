@@ -11,7 +11,8 @@ const config = {
   ipHashSalt: process.env.IP_HASH_SALT || (() => { throw new Error('IP_HASH_SALT must be set'); })(),
   trustProxy: process.env.TRUST_PROXY === 'true',
   isProduction: process.env.NODE_ENV === 'production',
-  isDevelopment: process.env.NODE_ENV === 'development' || !process.env.NODE_ENV
+  isDevelopment: process.env.NODE_ENV === 'development' || !process.env.NODE_ENV,
+  isVercel: Boolean(process.env.VERCEL)
 };
 
 export default config;

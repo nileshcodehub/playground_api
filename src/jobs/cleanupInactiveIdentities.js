@@ -1,7 +1,13 @@
 import cron from 'node-cron';
 import prisma from '../db/prismaClient.js';
+import config from '../config/env.js';
 
 export const scheduleCleanupJob = () => {
+  if (config.isVercel) {
+    console.log('[Cron Job] Skipping in-process node-cron schedule on Vercel serverless.');
+    return;
+  }
+
   // Run every day at 3:00 AM IST
   cron.schedule('0 3 * * *', async () => {
     console.log('[Cron Job] Starting inactive identities cleanup...');

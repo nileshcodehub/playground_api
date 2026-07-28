@@ -5,15 +5,15 @@ import { initDb } from './src/db/initDb.js';
 
 const PORT = config.port;
 
-const server = app.listen(PORT, async () => {
+// Ensure database tables exist automatically in Neon DB before accepting traffic
+await initDb();
+
+// Initialize daily identity cleanup cron job
+scheduleCleanupJob();
+
+const server = app.listen(PORT, () => {
   console.log(`🚀 Playground API running on http://localhost:${PORT}`);
   console.log(`📚 Interactive Docs available at http://localhost:${PORT}/docs`);
-  
-  // Ensure database tables exist automatically in Neon DB
-  await initDb();
-
-  // Initialize daily identity cleanup cron job
-  scheduleCleanupJob();
 });
 
 // Handle uncaught exceptions and unhandled rejections

@@ -1,5 +1,6 @@
 import * as overlayService from '../services/overlayService.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { sanitizePayload } from '../utils/sanitize.js';
 
 export const makeResourceController = (resource) => {
   return {
@@ -35,10 +36,11 @@ export const makeResourceController = (resource) => {
 
     create: async (req, res, next) => {
       try {
+        const payload = sanitizePayload(req.body);
         const record = await overlayService.createOverlayRecord(
           req.identityId,
           resource,
-          req.body
+          payload
         );
         res.status(201).json(record);
       } catch (error) {
@@ -48,11 +50,12 @@ export const makeResourceController = (resource) => {
 
     update: async (req, res, next) => {
       try {
+        const payload = sanitizePayload(req.body);
         const record = await overlayService.updateOverlayRecord(
           req.identityId,
           resource,
           req.params.id,
-          req.body
+          payload
         );
         res.json(record);
       } catch (error) {
