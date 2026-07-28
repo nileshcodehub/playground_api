@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import prisma from '../db/prismaClient.js';
 import { GLOBAL_MODELS } from '../services/overlayService.js';
+import { getEndpointsForResource } from '../config/endpointsCatalog.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -79,6 +80,8 @@ router.get('/docs/:resource', async (req, res, next) => {
     }
   }
 
+  const endpoints = getEndpointsForResource(resource, sampleRecord);
+
   const locals = {
     title: `Fake ${resource.charAt(0).toUpperCase() + resource.slice(1)} REST API Endpoints & Docs — Playground API`,
     metaDescription: `Free mock REST API for /${resource}. Test GET, POST, PUT, and DELETE HTTP requests with session-isolated sandbox mutations and live interactive request runner.`,
@@ -88,6 +91,7 @@ router.get('/docs/:resource', async (req, res, next) => {
     resources: RESOURCES,
     currentNav: resource,
     sampleRecord,
+    endpoints,
     identityId: req.identityId
   };
 

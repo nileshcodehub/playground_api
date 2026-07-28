@@ -9,7 +9,7 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const UPDATE_THRESHOLD_MS = 10 * 60 * 1000; // Update last_seen_at in DB at most once every 10 mins
 
 // Periodically prune expired entries to prevent unbounded Map growth (memory leak fix)
-setInterval(() => {
+const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [id, entry] of verifiedIdentitiesCache) {
     if (now - entry.verifiedAt > CACHE_TTL_MS) {
@@ -17,6 +17,9 @@ setInterval(() => {
     }
   }
 }, CACHE_TTL_MS);
+
+cleanupTimer.unref();
+
 
 export const identityMiddleware = async (req, res, next) => {
   try {
