@@ -8,7 +8,10 @@
     "dev": "nodemon server.js",
     "seed": "node src/db/seed.js",
     "test": "node --test tests/*.test.js",
-    "vercel-build": "prisma generate"
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "vercel-build": "prisma generate && prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
