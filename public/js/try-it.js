@@ -168,27 +168,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const sampleBodyStr = ep.bodyExample ? ep.bodyExample.replace(/\n\s*/g, ' ') : '';
     const formattedBodyForCurl = ep.bodyExample || '{}';
 
+    const origin = (typeof window !== 'undefined' && window.location && window.location.origin)
+      ? window.location.origin
+      : 'http://localhost:3000';
+
     const curlCmd = ep.method === 'GET' 
-      ? `curl -X GET 'http://localhost:3000${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
+      ? `curl -X GET '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
       : ep.method === 'DELETE'
-      ? `curl -X DELETE 'http://localhost:3000${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
-      : `curl -X ${ep.method} 'http://localhost:3000${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid" \\\n  -d '${formattedBodyForCurl}'`;
+      ? `curl -X DELETE '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
+      : `curl -X ${ep.method} '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid" \\\n  -d '${formattedBodyForCurl}'`;
 
     const fetchCmd = ep.method === 'GET' || ep.method === 'DELETE'
-      ? `fetch('http://localhost:3000${ep.path}', {\n  method: '${ep.method}',\n  credentials: 'include'\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`
-      : `fetch('http://localhost:3000${ep.path}', {\n  method: '${ep.method}',\n  headers: { 'Content-Type': 'application/json' },\n  credentials: 'include',\n  body: JSON.stringify(${sampleBodyStr || '{}'})\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`;
+      ? `fetch('${origin}${ep.path}', {\n  method: '${ep.method}',\n  credentials: 'include'\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`
+      : `fetch('${origin}${ep.path}', {\n  method: '${ep.method}',\n  headers: { 'Content-Type': 'application/json' },\n  credentials: 'include',\n  body: JSON.stringify(${sampleBodyStr || '{}'})\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`;
 
     const axiosCmd = ep.method === 'GET'
-      ? `import axios from 'axios';\n\naxios.get('http://localhost:3000${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
+      ? `import axios from 'axios';\n\naxios.get('${origin}${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
       : ep.method === 'DELETE'
-      ? `import axios from 'axios';\n\naxios.delete('http://localhost:3000${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
-      : `import axios from 'axios';\n\naxios.${ep.method.toLowerCase()}('http://localhost:3000${ep.path}', ${sampleBodyStr || '{}'}, {\n  withCredentials: true\n}).then(response => console.log(response.data));`;
+      ? `import axios from 'axios';\n\naxios.delete('${origin}${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
+      : `import axios from 'axios';\n\naxios.${ep.method.toLowerCase()}('${origin}${ep.path}', ${sampleBodyStr || '{}'}, {\n  withCredentials: true\n}).then(response => console.log(response.data));`;
 
     const pythonCmd = ep.method === 'GET'
-      ? `import requests\n\nresponse = requests.get('http://localhost:3000${ep.path}')\nprint(response.json())`
+      ? `import requests\n\nresponse = requests.get('${origin}${ep.path}')\nprint(response.json())`
       : ep.method === 'DELETE'
-      ? `import requests\n\nresponse = requests.delete('http://localhost:3000${ep.path}')\nprint(response.status_code)`
-      : `import requests\n\npayload = ${sampleBodyStr || '{}'}\nresponse = requests.${ep.method.toLowerCase()}('http://localhost:3000${ep.path}', json=payload)\nprint(response.json())`;
+      ? `import requests\n\nresponse = requests.delete('${origin}${ep.path}')\nprint(response.status_code)`
+      : `import requests\n\npayload = ${sampleBodyStr || '{}'}\nresponse = requests.${ep.method.toLowerCase()}('${origin}${ep.path}', json=payload)\nprint(response.json())`;
+
+    const goCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `package main\n\nimport (\n\t"fmt"\n\t"io"\n\t"net/http"\n)\n\nfunc main() {\n\turl := "${origin}${ep.path}"\n\treq, err := http.NewRequest("${ep.method}", url, nil)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\treq.Header.Set("Content-Type", "application/json")\n\tclient := &http.Client{}\n\tresp, err := client.Do(req)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, _ := io.ReadAll(resp.Body)\n\tfmt.Println(string(body))\n}`
+      : `package main\n\nimport (\n\t"bytes"\n\t"fmt"\n\t"io"\n\t"net/http"\n)\n\nfunc main() {\n\turl := "${origin}${ep.path}"\n\tpayload := []byte(\`${sampleBodyStr || '{}'}\`)\n\n\treq, err := http.NewRequest("${ep.method}", url, bytes.NewBuffer(payload))\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\treq.Header.Set("Content-Type", "application/json")\n\tclient := &http.Client{}\n\tresp, err := client.Do(req)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, _ := io.ReadAll(resp.Body)\n\tfmt.Println(string(body))\n}`;
+
+    const swiftCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `import Foundation\n\nlet url = URL(string: "${origin}${ep.path}")!\nvar request = URLRequest(url: url)\nrequest.httpMethod = "${ep.method}"\nrequest.setValue("application/json", forHTTPHeaderField: "Content-Type")\n\nlet task = URLSession.shared.dataTask(with: request) { data, response, error in\n    guard let data = data, error == nil else { return }\n    let responseString = String(data: data, encoding: .utf8)\n    print(responseString ?? "")\n}\ntask.resume()`
+      : `import Foundation\n\nlet url = URL(string: "${origin}${ep.path}")!\nvar request = URLRequest(url: url)\nrequest.httpMethod = "${ep.method}"\nrequest.setValue("application/json", forHTTPHeaderField: "Content-Type")\n\nlet jsonString = """\n${sampleBodyStr || '{}'}\n"""\nrequest.httpBody = jsonString.data(using: .utf8)\n\nlet task = URLSession.shared.dataTask(with: request) { data, response, error in\n    guard let data = data, error == nil else { return }\n    let responseString = String(data: data, encoding: .utf8)\n    print(responseString ?? "")\n}\ntask.resume()`;
+
+    const kotlinCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `import okhttp3.OkHttpClient\nimport okhttp3.Request\n\nval client = OkHttpClient()\nval request = Request.Builder()\n    .url("${origin}${ep.path}")\n    .${ep.method.toLowerCase()}()\n    .addHeader("Content-Type", "application/json")\n    .build()\n\nclient.newCall(request).execute().use { response ->\n    println(response.body?.string())\n}`
+      : `import okhttp3.MediaType.Companion.toMediaType\nimport okhttp3.OkHttpClient\nimport okhttp3.Request\nimport okhttp3.RequestBody.Companion.toRequestBody\n\nval client = OkHttpClient()\nval mediaType = "application/json; charset=utf-8".toMediaType()\nval body = """${sampleBodyStr || '{}'}""".toRequestBody(mediaType)\n\nval request = Request.Builder()\n    .url("${origin}${ep.path}")\n    .${ep.method.toLowerCase()}(body)\n    .addHeader("Content-Type", "application/json")\n    .build()\n\nclient.newCall(request).execute().use { response ->\n    println(response.body?.string())\n}`;
+
+    const rustCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `use reqwest::Error;\n\n#[tokio::main]\nasync fn main() -> Result<(), Error> {\n    let client = reqwest::Client::new();\n    let response = client\n        .${ep.method.toLowerCase()}("${origin}${ep.path}")\n        .header("Content-Type", "application/json")\n        .send()\n        .await?\n        .text()\n        .await?;\n\n    println!("{}", response);\n    Ok(())\n}`
+      : `use reqwest::Error;\nuse serde_json::json;\n\n#[tokio::main]\nasync fn main() -> Result<(), Error> {\n    let client = reqwest::Client::new();\n    let payload = json!(${sampleBodyStr || '{}'});\n\n    let response = client\n        .${ep.method.toLowerCase()}("${origin}${ep.path}")\n        .header("Content-Type", "application/json")\n        .json(&payload)\n        .send()\n        .await?\n        .text()\n        .await?;\n\n    println!("{}", response);\n    Ok(())\n}`;
+
+    const phpCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `<?php\nrequire 'vendor/autoload.php';\n\nuse GuzzleHttp\\Client;\n\n$client = new Client();\n$response = $client->request('${ep.method}', '${origin}${ep.path}', [\n    'headers' => [\n        'Content-Type' => 'application/json'\n    ]\n]);\n\necho $response->getBody();`
+      : `<?php\nrequire 'vendor/autoload.php';\n\nuse GuzzleHttp\\Client;\n\n$client = new Client();\n$response = $client->request('${ep.method}', '${origin}${ep.path}', [\n    'headers' => [\n        'Content-Type' => 'application/json'\n    ],\n    'json' => json_decode('${sampleBodyStr || '{}'}', true)\n]);\n\necho $response->getBody();`;
 
     let paramsHTML = '';
     if (ep.params && ep.params.length > 0) {
@@ -255,10 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="endpoint-path">${escapeHTML(ep.path)}</span>
             <span class="resource-badge-tag">/${escapeHTML(ep.resource)}</span>
           </div>
-          <button type="button" class="copy-url-btn" data-url="http://localhost:3000${escapeHTML(ep.path)}">
+          <button type="button" class="copy-url-btn" data-url="${origin}${escapeHTML(ep.path)}">
             <span>🔗 Copy URL</span>
           </button>
         </div>
+
 
         <p class="endpoint-summary">${escapeHTML(ep.summary)}</p>
 
@@ -271,6 +296,11 @@ document.addEventListener('DOMContentLoaded', () => {
               <button type="button" class="snippet-tab-btn" data-target="node">Node (fetch)</button>
               <button type="button" class="snippet-tab-btn" data-target="axios">Axios</button>
               <button type="button" class="snippet-tab-btn" data-target="python">Python</button>
+              <button type="button" class="snippet-tab-btn" data-target="go">Go</button>
+              <button type="button" class="snippet-tab-btn" data-target="swift">Swift</button>
+              <button type="button" class="snippet-tab-btn" data-target="kotlin">Kotlin</button>
+              <button type="button" class="snippet-tab-btn" data-target="rust">Rust</button>
+              <button type="button" class="snippet-tab-btn" data-target="php">PHP</button>
             </div>
             <button type="button" class="copy-btn">
               <span>📋 Copy Code</span>
@@ -281,8 +311,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <pre class="snippet-code-block" data-snippet="node" hidden><code>${escapeHTML(fetchCmd)}</code></pre>
             <pre class="snippet-code-block" data-snippet="axios" hidden><code>${escapeHTML(axiosCmd)}</code></pre>
             <pre class="snippet-code-block" data-snippet="python" hidden><code>${escapeHTML(pythonCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="go" hidden><code>${escapeHTML(goCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="swift" hidden><code>${escapeHTML(swiftCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="kotlin" hidden><code>${escapeHTML(kotlinCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="rust" hidden><code>${escapeHTML(rustCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="php" hidden><code>${escapeHTML(phpCmd)}</code></pre>
           </div>
         </div>
+
 
         <div class="examples-grid">
           ${ep.bodyExample ? `<div class="example-box"><h4>Request Payload Example</h4><pre><code>${escapeHTML(ep.bodyExample)}</code></pre></div>` : ''}

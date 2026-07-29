@@ -23,7 +23,7 @@ Playground API provides pre-seeded global baseline mock datasets (`users`, `post
   - Slices the virtual ID list by `page` (default `1`) and `limit` (default `10`, max `30`) prior to database record fetching for high performance.
 - 🛡️ **Sandbox Record Caps & Limits**: Identity sessions are capped at 30 user-created records per resource to prevent abuse.
 - 🌐 **CORS & Credentials Support**: Configured with dynamic origin-reflecting CORS (`credentials: true`), making cross-origin requests from React, Vue, Next.js, or mobile applications seamless.
-- 📄 **Interactive Hosted Documentation**: Server-rendered docs powered by **EJS** at `/` and `/docs` with dynamic endpoint catalog schemas ([`src/config/endpointsCatalog.js`](src/config/endpointsCatalog.js)) and an interactive browser-based request runner ([`public/js/try-it.js`](public/js/try-it.js)).
+- 📄 **Interactive Hosted Documentation**: Server-rendered docs powered by **EJS** at `/` and `/docs` with multi-language code generators (cURL, Node, Axios, Python, Go, Swift, Kotlin, Rust, PHP) and an interactive browser-based request runner ([`public/js/try-it.js`](public/js/try-it.js)).
 - ☁️ **Vercel Serverless & Neon DB Ready**: Optimized for serverless deployment on Vercel with zero-cold-start DB initialization ([`api/index.js`](api/index.js)) and connection pooling with Neon Serverless PostgreSQL.
 - 🧹 **Automated Cleanup Job**: Background task ([`src/jobs/cleanupInactiveIdentities.js`](src/jobs/cleanupInactiveIdentities.js)) for purging inactive identities older than 10 days.
 
