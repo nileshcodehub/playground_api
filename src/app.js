@@ -11,6 +11,7 @@ import { generalLimiter } from './middleware/rateLimit.js';
 import { errorHandler, AppError } from './middleware/errorHandler.js';
 import { makeResourceRouter } from './routes/resourceRoutes.js';
 import docsRouter from './routes/docsRoutes.js';
+import { getHealth } from './controllers/healthController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,6 +49,9 @@ app.use('/public', express.static(path.join(rootDir, 'public')));
 // Identity Cookie Middleware & Global Rate Limiter
 app.use(identityMiddleware);
 app.use(generalLimiter);
+
+// Health Check & System Metrics Endpoint
+app.get('/health', getHealth);
 
 // Resource API Routes (REST Data Endpoints)
 app.use('/users', makeResourceRouter('users'));
