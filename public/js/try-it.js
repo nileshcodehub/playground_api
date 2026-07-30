@@ -657,4 +657,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial wiring for pre-rendered DOM elements
   wireAllInteractions(document);
+
+  // Reset Session Sandbox Button Wiring
+  const resetBtn = document.getElementById('reset-sandbox-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async () => {
+      const confirmReset = confirm('Are you sure you want to reset your session sandbox? All your created, updated, and deleted records will be purged.');
+      if (!confirmReset) return;
+
+      const originalText = resetBtn.innerHTML;
+      resetBtn.disabled = true;
+      resetBtn.innerHTML = '⏳ Resetting...';
+
+      try {
+        let res = await fetch('/session/reset', { method: 'DELETE' });
+        if (!res.ok) {
+          // Fallback to POST /session/reset if DELETE fails
+          res = await fetch('/session/reset', { method: 'POST' });
+        }
+
+        if (res.ok) {
+          resetBtn.innerHTML = '✅ Reset Done!';
+          setTimeout(() => {
+            window.location.reload();
+          }, 400);
+        } else {
+          alert('Failed to reset session sandbox. Please try again.');
+          resetBtn.disabled = false;
+          resetBtn.innerHTML = originalText;
+        }
+      } catch (err) {
+        alert('Network error resetting session sandbox: ' + err.message);
+        resetBtn.disabled = false;
+        resetBtn.innerHTML = originalText;
+      }
+    });
+  }
 });

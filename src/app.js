@@ -11,6 +11,7 @@ import { generalLimiter } from './middleware/rateLimit.js';
 import { errorHandler, AppError } from './middleware/errorHandler.js';
 import { makeResourceRouter } from './routes/resourceRoutes.js';
 import docsRouter from './routes/docsRoutes.js';
+import sessionRouter from './routes/sessionRoutes.js';
 import { getHealth } from './controllers/healthController.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -52,6 +53,9 @@ app.use(generalLimiter);
 
 // Health Check & System Metrics Endpoint
 app.get('/health', getHealth);
+
+// Session Sandbox Management Endpoints (/session/reset)
+app.use('/session', sessionRouter);
 
 // Resource API Routes (REST Data Endpoints)
 app.use('/users', makeResourceRouter('users'));

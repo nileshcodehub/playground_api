@@ -37,20 +37,21 @@ export const identityMiddleware = async (req, res, next) => {
 
     req.ipHash = ipHash;
 
-    // Check pg_identity cookie
-    let identityId = req.cookies ? req.cookies.pg_identity : null;
+    // Check X-Playground-Identity header or pg_identity cookie
+    let providedIdentityId = req.headers['x-playground-identity'] || (req.cookies ? req.cookies.pg_identity : null);
+    let identityId = providedIdentityId;
     let validIdentity = false;
     const now = Date.now();
 
-    if (identityId) {
-      const cached = verifiedIdentitiesCache.get(identityId);
+    if (providedIdentityId) {
+      const cached = verifiedIdentitiesCache.get(providedIdentityId);
       if (cached && (now - cached.verifiedAt < CACHE_TTL_MS)) {
         validIdentity = true;
         // Non-blocking background update if last_seen_at is older than 10 mins
         if (now - cached.lastUpdated > UPDATE_THRESHOLD_MS) {
           cached.lastUpdated = now;
           prisma.identities.update({
-            where: { id: identityId },
+            where: { id: providedIdentityId },
             data: { last_seen_at: new Date(), ip_hash: ipHash }
           }).catch((err) => {
             console.warn('[Identity] Background last_seen_at update failed:', err.message);
@@ -59,28 +60,30 @@ export const identityMiddleware = async (req, res, next) => {
       } else {
         try {
           const existing = await prisma.identities.findUnique({
-            where: { id: identityId }
+            where: { id: providedIdentityId }
           });
           if (existing) {
             validIdentity = true;
-            verifiedIdentitiesCache.set(identityId, { verifiedAt: now, lastUpdated: now });
+            verifiedIdentitiesCache.set(providedIdentityId, { verifiedAt: now, lastUpdated: now });
             // Non-blocking background update
             prisma.identities.update({
-              where: { id: identityId },
+              where: { id: providedIdentityId },
               data: { last_seen_at: new Date(), ip_hash: ipHash }
             }).catch((err) => {
               console.warn('[Identity] Background last_seen_at update failed:', err.message);
             });
           }
         } catch (err) {
-          // DB unreachable — log and fall through to create a new identity
-          console.warn('[Identity] DB error during identity lookup, will create new identity:', err.message);
+          // DB unreachable — log and fall through
+          console.warn('[Identity] DB error during identity lookup:', err.message);
         }
       }
     }
 
     if (!validIdentity) {
-      identityId = uuidv4();
+      if (!identityId) {
+        identityId = uuidv4();
+      }
       verifiedIdentitiesCache.set(identityId, { verifiedAt: now, lastUpdated: now });
 
       // Non-blocking background database creation so page loads respond instantly

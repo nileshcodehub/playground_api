@@ -345,3 +345,16 @@ export const deleteOverlayRecord = async (identityId, resource, publicId) => {
 
   return true;
 };
+
+export const resetSessionOverlay = async (identityId) => {
+  if (!identityId) {
+    throw new AppError('Identity required to reset session sandbox', 401);
+  }
+
+  const { count } = await prisma.overlayRecords.deleteMany({
+    where: { identity_id: identityId }
+  });
+
+  return { count };
+};
+
