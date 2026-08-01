@@ -172,11 +172,11 @@ document.addEventListener('DOMContentLoaded', () => {
       ? window.location.origin
       : 'http://localhost:3000';
 
-    const curlCmd = ep.method === 'GET' 
+    const curlCmd = ep.method === 'GET'
       ? `curl -X GET '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
       : ep.method === 'DELETE'
-      ? `curl -X DELETE '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
-      : `curl -X ${ep.method} '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid" \\\n  -d '${formattedBodyForCurl}'`;
+        ? `curl -X DELETE '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
+        : `curl -X ${ep.method} '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid" \\\n  -d '${formattedBodyForCurl}'`;
 
     const fetchCmd = ep.method === 'GET' || ep.method === 'DELETE'
       ? `fetch('${origin}${ep.path}', {\n  method: '${ep.method}',\n  credentials: 'include'\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`
@@ -185,14 +185,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const axiosCmd = ep.method === 'GET'
       ? `import axios from 'axios';\n\naxios.get('${origin}${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
       : ep.method === 'DELETE'
-      ? `import axios from 'axios';\n\naxios.delete('${origin}${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
-      : `import axios from 'axios';\n\naxios.${ep.method.toLowerCase()}('${origin}${ep.path}', ${sampleBodyStr || '{}'}, {\n  withCredentials: true\n}).then(response => console.log(response.data));`;
+        ? `import axios from 'axios';\n\naxios.delete('${origin}${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
+        : `import axios from 'axios';\n\naxios.${ep.method.toLowerCase()}('${origin}${ep.path}', ${sampleBodyStr || '{}'}, {\n  withCredentials: true\n}).then(response => console.log(response.data));`;
 
     const pythonCmd = ep.method === 'GET'
       ? `import requests\n\nresponse = requests.get('${origin}${ep.path}')\nprint(response.json())`
       : ep.method === 'DELETE'
-      ? `import requests\n\nresponse = requests.delete('${origin}${ep.path}')\nprint(response.status_code)`
-      : `import requests\n\npayload = ${sampleBodyStr || '{}'}\nresponse = requests.${ep.method.toLowerCase()}('${origin}${ep.path}', json=payload)\nprint(response.json())`;
+        ? `import requests\n\nresponse = requests.delete('${origin}${ep.path}')\nprint(response.status_code)`
+        : `import requests\n\npayload = ${sampleBodyStr || '{}'}\nresponse = requests.${ep.method.toLowerCase()}('${origin}${ep.path}', json=payload)\nprint(response.json())`;
 
     const goCmd = ep.method === 'GET' || ep.method === 'DELETE'
       ? `package main\n\nimport (\n\t"fmt"\n\t"io"\n\t"net/http"\n)\n\nfunc main() {\n\turl := "${origin}${ep.path}"\n\treq, err := http.NewRequest("${ep.method}", url, nil)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\treq.Header.Set("Content-Type", "application/json")\n\tclient := &http.Client{}\n\tresp, err := client.Do(req)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, _ := io.ReadAll(resp.Body)\n\tfmt.Println(string(body))\n}`
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <details class="try-it-details">
             <summary>
               <span>⚡ Try it out — Test endpoint live</span>
-              <span style="font-size: 0.8rem; font-weight: normal; opacity: 0.8;">Run fetch</span>
+              <span style="font-size: 0.8rem; font-weight: normal; opacity: 0.8;">Test now</span>
             </summary>
             <div class="try-it-body">
               <form class="try-it__form" data-method="${escapeHTML(ep.method)}" data-path="${escapeHTML(ep.path)}">
@@ -972,4 +972,79 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Header & Footer Triggers Wiring
+  const statsBtns = document.querySelectorAll('.header-stats-btn');
+  const footerStatsTrigger = document.getElementById('footer-stats-trigger');
+  statsBtns.forEach(btn => btn.addEventListener('click', openDashboard));
+  if (footerStatsTrigger) {
+    footerStatsTrigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      openDashboard();
+    });
+  }
+
+  const copyBtns = document.querySelectorAll('.header-copy-btn');
+  copyBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const sessionDisplay = document.getElementById('session-id-display');
+      const token = sessionDisplay ? sessionDisplay.getAttribute('data-session-token') : null;
+      if (!token) return alert('No active session token found.');
+
+      try {
+        await navigator.clipboard.writeText(token);
+        const origText = btn.innerHTML;
+        btn.innerHTML = '<span>✅ Copied!</span>';
+        setTimeout(() => { btn.innerHTML = origText; }, 2000);
+      } catch {
+        alert(token);
+      }
+    });
+  });
+
+  // Mobile Drawer Toggle Wiring
+  const mobileToggleBtn = document.getElementById('mobile-menu-toggle');
+  const appSidebar = document.getElementById('app-sidebar');
+  if (mobileToggleBtn && appSidebar) {
+    mobileToggleBtn.addEventListener('click', () => {
+      appSidebar.classList.toggle('mobile-open');
+    });
+  }
+
+  // Architecture Explainer Modal Wiring
+  const openExplainerBtn = document.getElementById('open-explainer-modal-btn');
+  const footerExplainerTrigger = document.getElementById('footer-explainer-trigger');
+  const explainerModal = document.getElementById('sandbox-explainer-modal');
+  const closeExplainerBtn = document.getElementById('close-explainer-modal-btn');
+  const dismissExplainerBtn = document.getElementById('dismiss-explainer-modal-btn');
+
+  const openExplainer = () => {
+    if (explainerModal) explainerModal.removeAttribute('hidden');
+  };
+
+  const closeExplainer = () => {
+    if (explainerModal) explainerModal.setAttribute('hidden', '');
+  };
+
+  if (openExplainerBtn) openExplainerBtn.addEventListener('click', openExplainer);
+  if (footerExplainerTrigger) {
+    footerExplainerTrigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      openExplainer();
+    });
+  }
+  if (closeExplainerBtn) closeExplainerBtn.addEventListener('click', closeExplainer);
+  if (dismissExplainerBtn) dismissExplainerBtn.addEventListener('click', closeExplainer);
+
+  if (explainerModal) {
+    explainerModal.addEventListener('click', (e) => {
+      if (e.target === explainerModal) closeExplainer();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && explainerModal && !explainerModal.hasAttribute('hidden')) {
+      closeExplainer();
+    }
+  });
 });

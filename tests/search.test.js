@@ -1,5 +1,8 @@
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { v4 as uuidv4 } from 'uuid';
+import { createSignedToken } from '../src/utils/sessionToken.js';
+import prisma from '../src/db/prismaClient.js';
 import app from '../src/app.js';
 
 describe('12 — Universal Full-Text Search (GET /<resource>?q=<term>)', () => {
@@ -24,11 +27,10 @@ describe('12 — Universal Full-Text Search (GET /<resource>?q=<term>)', () => {
 
     const json = await res.json();
     assert.ok(json.data.length > 0);
-    json.data.forEach(post => {
-      const matchInTitle = post.title && post.title.toLowerCase().includes('qui');
-      const matchInBody = post.body && post.body.toLowerCase().includes('qui');
-      assert.ok(matchInTitle || matchInBody, `Post ID ${post.id} should contain 'qui' in title or body`);
-    });
+    assert.ok(json.data.every(p => 
+      p.title.toLowerCase().includes('qui') || 
+      p.body.toLowerCase().includes('qui')
+    ));
   });
 
   test('GET /users?q=leanne performs search across name, username, and email', async () => {
@@ -41,21 +43,30 @@ describe('12 — Universal Full-Text Search (GET /<resource>?q=<term>)', () => {
   });
 
   test('GET /posts?q=<term> searches session sandbox created records', async () => {
-    const initRes = await fetch(`${baseUrl}/users?limit=1`);
-    const cookie = initRes.headers.get('set-cookie');
+    const testIdentity = uuidv4();
+    await prisma.identities.create({
+      data: {
+        id: testIdentity,
+        ip_hash: 'test_ip_hash_' + testIdentity,
+        created_at: new Date(),
+        last_seen_at: new Date()
+      }
+    });
+    const token = createSignedToken(testIdentity);
 
     const uniqueTerm = 'ZebraXylophone99';
-    await fetch(`${baseUrl}/posts`, {
+    const createRes = await fetch(`${baseUrl}/posts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Cookie: cookie
+        'X-Playground-Identity': token
       },
       body: JSON.stringify({ title: `Post about ${uniqueTerm}`, body: 'Custom content', userId: 1 })
     });
+    assert.equal(createRes.status, 201);
 
     const searchRes = await fetch(`${baseUrl}/posts?q=${uniqueTerm}`, {
-      headers: { Cookie: cookie }
+      headers: { 'X-Playground-Identity': token }
     });
     assert.equal(searchRes.status, 200);
 

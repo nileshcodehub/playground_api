@@ -61,10 +61,37 @@
 
     <div class="endpoint-card" style="margin: 0;">
       <div style="font-weight: 700; font-size: 1.1rem; color: var(--put-badge); margin-bottom: 0.5rem;">
-        🔒 Cookie-Based Identity
+        🔒 Cookie & Header Session Token
       </div>
       <p style="font-size: 0.9rem; color: var(--text-secondary);">
-        Identity is securely tied to the <code>pg_identity</code> HTTP cookie. IP addresses are hashed using SHA-256 strictly for rate limiting backstop (60 req/min).
+        Identity is securely resolved via <code>pg_identity</code> HTTP cookie or <code>X-Playground-Identity</code> header with HMAC-SHA256 token validation.
+      </p>
+    </div>
+
+    <div class="endpoint-card" style="margin: 0;">
+      <div style="font-weight: 700; font-size: 1.1rem; color: var(--patch-badge); margin-bottom: 0.5rem;">
+        ⏱️ Network Delay & Error Simulation
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">
+        Simulate artificial latency (<code>?_delay=1500</code>) or force HTTP error codes (<code>?_status=500</code>) to test frontend error handling & loading UI states.
+      </p>
+    </div>
+
+    <div class="endpoint-card" style="margin: 0;">
+      <div style="font-weight: 700; font-size: 1.1rem; color: #38bdf8; margin-bottom: 0.5rem;">
+        📦 Multi-Format Collection Exports
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">
+        Instantly export OpenAPI 3.0 Specs, Postman v2.1 Collections, Bruno, and Insomnia files for all or individual API resources.
+      </p>
+    </div>
+
+    <div class="endpoint-card" style="margin: 0; cursor: pointer; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.03);" id="overview-explainer-trigger-card" onclick="document.getElementById('open-explainer-modal-btn') && document.getElementById('open-explainer-modal-btn').click()">
+      <div style="font-weight: 700; font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">
+        💡 How Sandboxing Works
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">
+        Click to explore how zero-login stateful sandboxing works without breaking shared global seed data for other developers.
       </p>
     </div>
   </div>
@@ -73,39 +100,81 @@
   <section style="margin-bottom: 2.5rem;">
     <h2 style="font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-primary);">Why Choose Playground API? (Feature Comparison)</h2>
     <div class="endpoint-card" style="padding: 1.25rem; overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
         <thead>
           <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-primary);">
-            <th style="padding: 0.75rem 0.5rem;">Feature</th>
-            <th style="padding: 0.75rem 0.5rem; color: var(--primary-accent);">Playground API</th>
-            <th style="padding: 0.75rem 0.5rem;">JSONPlaceholder</th>
-            <th style="padding: 0.75rem 0.5rem;">DummyJSON / ReqRes</th>
+            <th style="padding: 0.75rem 0.6rem; min-width: 200px;">Feature / Capability</th>
+            <th style="padding: 0.75rem 0.6rem; color: var(--primary-accent); min-width: 210px;">⚡ Playground API</th>
+            <th style="padding: 0.75rem 0.6rem; min-width: 170px;">JSONPlaceholder</th>
+            <th style="padding: 0.75rem 0.6rem; min-width: 170px;">DummyJSON / ReqRes</th>
           </tr>
         </thead>
         <tbody>
           <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-            <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: var(--text-primary);">Per-Session Stateful Mutations</td>
-            <td style="padding: 0.75rem 0.5rem; color: #22c55e; font-weight: 700;">✅ Yes (`pg_identity` Sandbox)</td>
-            <td style="padding: 0.75rem 0.5rem; color: var(--delete-badge);">❌ Stateless (Fake Response)</td>
-            <td style="padding: 0.75rem 0.5rem; color: var(--delete-badge);">❌ Stateless / Static Mock</td>
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Per-Session Stateful Mutations</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ Yes (`pg_identity` Cookie / Header)</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Stateless (Fake Response)</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Stateless / Static Mock</td>
           </tr>
           <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-            <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: var(--text-primary);">Interactive Live Request Tester</td>
-            <td style="padding: 0.75rem 0.5rem; color: #22c55e; font-weight: 700;">✅ Built-in per endpoint</td>
-            <td style="padding: 0.75rem 0.5rem;">⚠️ Basic code examples</td>
-            <td style="padding: 0.75rem 0.5rem;">⚠️ Static snippets</td>
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Universal Full-Text Search (`?q=`)</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ Across merged baseline + sandbox</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Primitive string match</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Limited field match</td>
           </tr>
           <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-            <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: var(--text-primary);">Zero Configuration / Registration</td>
-            <td style="padding: 0.75rem 0.5rem; color: #22c55e; font-weight: 700;">✅ 100% Free & Open</td>
-            <td style="padding: 0.75rem 0.5rem; color: #22c55e;">✅ Free</td>
-            <td style="padding: 0.75rem 0.5rem; color: #22c55e;">✅ Free</td>
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Dynamic Sorting (`?_sort=&_order=`)</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ Multi-field asc / desc sorting</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Single-field static sort</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Limited or unsupported</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Relational Sub-Resources</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ `/users/1/posts`, `/posts/1/comments`</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Static relational endpoints</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Flat lists only</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Network Delay Simulation</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ `X-Simulate-Delay` / `?_delay=1500`</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Unsupported</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Hardcoded query param</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">HTTP Status Error Simulation</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ `X-Simulate-Status` / `?_status=500`</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Unsupported</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Unsupported</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Schema Collection Downloads</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ OpenAPI 3.0, Postman, Bruno, Insomnia</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ None</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ None</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Session Dashboard & Metrics</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ Real-time `/session/stats` & TTL</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ None</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ None</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Multi-Language Code Generators</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ 9 Languages (cURL, Node, Python, Go...)</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ cURL snippets only</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Static JS snippets</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Zero Configuration / Registration</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ 100% Free & Open</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e;">✅ Free</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e;">✅ Free</td>
           </tr>
           <tr style="color: var(--text-secondary);">
-            <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: var(--text-primary);">Pagination & Field Filtering</td>
-            <td style="padding: 0.75rem 0.5rem; color: #22c55e; font-weight: 700;">✅ `page`, `limit`, virtual ID slice</td>
-            <td style="padding: 0.75rem 0.5rem;">✅ Supported</td>
-            <td style="padding: 0.75rem 0.5rem;">✅ Supported</td>
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">System Health Endpoint</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ `GET /health` with DB latency ms</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Unsupported</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Static ping</td>
           </tr>
         </tbody>
       </table>
@@ -160,36 +229,90 @@ fetch('http://localhost:3000/users?page=1&limit=10', {
     <% } %>
   </div>
 
-  <!-- Developer Frequently Asked Questions (FAQ) for Search Engines -->
+  <!-- Developer Frequently Asked Questions (FAQ) Accordion -->
   <section style="margin-bottom: 2.5rem;">
     <h2 style="font-size: 1.4rem; margin-bottom: 1.25rem; color: var(--text-primary);">Frequently Asked Questions (FAQ)</h2>
 
-    <div class="endpoint-card" style="margin-bottom: 1rem;">
-      <h3 style="font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">What makes Playground API different from JSONPlaceholder?</h3>
-      <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
-        While standard mock APIs like JSONPlaceholder return fake responses when you send a POST, PUT, or DELETE request without saving your changes, Playground API saves your mutations into a <strong>per-session sandbox overlay</strong> tied to your HTTP cookie. When you perform subsequent GET requests, your created, updated, or deleted items persist specifically for you without altering global seed data for other developers.
-      </p>
-    </div>
+    <div class="faq-container">
+      <!-- Item 1: Auto-Expanded by Default -->
+      <details class="faq-item" open>
+        <summary>
+          <span>What makes Playground API different from JSONPlaceholder?</span>
+        </summary>
+        <div class="faq-answer">
+          While standard mock APIs like JSONPlaceholder return fake responses when you send a <code>POST</code>, <code>PUT</code>, or <code>DELETE</code> request without saving your changes, Playground API saves your mutations into a <strong>per-session sandbox overlay</strong> tied to your HTTP cookie or <code>X-Playground-Identity</code> header token. When you perform subsequent <code>GET</code> requests, your created, updated, or deleted items persist specifically for you without altering global seed data for other developers.
+        </div>
+      </details>
 
-    <div class="endpoint-card" style="margin-bottom: 1rem;">
-      <h3 style="font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">Do I need an API key or registration to use Playground API?</h3>
-      <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
-        No. Playground API is 100% free and open. No API keys, sign-ups, or authentication headers are required. Simply make standard HTTP requests using <code>fetch</code>, <code>axios</code>, <code>cURL</code>, or Postman.
-      </p>
-    </div>
+      <!-- Item 2 -->
+      <details class="faq-item">
+        <summary>
+          <span>Do I need an API key or account registration?</span>
+        </summary>
+        <div class="faq-answer">
+          No. Playground API is 100% free and open-source. No API keys, user sign-ups, or authentication tokens are required to start prototyping. Simply make standard HTTP requests using <code>fetch</code>, <code>axios</code>, <code>cURL</code>, or Postman.
+        </div>
+      </details>
 
-    <div class="endpoint-card" style="margin-bottom: 1rem;">
-      <h3 style="font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">How long do sandbox session mutations persist?</h3>
-      <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
-        Your session overlay data persists via the <code>pg_identity</code> cookie and is maintained in our database for up to 10 days of inactivity. An automated daily cron job cleans up inactive identity sessions automatically.
-      </p>
-    </div>
+      <!-- Item 3 -->
+      <details class="faq-item">
+        <summary>
+          <span>How do I use Playground API in cross-origin apps, Cypress, or Postman?</span>
+        </summary>
+        <div class="faq-answer">
+          For cross-origin frontend applications (React, Vue, Next.js) or Cypress/Postman tests where third-party cookies might be blocked, pass the <code>X-Playground-Identity: &lt;signed-token&gt;</code> header in your HTTP requests. You can copy your active signed token instantly from the top navigation bar or sidebar drawer.
+        </div>
+      </details>
 
-    <div class="endpoint-card" style="margin-bottom: 1rem;">
-      <h3 style="font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">What are the rate limits on Playground API?</h3>
-      <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
-        General read requests are limited to 60 requests per minute per salted IP hash. Mutation requests (POST, PUT, DELETE) are limited to 15 requests per hour per IP hash with a quota cap of 30 custom sandbox records per identity session.
-      </p>
+      <!-- Item 4 -->
+      <details class="faq-item">
+        <summary>
+          <span>How long do session sandbox mutations persist?</span>
+        </summary>
+        <div class="faq-answer">
+          Your session overlay data persists via your identity token and is maintained in the database for up to <strong>10 days of inactivity</strong>. An automated daily cleanup job purges inactive identities automatically. You can also purge your sandbox instantly at any time using the <code>DELETE /session/reset</code> endpoint or the "Reset Sandbox" button in the docs.
+        </div>
+      </details>
+
+      <!-- Item 5 -->
+      <details class="faq-item">
+        <summary>
+          <span>How does Network Delay and HTTP Error Simulation work?</span>
+        </summary>
+        <div class="faq-answer">
+          You can test frontend loading states and resilience by introducing artificial latency (0–20,000ms) with the <code>X-Simulate-Delay: 1500</code> header or <code>?_delay=1500</code> query parameter. To test error boundaries, pass <code>X-Simulate-Status: 500</code> or <code>?_status=404</code> to force custom status error responses.
+        </div>
+      </details>
+
+      <!-- Item 6 -->
+      <details class="faq-item">
+        <summary>
+          <span>What are the rate limits and record creation quotas?</span>
+        </summary>
+        <div class="faq-answer">
+          General read requests are limited to 60 requests per minute per IP hash. Mutation requests (<code>POST</code>, <code>PUT</code>, <code>DELETE</code>) allow up to 15 requests per minute with a quota cap of <strong>30 self-created sandbox records per resource</strong> per session to prevent abuse.
+        </div>
+      </details>
+
+      <!-- Item 7 -->
+      <details class="faq-item">
+        <summary>
+          <span>How do I export API collections for Postman, Bruno, or Insomnia?</span>
+        </summary>
+        <div class="faq-answer">
+          You can export OpenAPI 3.0 Specs, Postman v2.1 Collections, Bruno Collections, and Insomnia files with one click from the sidebar or resource documentation pages. Use the resource filter dropdown in the sidebar to download schemas for specific collections (<code>/users</code>, <code>/posts</code>, <code>/comments</code>, <code>/todos</code>) or all resources at once.
+        </div>
+      </details>
+
+      <!-- Item 8 -->
+      <details class="faq-item">
+        <summary>
+          <span>Is full-text search and dynamic sorting supported?</span>
+        </summary>
+        <div class="faq-answer">
+          Yes! Append <code>?q=&lt;term&gt;</code> to perform case-insensitive full-text search across all record fields (e.g., <code>GET /posts?q=javascript</code>). For sorting, use <code>?_sort=&lt;field&gt;&amp;_order=asc|desc</code> (e.g., <code>GET /posts?_sort=title&amp;_order=desc</code>). Search and sorting operate dynamically across merged global database records and your local session overlay.
+        </div>
+      </details>
     </div>
   </section>
 </div>

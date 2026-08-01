@@ -50,10 +50,10 @@ export const getCommentsEndpoints = (sampleRecord = null) => {
       path: "/comments",
       summary: "Create a new session sandbox comment record. Returns a local-<uuid> formatted ID with _sandbox: 'created'. Each session identity is capped at 30 created records.",
       params: [
-        { name: "post_id", in: "body", type: "integer", description: "Target post ID." },
-        { name: "name", in: "body", type: "string", description: "Comment title or reviewer name." },
-        { name: "email", in: "body", type: "string", description: "Commenter email address." },
-        { name: "body", in: "body", type: "string", description: "Comment text content." }
+        { name: "post_id", in: "body", type: "integer", required: true, description: "Target post ID." },
+        { name: "name", in: "body", type: "string", required: true, description: "Comment title or reviewer name." },
+        { name: "email", in: "body", type: "string", required: true, description: "Commenter email address." },
+        { name: "body", in: "body", type: "string", required: true, description: "Comment text content." }
       ],
       bodyExample: JSON.stringify({
         post_id: realComment.post_id || 1,

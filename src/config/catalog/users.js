@@ -53,13 +53,13 @@ export const getUsersEndpoints = (sampleRecord = null) => {
       path: "/users",
       summary: "Create a new session sandbox user record. Returns a local-<uuid> formatted ID with _sandbox: 'created'. Each session identity is capped at 30 created records.",
       params: [
-        { name: "name", in: "body", type: "string", description: "Full name of the user." },
-        { name: "username", in: "body", type: "string", description: "Username." },
-        { name: "email", in: "body", type: "string", description: "Email address." },
-        { name: "phone", in: "body", type: "string", description: "Phone number." },
-        { name: "website", in: "body", type: "string", description: "Website URL." },
-        { name: "address", in: "body", type: "object", description: "JSON object containing street, city, zipcode." },
-        { name: "company", in: "body", type: "object", description: "JSON object containing company name and catchPhrase." }
+        { name: "name", in: "body", type: "string", required: true, description: "Full name of the user." },
+        { name: "username", in: "body", type: "string", required: true, description: "Username." },
+        { name: "email", in: "body", type: "string", required: true, description: "Email address." },
+        { name: "phone", in: "body", type: "string", required: false, description: "Phone number." },
+        { name: "website", in: "body", type: "string", required: false, description: "Website URL." },
+        { name: "address", in: "body", type: "object", required: false, description: "JSON object containing street, city, zipcode." },
+        { name: "company", in: "body", type: "object", required: false, description: "JSON object containing company name and catchPhrase." }
       ],
       bodyExample: JSON.stringify({
         name: realUser.name || "Jane Doe",

@@ -19,9 +19,9 @@ describe('10 — Session Quota & Activity Dashboard Endpoint', () => {
   });
 
   test('GET /session/stats returns identity metadata, quota caps, and per-resource breakdown', async () => {
-    // Initial GET request to get identity session cookie
-    const initRes = await fetch(`${baseUrl}/users?limit=1`);
-    const cookie = initRes.headers.get('set-cookie');
+    // Initial fresh session reset to ensure pristine state
+    const resetRes = await fetch(`${baseUrl}/session/reset`, { method: 'DELETE' });
+    const cookie = resetRes.headers.get('set-cookie');
 
     // Perform a POST mutation to create a post in session
     await fetch(`${baseUrl}/posts`, {

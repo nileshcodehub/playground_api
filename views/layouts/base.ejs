@@ -4,23 +4,78 @@
     <%- include('../partials/head') %>
   </head>
   <body>
-    <div class="app-layout">
-      <!-- Left Sidebar (Desktop 2-Column) -->
-      <aside class="sidebar">
+    <!-- 1. HEADER (Top Navigation Bar) -->
+    <header class="top-nav">
+      <div class="header-inner">
+        <!-- Brand / Logo -->
         <a href="/" class="brand">
-          <img src="/public/favicon.svg" alt="Playground API Logo" class="brand-icon" style="width: 32px; height: 32px; border-radius: 8px;" />
-          <div>
-            <div class="brand-title">Playground API</div>
-          </div>
+          <img src="/public/favicon.svg" alt="Playground API Logo" class="brand-icon" style="width: 30px; height: 30px; border-radius: 8px;" />
+          <div class="brand-title">Playground API</div>
           <span class="brand-version">v1.0</span>
         </a>
 
-        <!-- Theme Switcher Controller -->
-        <div class="theme-controller">
-          <span class="theme-label">Theme</span>
-          <div class="theme-toggle-group">
-            <button type="button" class="theme-btn" data-theme-val="dark" title="Dark Obsidian">🌙 Dark</button>
-            <button type="button" class="theme-btn" data-theme-val="light" title="Light Mode">☀️ Light</button>
+        <!-- Header Actions (Right Bar) -->
+        <div class="header-actions">
+          <span class="header-status-badge" title="Stateful Sandbox Active">
+            <span class="status-dot"></span> Sandbox Active
+          </span>
+
+          <!-- Theme Switcher Controller -->
+          <div class="theme-controller-header" style="display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.15rem 0.25rem;">
+            <button type="button" class="theme-btn" data-theme-val="dark" title="Dark Obsidian" style="padding: 0.2rem 0.45rem; font-size: 0.76rem; border-radius: 4px;">🌙 Dark</button>
+            <button type="button" class="theme-btn" data-theme-val="light" title="Light Mode" style="padding: 0.2rem 0.45rem; font-size: 0.76rem; border-radius: 4px;">☀️ Light</button>
+          </div>
+
+          <button type="button" id="header-stats-btn" class="header-action-btn header-stats-btn" title="View Session Quota & Activity Dashboard">
+            <span>📊 Stats</span>
+          </button>
+
+          <button type="button" id="header-copy-token-btn" class="header-action-btn header-copy-btn" title="Copy signed Session Token for X-Playground-Identity header">
+            <span>📋 Copy Token</span>
+          </button>
+
+          <a href="/health" class="header-action-btn header-health-btn" title="System Health & Metrics">
+            <span>🏥 Health</span>
+          </a>
+
+          <!-- Mobile Drawer Toggle Button -->
+          <button type="button" id="mobile-menu-toggle" class="header-action-btn mobile-toggle-btn" title="Toggle Navigation Drawer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. LAYOUT CONTAINER (Sidebar + Main Content) -->
+    <div class="app-layout-container">
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="app-sidebar">
+
+        <!-- Mobile-Only Quick Header Actions Card -->
+        <div class="sidebar-mobile-quick-card">
+          <div class="sidebar-mobile-card-header">
+            <div class="sidebar-mobile-status">
+              <span class="status-dot"></span> Sandbox Active
+            </div>
+            <div class="theme-controller-header" style="display: flex; align-items: center; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.15rem 0.25rem;">
+              <button type="button" class="theme-btn" data-theme-val="dark" title="Dark Obsidian" style="padding: 0.2rem 0.45rem; font-size: 0.74rem; border-radius: 4px;">🌙 Dark</button>
+              <button type="button" class="theme-btn" data-theme-val="light" title="Light Mode" style="padding: 0.2rem 0.45rem; font-size: 0.74rem; border-radius: 4px;">☀️ Light</button>
+            </div>
+          </div>
+
+          <div class="sidebar-mobile-actions-grid">
+            <button type="button" class="sidebar-mobile-action-btn header-stats-btn" title="View Session Quota & Activity Dashboard">
+              <span class="btn-icon">📊</span>
+              <span>Stats</span>
+            </button>
+            <button type="button" class="sidebar-mobile-action-btn header-copy-btn" title="Copy signed Session Token">
+              <span class="btn-icon">📋</span>
+              <span>Copy Token</span>
+            </button>
+            <a href="/health" class="sidebar-mobile-action-btn header-health-btn" title="System Health & Metrics">
+              <span class="btn-icon">🏥</span>
+              <span>Health</span>
+            </a>
           </div>
         </div>
 
@@ -43,14 +98,10 @@
           <div class="session-id" id="session-id-display" data-session-token="<%= (typeof signedToken !== 'undefined' && signedToken) ? signedToken : (typeof identityId !== 'undefined' ? identityId : '') %>">
             <%= (typeof identityId !== 'undefined' && identityId) ? (identityId.slice(0, 8) + '...') : 'Active Session' %>
           </div>
-          <div class="session-actions" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.25rem;">
+          <div class="session-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem;">
             <button type="button" id="copy-session-id-btn" class="session-action-btn copy-session-btn" title="Copy signed Session Token for X-Playground-Identity header">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               <span>Copy</span>
-            </button>
-            <button type="button" id="open-session-dashboard-btn" class="session-action-btn dashboard-btn" title="View Session Quota & Activity Dashboard">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-              <span>Stats</span>
             </button>
             <button type="button" id="reset-sandbox-btn" class="session-action-btn reset-sandbox-btn" title="Purge all sandbox mutations for this session">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
@@ -58,39 +109,7 @@
             </button>
           </div>
           <div class="session-note">
-            Mutations are session-isolated & HMAC signed. Global datasets remain pristine.
-          </div>
-        </div>
-
-        <!-- Export API Collections Card -->
-        <div class="session-card export-collections-card" style="margin-top: 0.75rem;">
-          <div class="session-card-header">
-            <span>Export Collections</span>
-            <span style="font-size: 0.7rem; font-weight: 600; color: var(--primary-accent);">Schema / JSON</span>
-          </div>
-          <div style="margin-top: 0.5rem;">
-            <select id="export-resource-select" class="form-control" style="font-size: 0.78rem; padding: 0.25rem 0.5rem; height: 30px; width: 100%; border-radius: 4px; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); cursor: pointer;">
-              <option value="all" <%= (typeof currentNav !== 'undefined' && currentNav === 'overview') ? 'selected' : '' %>>📁 All Resources</option>
-              <option value="users" <%= (typeof currentNav !== 'undefined' && currentNav === 'users') ? 'selected' : '' %>>👤 Users Collection</option>
-              <option value="posts" <%= (typeof currentNav !== 'undefined' && currentNav === 'posts') ? 'selected' : '' %>>📝 Posts Collection</option>
-              <option value="comments" <%= (typeof currentNav !== 'undefined' && currentNav === 'comments') ? 'selected' : '' %>>💬 Comments Collection</option>
-              <option value="todos" <%= (typeof currentNav !== 'undefined' && currentNav === 'todos') ? 'selected' : '' %>>✅ Todos Collection</option>
-            </select>
-          </div>
-          <div class="export-collections-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.5rem;">
-            <% const initQuery = (typeof currentNav !== 'undefined' && currentNav !== 'overview') ? `?resource=${currentNav}` : ''; %>
-            <a id="export-btn-openapi" href="/downloads/openapi.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download OpenAPI 3.0 Specification">
-              <span>🌐 OpenAPI</span>
-            </a>
-            <a id="export-btn-postman" href="/downloads/postman.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Postman Collection v2.1">
-              <span>📦 Postman</span>
-            </a>
-            <a id="export-btn-bruno" href="/downloads/bruno.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Bruno API Collection">
-              <span>🐶 Bruno</span>
-            </a>
-            <a id="export-btn-insomnia" href="/downloads/insomnia.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Insomnia v4 Collection">
-              <span>💧 Insomnia</span>
-            </a>
+            Mutations are session-isolated & HMAC signed. Global seed data remains pristine.
           </div>
         </div>
 
@@ -136,18 +155,110 @@
             <span class="nav-count">REST</span>
           </a>
         </nav>
+
+        <!-- Export API Collections Card (Below Documentation Section) -->
+        <div class="session-card export-collections-card" style="margin-top: 0.75rem;">
+          <div class="session-card-header">
+            <span>Export Collections</span>
+            <span style="font-size: 0.7rem; font-weight: 600; color: var(--primary-accent);">Schema / JSON</span>
+          </div>
+          <div style="margin-top: 0.5rem;">
+            <select id="export-resource-select" class="form-control" style="font-size: 0.78rem; padding: 0.25rem 0.5rem; height: 30px; width: 100%; border-radius: 4px; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); cursor: pointer;">
+              <option value="all" <%= (typeof currentNav !== 'undefined' && currentNav === 'overview') ? 'selected' : '' %>>📁 All Resources</option>
+              <option value="users" <%= (typeof currentNav !== 'undefined' && currentNav === 'users') ? 'selected' : '' %>>👤 Users Collection</option>
+              <option value="posts" <%= (typeof currentNav !== 'undefined' && currentNav === 'posts') ? 'selected' : '' %>>📝 Posts Collection</option>
+              <option value="comments" <%= (typeof currentNav !== 'undefined' && currentNav === 'comments') ? 'selected' : '' %>>💬 Comments Collection</option>
+              <option value="todos" <%= (typeof currentNav !== 'undefined' && currentNav === 'todos') ? 'selected' : '' %>>✅ Todos Collection</option>
+            </select>
+          </div>
+          <div class="export-collections-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.5rem;">
+            <% const initQuery = (typeof currentNav !== 'undefined' && currentNav !== 'overview') ? `?resource=${currentNav}` : ''; %>
+            <a id="export-btn-openapi" href="/downloads/openapi.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download OpenAPI 3.0 Specification">
+              <span>🌐 OpenAPI</span>
+            </a>
+            <a id="export-btn-postman" href="/downloads/postman.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Postman Collection v2.1">
+              <span>📦 Postman</span>
+            </a>
+            <a id="export-btn-bruno" href="/downloads/bruno.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Bruno API Collection">
+              <span>🐶 Bruno</span>
+            </a>
+            <a id="export-btn-insomnia" href="/downloads/insomnia.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Insomnia v4 Collection">
+              <span>💧 Insomnia</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Interactive Architecture Explainer Trigger -->
+        <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+          <button type="button" id="open-explainer-modal-btn" class="session-action-btn" style="width: 100%; justify-content: center; background: rgba(59, 130, 246, 0.1); color: var(--primary-accent); border-color: rgba(59, 130, 246, 0.3);" title="How Session Sandboxing Works">
+            <span>💡 How Sandboxing Works</span>
+          </button>
+        </div>
       </aside>
 
-      <!-- Right Main Area -->
+      <!-- MAIN CONTENT -->
       <main class="main-area">
-        <%- body %>
-
-        <footer class="footer">
-          <p>Playground API — Built with 💖 by Nilesh Kumar</p>
-        </footer>
+        <div class="main-content-container">
+          <%- body %>
+        </div>
       </main>
     </div>
 
+    <!-- 3. FOOTER -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-grid">
+          <!-- Column 1: Brand & Mission -->
+          <div class="footer-col">
+            <div class="footer-brand">
+              <img src="/public/favicon.svg" alt="Playground API Logo" style="width: 24px; height: 24px; border-radius: 6px;" />
+              <span style="font-weight: 700; color: var(--text-primary);">Playground API</span>
+            </div>
+            <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; margin-top: 0.6rem;">
+              Free, zero-configuration stateful fake REST API for frontend prototyping, HTTP testing, and automated E2E test suites.
+            </p>
+          </div>
+
+          <!-- Column 2: API Resources -->
+          <div class="footer-col">
+            <h4 class="footer-title">Resources</h4>
+            <ul class="footer-links">
+              <li><a href="/docs/users">/users</a></li>
+              <li><a href="/docs/posts">/posts</a></li>
+              <li><a href="/docs/comments">/comments</a></li>
+              <li><a href="/docs/todos">/todos</a></li>
+            </ul>
+          </div>
+
+          <!-- Column 3: Developer Tools -->
+          <div class="footer-col">
+            <h4 class="footer-title">Export Collections</h4>
+            <ul class="footer-links">
+              <li><a href="/downloads/openapi.json" download>OpenAPI 3.0 Spec</a></li>
+              <li><a href="/downloads/postman.json" download>Postman Collection</a></li>
+              <li><a href="/downloads/bruno.json" download>Bruno Collection</a></li>
+              <li><a href="/downloads/insomnia.json" download>Insomnia Collection</a></li>
+            </ul>
+          </div>
+
+          <!-- Column 4: Architecture & Health -->
+          <div class="footer-col">
+            <h4 class="footer-title">System & Health</h4>
+            <ul class="footer-links">
+              <li><a href="/health">GET /health Status</a></li>
+              <li><a href="#" id="footer-stats-trigger">Session Dashboard</a></li>
+              <li><a href="#" id="footer-explainer-trigger">Sandboxing Architecture</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© 2026 Playground API — Built with 💖 by Nilesh Kumar. Open source & free for all developers.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- MODALS -->
     <!-- Session Dashboard Modal -->
     <div id="session-dashboard-modal" class="modal-backdrop" hidden>
       <div class="modal-card">
@@ -181,6 +292,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Explainer Modal -->
+    <%- include('../partials/explainer-modal') %>
 
     <script src="/public/js/endpoints-catalog.js"></script>
     <script src="/public/js/try-it.js"></script>
