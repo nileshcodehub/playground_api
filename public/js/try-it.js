@@ -974,9 +974,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Header & Footer Triggers Wiring
-  const headerStatsBtn = document.getElementById('header-stats-btn');
+  const statsBtns = document.querySelectorAll('.header-stats-btn');
   const footerStatsTrigger = document.getElementById('footer-stats-trigger');
-  if (headerStatsBtn) headerStatsBtn.addEventListener('click', openDashboard);
+  statsBtns.forEach(btn => btn.addEventListener('click', openDashboard));
   if (footerStatsTrigger) {
     footerStatsTrigger.addEventListener('click', (e) => {
       e.preventDefault();
@@ -984,22 +984,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const headerCopyBtn = document.getElementById('header-copy-token-btn');
-  if (headerCopyBtn) {
-    headerCopyBtn.addEventListener('click', async () => {
+  const copyBtns = document.querySelectorAll('.header-copy-btn');
+  copyBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
       const sessionDisplay = document.getElementById('session-id-display');
       const token = sessionDisplay ? sessionDisplay.getAttribute('data-session-token') : null;
       if (!token) return alert('No active session token found.');
 
       try {
         await navigator.clipboard.writeText(token);
-        headerCopyBtn.textContent = '✅ Copied!';
-        setTimeout(() => { headerCopyBtn.textContent = '📋 Copy Token'; }, 2000);
+        const origText = btn.innerHTML;
+        btn.innerHTML = '<span>✅ Copied!</span>';
+        setTimeout(() => { btn.innerHTML = origText; }, 2000);
       } catch {
         alert(token);
       }
     });
-  }
+  });
 
   // Mobile Drawer Toggle Wiring
   const mobileToggleBtn = document.getElementById('mobile-menu-toggle');

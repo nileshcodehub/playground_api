@@ -51,6 +51,34 @@
       <!-- SIDEBAR -->
       <aside class="sidebar" id="app-sidebar">
 
+        <!-- Mobile-Only Quick Header Actions Card -->
+        <div class="sidebar-mobile-quick-card">
+          <div class="sidebar-mobile-card-header">
+            <div class="sidebar-mobile-status">
+              <span class="status-dot"></span> Sandbox Active
+            </div>
+            <div class="theme-controller-header" style="display: flex; align-items: center; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.15rem 0.25rem;">
+              <button type="button" class="theme-btn" data-theme-val="dark" title="Dark Obsidian" style="padding: 0.2rem 0.45rem; font-size: 0.74rem; border-radius: 4px;">🌙 Dark</button>
+              <button type="button" class="theme-btn" data-theme-val="light" title="Light Mode" style="padding: 0.2rem 0.45rem; font-size: 0.74rem; border-radius: 4px;">☀️ Light</button>
+            </div>
+          </div>
+
+          <div class="sidebar-mobile-actions-grid">
+            <button type="button" class="sidebar-mobile-action-btn header-stats-btn" title="View Session Quota & Activity Dashboard">
+              <span class="btn-icon">📊</span>
+              <span>Stats</span>
+            </button>
+            <button type="button" class="sidebar-mobile-action-btn header-copy-btn" title="Copy signed Session Token">
+              <span class="btn-icon">📋</span>
+              <span>Copy Token</span>
+            </button>
+            <a href="/health" class="sidebar-mobile-action-btn header-health-btn" title="System Health & Metrics">
+              <span class="btn-icon">🏥</span>
+              <span>Health</span>
+            </a>
+          </div>
+        </div>
+
         <!-- Live Search Box -->
         <div class="sidebar-search-box">
           <input
