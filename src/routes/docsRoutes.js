@@ -38,7 +38,8 @@ router.get('/', (req, res, next) => {
     baseUrl: `${req.protocol}://${req.get('host')}`,
     resources: RESOURCES,
     currentNav: 'overview',
-    identityId: req.identityId
+    identityId: req.identityId,
+    signedToken: req.signedToken
   };
 
   res.render('docs-index', locals, (err, htmlContent) => {
@@ -102,7 +103,8 @@ router.get('/docs/:resource', async (req, res, next) => {
     currentNav: resource,
     sampleRecord,
     endpoints,
-    identityId: req.identityId
+    identityId: req.identityId,
+    signedToken: req.signedToken
   };
 
   res.render(resource, locals, (err, htmlContent) => {

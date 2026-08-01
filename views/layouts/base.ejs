@@ -40,17 +40,22 @@
             <span>Identity Session</span>
             <span class="status-dot" title="Session Active"></span>
           </div>
-          <div class="session-id">
-            <%= (typeof identityId !== 'undefined' && identityId) ? (identityId.slice(0, 8) + '...') :
-            'Cookie Active (pg_identity)' %>
+          <div class="session-id" id="session-id-display" data-session-token="<%= (typeof signedToken !== 'undefined' && signedToken) ? signedToken : (typeof identityId !== 'undefined' ? identityId : '') %>">
+            <%= (typeof identityId !== 'undefined' && identityId) ? (identityId.slice(0, 8) + '...') : 'Active Session' %>
+          </div>
+          <div class="session-actions">
+            <button type="button" id="copy-session-id-btn" class="session-action-btn copy-session-btn" title="Copy signed Session Token for X-Playground-Identity header">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+            <button type="button" id="reset-sandbox-btn" class="session-action-btn reset-sandbox-btn" title="Purge all sandbox mutations for this session">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Reset</span>
+            </button>
           </div>
           <div class="session-note">
-            Mutations are session-isolated via HTTP cookie. Global datasets
-            remain pristine.
+            Mutations are session-isolated & HMAC signed. Global datasets remain pristine.
           </div>
-          <button type="button" id="reset-sandbox-btn" class="reset-sandbox-btn" title="Purge all sandbox mutations for this session">
-            🔄 Reset Sandbox
-          </button>
         </div>
 
         <!-- Navigation Menu -->

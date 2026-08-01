@@ -35,7 +35,9 @@ if (config.trustProxy) {
 // allow any cross-origin site to read credentialed responses.
 app.use(cors({
   origin: (origin, callback) => callback(null, origin || false),
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Playground-Identity', 'X-Simulate-Delay', 'X-Simulate-Status'],
+  exposedHeaders: ['X-Playground-Identity']
 }));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));

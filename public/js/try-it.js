@@ -302,8 +302,9 @@ document.addEventListener('DOMContentLoaded', () => {
               <button type="button" class="snippet-tab-btn" data-target="rust">Rust</button>
               <button type="button" class="snippet-tab-btn" data-target="php">PHP</button>
             </div>
-            <button type="button" class="copy-btn">
-              <span>📋 Copy Code</span>
+            <button type="button" class="copy-btn" title="Copy code snippet">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
             </button>
           </div>
           <div class="snippet-content">
@@ -523,12 +524,13 @@ document.addEventListener('DOMContentLoaded', () => {
         copyBtn.addEventListener('click', () => {
           const visibleBlock = Array.from(codeBlocks).find(b => !b.hidden);
           if (visibleBlock) {
-            const codeText = visibleBlock.textContent;
+            const originalHTML = copyBtn.innerHTML;
+            const successHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span style="color:#10b981;">Copied!</span>`;
+
             navigator.clipboard.writeText(codeText).then(() => {
-              const originalText = copyBtn.innerHTML;
-              copyBtn.innerHTML = '<span>✅ Copied!</span>';
+              copyBtn.innerHTML = successHTML;
               setTimeout(() => {
-                copyBtn.innerHTML = originalText;
+                copyBtn.innerHTML = originalHTML;
               }, 2000);
             }).catch(err => console.error('Copy error:', err));
           }
@@ -657,6 +659,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial wiring for pre-rendered DOM elements
   wireAllInteractions(document);
+
+  // Copy Session Token Button Wiring
+  const copyBtn = document.getElementById('copy-session-id-btn');
+  const sessionDisplay = document.getElementById('session-id-display');
+  if (copyBtn && sessionDisplay) {
+    copyBtn.addEventListener('click', async () => {
+      const token = sessionDisplay.getAttribute('data-session-token');
+      if (!token) {
+        alert('No active session token found.');
+        return;
+      }
+      const originalHTML = copyBtn.innerHTML;
+      const successHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span style="color:#10b981;">Copied!</span>`;
+
+      try {
+        await navigator.clipboard.writeText(token);
+        copyBtn.innerHTML = successHTML;
+        setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 2000);
+      } catch (err) {
+        const textarea = document.createElement('textarea');
+        textarea.value = token;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        copyBtn.innerHTML = successHTML;
+        setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 2000);
+      }
+    });
+  }
 
   // Reset Session Sandbox Button Wiring
   const resetBtn = document.getElementById('reset-sandbox-btn');
