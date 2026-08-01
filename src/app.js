@@ -10,6 +10,7 @@ import { identityMiddleware } from './middleware/identity.js';
 import { generalLimiter } from './middleware/rateLimit.js';
 import { errorHandler, AppError } from './middleware/errorHandler.js';
 import { makeResourceRouter } from './routes/resourceRoutes.js';
+import { makeResourceController } from './controllers/resourceController.js';
 import docsRouter from './routes/docsRoutes.js';
 import sessionRouter from './routes/sessionRoutes.js';
 import { getHealth } from './controllers/healthController.js';
@@ -58,6 +59,22 @@ app.get('/health', getHealth);
 
 // Session Sandbox Management Endpoints (/session/reset)
 app.use('/session', sessionRouter);
+
+// Nested Sub-Resource Routes (JSONPlaceholder parity)
+app.get('/users/:userId/posts', (req, res, next) => {
+  req.resourceFilters = { user_id: req.params.userId };
+  makeResourceController('posts').list(req, res, next);
+});
+
+app.get('/users/:userId/todos', (req, res, next) => {
+  req.resourceFilters = { user_id: req.params.userId };
+  makeResourceController('todos').list(req, res, next);
+});
+
+app.get('/posts/:postId/comments', (req, res, next) => {
+  req.resourceFilters = { post_id: req.params.postId };
+  makeResourceController('comments').list(req, res, next);
+});
 
 // Resource API Routes (REST Data Endpoints)
 app.use('/users', makeResourceRouter('users'));

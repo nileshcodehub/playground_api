@@ -72,70 +72,103 @@ export const getVirtualList = async (identityId, resource) => {
   return { virtualList: [...createdIds, ...globalIds], overlay };
 };
 
-export const getPaginatedResource = async (identityId, resource, { page = 1, limit = 10 } = {}) => {
+export const getAllMergedRecords = async (identityId, resource) => {
+  const modelName = GLOBAL_MODELS[resource];
+  if (!modelName) {
+    throw new AppError(`Unknown resource: ${resource}`, 400);
+  }
+
+  const globalRows = await prisma[modelName].findMany({
+    orderBy: { id: 'asc' }
+  });
+
+  const overlay = await loadOverlay(identityId, resource);
+  const { deletedIds, updatesById, created } = overlay;
+
+  const activeGlobalRecords = globalRows
+    .filter(row => !deletedIds.has(row.id))
+    .map(row => {
+      if (updatesById.has(row.id)) {
+        const patch = updatesById.get(row.id);
+        return {
+          ...row,
+          ...(typeof patch === 'object' && patch !== null ? patch : {}),
+          _sandbox: 'updated'
+        };
+      }
+      return row;
+    });
+
+  // Created items top (newest first), then global items preserving DB order
+  return [...created, ...activeGlobalRecords];
+};
+
+export const getPaginatedResource = async (identityId, resource, { page = 1, limit = 10, filters = {}, _sort, _order = 'asc' } = {}) => {
   const pageNum = Math.max(1, parseInt(page, 10) || 1);
   const limitNum = Math.min(30, Math.max(1, parseInt(limit, 10) || 10));
 
-  // getVirtualList now returns both the ID list AND the overlay data so we
-  // don't need to call loadOverlay a second time (eliminates one DB round-trip)
-  const { virtualList, overlay } = await getVirtualList(identityId, resource);
-  const total = virtualList.length;
-  const totalPages = Math.ceil(total / limitNum) || 1;
+  // Step 1: Fetch all merged records
+  let records = await getAllMergedRecords(identityId, resource);
 
-  const startIndex = (pageNum - 1) * limitNum;
-  const pageSliceIds = virtualList.slice(startIndex, startIndex + limitNum);
+  // Step 2: Apply Filters (01-feature-relational-filtering)
+  const filterEntries = Object.entries(filters).filter(([_, val]) => val !== undefined && val !== null && val !== '');
+  if (filterEntries.length > 0) {
+    records = records.filter(item => {
+      return filterEntries.every(([key, expectedValue]) => {
+        const itemVal = item[key];
+        if (itemVal === undefined) return false;
 
-  if (pageSliceIds.length === 0) {
-    return {
-      data: [],
-      pagination: {
-        page: pageNum,
-        limit: limitNum,
-        total,
-        totalPages,
-        hasNextPage: pageNum < totalPages,
-        hasPrevPage: pageNum > 1
-      }
-    };
+        if (typeof expectedValue === 'boolean') {
+          return Boolean(itemVal) === expectedValue;
+        }
+
+        if (typeof expectedValue === 'number') {
+          return Number(itemVal) === expectedValue;
+        }
+
+        return String(itemVal).toLowerCase() === String(expectedValue).toLowerCase();
+      });
+    });
   }
 
-  // Reuse overlay from getVirtualList — no second DB query needed
-  const { updatesById, created } = overlay;
-  const createdMap = new Map(created.map(item => [item.id, item]));
+  // Step 3: Apply Dynamic Sorting (13-feature-dynamic-sorting)
+  if (_sort && typeof _sort === 'string') {
+    const sortKey = _sort.trim();
+    const isDesc = String(_order).toLowerCase() === 'desc';
 
-  const globalIntIds = pageSliceIds
-    .filter(id => typeof id === 'number')
-    .map(id => parseInt(id, 10));
+    records.sort((a, b) => {
+      const valA = a[sortKey];
+      const valB = b[sortKey];
 
-  const modelName = GLOBAL_MODELS[resource];
-  const globalRecords = globalIntIds.length > 0
-    ? await prisma[modelName].findMany({ where: { id: { in: globalIntIds } } })
-    : [];
+      if (valA === undefined && valB === undefined) return 0;
+      if (valA === undefined) return 1;
+      if (valB === undefined) return -1;
 
-  const globalRecordMap = new Map(globalRecords.map(rec => [rec.id, rec]));
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return isDesc ? valB - valA : valA - valB;
+      }
 
-  const resultData = pageSliceIds.map(id => {
-    if (typeof id === 'string' && id.startsWith('local-')) {
-      return createdMap.get(id);
-    }
+      if (typeof valA === 'boolean' && typeof valB === 'boolean') {
+        return isDesc ? (valB === valA ? 0 : valB ? 1 : -1) : (valA === valB ? 0 : valA ? 1 : -1);
+      }
 
-    const baseRecord = globalRecordMap.get(id);
-    if (!baseRecord) return null;
+      const strA = String(valA).toLowerCase();
+      const strB = String(valB).toLowerCase();
 
-    if (updatesById.has(id)) {
-      const patch = updatesById.get(id);
-      return {
-        ...baseRecord,
-        ...(typeof patch === 'object' && patch !== null ? patch : {}),
-        _sandbox: 'updated'
-      };
-    }
+      if (strA < strB) return isDesc ? 1 : -1;
+      if (strA > strB) return isDesc ? -1 : 1;
+      return 0;
+    });
+  }
 
-    return baseRecord;
-  }).filter(Boolean);
+  // Step 4: Paginate
+  const total = records.length;
+  const totalPages = Math.ceil(total / limitNum) || 1;
+  const startIndex = (pageNum - 1) * limitNum;
+  const pageSlice = records.slice(startIndex, startIndex + limitNum);
 
   return {
-    data: resultData,
+    data: pageSlice,
     pagination: {
       page: pageNum,
       limit: limitNum,

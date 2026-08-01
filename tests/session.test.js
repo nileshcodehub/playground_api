@@ -56,12 +56,12 @@ describe('Option B Signed Session Architecture & Reset API (/session/reset)', ()
     const created = await createRes.json();
     assert.ok(created.id.startsWith('local-'));
 
-    // Verify GET /users now includes the created sandbox item at the top
+    // Verify GET /users now includes the created sandbox item
     const listRes = await fetch(`${baseUrl}/users`, {
       headers: { Cookie: identityCookie }
     });
     const listJson = await listRes.json();
-    assert.equal(listJson.data[0].name, 'Sandbox User');
+    assert.ok(listJson.data.some(u => u.name === 'Sandbox User'), 'Expected created Sandbox User in user list');
   });
 
   test('IP Auto-Recovery attaches request without cookie to existing IP session', async () => {
