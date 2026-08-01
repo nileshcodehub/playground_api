@@ -49,9 +49,9 @@ export const getPostsEndpoints = (sampleRecord = null) => {
       path: "/posts",
       summary: "Create a new session sandbox post record. Returns a local-<uuid> formatted ID with _sandbox: 'created'. Each session identity is capped at 30 created records.",
       params: [
-        { name: "user_id", in: "body", type: "integer", description: "Author user ID." },
-        { name: "title", in: "body", type: "string", description: "Post title." },
-        { name: "body", in: "body", type: "string", description: "Post body text content." }
+        { name: "user_id", in: "body", type: "integer", required: true, description: "Author user ID." },
+        { name: "title", in: "body", type: "string", required: true, description: "Post title." },
+        { name: "body", in: "body", type: "string", required: true, description: "Post body text content." }
       ],
       bodyExample: JSON.stringify({
         user_id: realPost.user_id || 1,

@@ -51,9 +51,9 @@ export const getTodosEndpoints = (sampleRecord = null) => {
       path: "/todos",
       summary: "Create a new session sandbox todo record. Returns a local-<uuid> formatted ID with _sandbox: 'created'. Each session identity is capped at 30 created records.",
       params: [
-        { name: "user_id", in: "body", type: "integer", description: "Owner user ID." },
-        { name: "title", in: "body", type: "string", description: "Todo task title." },
-        { name: "completed", in: "body", type: "boolean", description: "Completion status (true / false)." }
+        { name: "user_id", in: "body", type: "integer", required: true, description: "Owner user ID." },
+        { name: "title", in: "body", type: "string", required: true, description: "Todo task title." },
+        { name: "completed", in: "body", type: "boolean", required: false, description: "Completion status (true / false)." }
       ],
       bodyExample: JSON.stringify({
         user_id: realTodo.user_id || 1,
