@@ -13,6 +13,7 @@ export const getTodosEndpoints = (sampleRecord = null) => {
       path: "/todos",
       summary: "Retrieve a paginated list of todos. Results merge shared global todos with session sandbox overlays (newly created todos appear at the top).",
       params: [
+        { name: "q", in: "query", type: "string", description: "Full-text search query term across title, etc." },
         { name: "user_id", in: "query", type: "integer", description: "Filter todos by owner user ID (e.g. user_id=1)." },
         { name: "completed", in: "query", type: "boolean", description: "Filter todos by completion status (true or false)." },
         { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },

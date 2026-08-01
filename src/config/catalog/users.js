@@ -17,6 +17,7 @@ export const getUsersEndpoints = (sampleRecord = null) => {
       path: "/users",
       summary: "Retrieve a paginated list of users. Results merge shared global user records with session sandbox overlays (newly created users appear at the top).",
       params: [
+        { name: "q", in: "query", type: "string", description: "Full-text search query term across name, username, email, etc." },
         { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
         { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." },
         { name: "_sort", in: "query", type: "string", description: "Field name to sort results by (e.g. name, id, username, email)." },

@@ -103,7 +103,7 @@ export const getAllMergedRecords = async (identityId, resource) => {
   return [...created, ...activeGlobalRecords];
 };
 
-export const getPaginatedResource = async (identityId, resource, { page = 1, limit = 10, filters = {}, _sort, _order = 'asc' } = {}) => {
+export const getPaginatedResource = async (identityId, resource, { page = 1, limit = 10, filters = {}, _sort, _order = 'asc', q } = {}) => {
   const pageNum = Math.max(1, parseInt(page, 10) || 1);
   const limitNum = Math.min(30, Math.max(1, parseInt(limit, 10) || 10));
 
@@ -127,6 +127,20 @@ export const getPaginatedResource = async (identityId, resource, { page = 1, lim
         }
 
         return String(itemVal).toLowerCase() === String(expectedValue).toLowerCase();
+      });
+    });
+  }
+
+  // Step 2.5: Apply Universal Full-Text Search (12-feature-full-text-search)
+  if (q && typeof q === 'string' && q.trim().length > 0) {
+    const searchTerm = q.trim().toLowerCase();
+    records = records.filter(item => {
+      return Object.values(item).some(val => {
+        if (val === undefined || val === null) return false;
+        if (typeof val === 'object') {
+          return JSON.stringify(val).toLowerCase().includes(searchTerm);
+        }
+        return String(val).toLowerCase().includes(searchTerm);
       });
     });
   }

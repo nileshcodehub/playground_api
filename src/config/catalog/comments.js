@@ -14,6 +14,7 @@ export const getCommentsEndpoints = (sampleRecord = null) => {
       path: "/comments",
       summary: "Retrieve a paginated list of comments. Results merge shared global comments with session sandbox overlays (newly created comments appear at the top).",
       params: [
+        { name: "q", in: "query", type: "string", description: "Full-text search query term across name, email, body, etc." },
         { name: "post_id", in: "query", type: "integer", description: "Filter comments by parent post ID (e.g. post_id=1)." },
         { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
         { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." },

@@ -6,7 +6,7 @@ export const makeResourceController = (resource) => {
   return {
     list: async (req, res, next) => {
       try {
-        const { page, limit, _sort, _order, _delay, _status, ...queryFilters } = req.query;
+        const { page, limit, _sort, _order, _delay, _status, q, ...queryFilters } = req.query;
         const rawFilters = { ...queryFilters, ...(req.resourceFilters || {}) };
 
         // Type-cast known relational and boolean filter fields
@@ -27,7 +27,7 @@ export const makeResourceController = (resource) => {
         const result = await overlayService.getPaginatedResource(
           req.identityId,
           resource,
-          { page, limit, filters, _sort, _order }
+          { page, limit, filters, _sort, _order, q }
         );
         res.json(result);
       } catch (error) {

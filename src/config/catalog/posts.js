@@ -13,6 +13,7 @@ export const getPostsEndpoints = (sampleRecord = null) => {
       path: "/posts",
       summary: "Retrieve a paginated list of posts. Results merge shared global posts with session sandbox overlays (newly created posts appear at the top).",
       params: [
+        { name: "q", in: "query", type: "string", description: "Full-text search query term across title, body, etc." },
         { name: "user_id", in: "query", type: "integer", description: "Filter posts by author user ID (e.g. user_id=1)." },
         { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
         { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." },
