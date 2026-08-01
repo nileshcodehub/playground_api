@@ -30,6 +30,7 @@
   --delete-bg: rgba(239, 68, 68, 0.1);
 
   --sidebar-width: 280px;
+  --header-height: 52px;
 }
 
 [data-theme="light"] {
@@ -68,13 +69,29 @@
   padding: 0;
 }
 
+html,
+:root,
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-dark);
   color: var(--text-primary);
   line-height: 1.6;
-  min-height: 100vh;
+  height: 100vh;
+  /* overflow: hidden; */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html::-webkit-scrollbar,
+:root::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+  width: 0;
+  height: 0;
 }
 
 /* Top Header Navigation */
@@ -82,19 +99,23 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+  height: var(--header-height);
   background-color: var(--bg-sidebar);
   border-bottom: 1px solid var(--border-color);
-  padding: 0.6rem 1.5rem;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
   backdrop-filter: blur(8px);
 }
 
 .header-inner {
-  /* max-width: 1500px; */
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  width: 100%;
 }
 
 .header-actions {
@@ -146,13 +167,16 @@ body {
 .app-layout-container {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 54px);
+  min-height: calc(100vh - var(--header-height));
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 @media (min-width: 900px) {
   .app-layout-container {
     display: grid;
-    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   }
 }
 
@@ -160,7 +184,7 @@ body {
 .sidebar {
   background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-color);
-  padding: 1.5rem 1.25rem;
+  padding: 1.5rem 1.25rem 2.5rem 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -170,8 +194,8 @@ body {
 @media (min-width: 900px) {
   .sidebar {
     position: sticky;
-    top: 54px;
-    height: calc(100vh - 54px);
+    padding-top: var(--header-height);
+    height: calc(100vh - var(--header-height));
     overflow-y: auto;
   }
 }
@@ -180,6 +204,7 @@ body {
   max-width: 1240px;
   margin: 0 auto;
   width: 100%;
+  min-width: 0;
 }
 
 .brand {
@@ -448,8 +473,12 @@ body {
 
 /* Main Area */
 .main-area {
-  padding: 2.25rem 2.75rem;
-  /* max-width: 1050px; */
+  padding: 2.5rem 2.5rem 3rem 2.5rem;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
 }
 
 @media (max-width: 768px) {
@@ -485,6 +514,9 @@ body {
   padding: 1.75rem;
   margin-bottom: 2rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .endpoint-card:hover {
@@ -578,6 +610,8 @@ body {
 
 .params-container {
   margin-bottom: 1.75rem;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .params-title {
@@ -630,9 +664,16 @@ body {
 
 .examples-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.25rem;
   margin-bottom: 1.75rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.example-box {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .example-box h4 {
@@ -683,8 +724,11 @@ pre {
   color: var(--code-text);
   line-height: 1.5;
   max-height: 380px;
+  max-width: 100%;
   overflow-y: auto;
   overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* Snippet Generator Container */
@@ -694,6 +738,8 @@ pre {
   border-radius: 8px;
   background-color: var(--bg-sidebar);
   overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .snippet-header {
