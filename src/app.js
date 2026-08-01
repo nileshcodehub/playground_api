@@ -8,9 +8,15 @@ import { fileURLToPath } from 'url';
 import config from './config/env.js';
 import { identityMiddleware } from './middleware/identity.js';
 import { generalLimiter } from './middleware/rateLimit.js';
+import { simulationMiddleware } from './middleware/simulation.js';
 import { errorHandler, AppError } from './middleware/errorHandler.js';
 import { makeResourceRouter } from './routes/resourceRoutes.js';
+import { makeResourceController } from './controllers/resourceController.js';
 import docsRouter from './routes/docsRoutes.js';
+import cronRouter from './routes/cronRoutes.js';
+import downloadRouter from './routes/downloadRoutes.js';
+import sessionRouter from './routes/sessionRoutes.js';
+import { getHealth } from './controllers/healthController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +39,9 @@ if (config.trustProxy) {
 // allow any cross-origin site to read credentialed responses.
 app.use(cors({
   origin: (origin, callback) => callback(null, origin || false),
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Playground-Identity', 'X-Simulate-Delay', 'X-Simulate-Status'],
+  exposedHeaders: ['X-Playground-Identity']
 }));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
@@ -45,9 +53,34 @@ if (!config.isProduction) {
 // Static file serving (bypasses DB identity check for speed)
 app.use('/public', express.static(path.join(rootDir, 'public')));
 
-// Identity Cookie Middleware & Global Rate Limiter
+// Identity Cookie Middleware, Global Rate Limiter & Network Simulation
 app.use(identityMiddleware);
 app.use(generalLimiter);
+app.use(simulationMiddleware);
+
+// Health Check & System Metrics Endpoint
+app.get('/health', getHealth);
+
+// Session Sandbox Management, Cron & Collection Downloads Endpoints
+app.use('/session', sessionRouter);
+app.use('/api/cron', cronRouter);
+app.use('/downloads', downloadRouter);
+
+// Nested Sub-Resource Routes (JSONPlaceholder parity)
+app.get('/users/:userId/posts', (req, res, next) => {
+  req.resourceFilters = { user_id: req.params.userId };
+  makeResourceController('posts').list(req, res, next);
+});
+
+app.get('/users/:userId/todos', (req, res, next) => {
+  req.resourceFilters = { user_id: req.params.userId };
+  makeResourceController('todos').list(req, res, next);
+});
+
+app.get('/posts/:postId/comments', (req, res, next) => {
+  req.resourceFilters = { post_id: req.params.postId };
+  makeResourceController('comments').list(req, res, next);
+});
 
 // Resource API Routes (REST Data Endpoints)
 app.use('/users', makeResourceRouter('users'));

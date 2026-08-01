@@ -1,14 +1,9 @@
 {
   "version": 2,
-  "functions": {
-    "api/index.js": {
-      "includeFiles": "{views/**,public/**,src/db/**}"
-    }
-  },
-  "rewrites": [
+  "crons": [
     {
-      "source": "/(.*)",
-      "destination": "/api/index.js"
+      "path": "/api/cron/cleanup",
+      "schedule": "0 0 * * *"
     }
   ]
 }

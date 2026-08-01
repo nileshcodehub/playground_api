@@ -40,13 +40,57 @@
             <span>Identity Session</span>
             <span class="status-dot" title="Session Active"></span>
           </div>
-          <div class="session-id">
-            <%= (typeof identityId !== 'undefined' && identityId) ? (identityId.slice(0, 8) + '...') :
-            'Cookie Active (pg_identity)' %>
+          <div class="session-id" id="session-id-display" data-session-token="<%= (typeof signedToken !== 'undefined' && signedToken) ? signedToken : (typeof identityId !== 'undefined' ? identityId : '') %>">
+            <%= (typeof identityId !== 'undefined' && identityId) ? (identityId.slice(0, 8) + '...') : 'Active Session' %>
+          </div>
+          <div class="session-actions" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.25rem;">
+            <button type="button" id="copy-session-id-btn" class="session-action-btn copy-session-btn" title="Copy signed Session Token for X-Playground-Identity header">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+            <button type="button" id="open-session-dashboard-btn" class="session-action-btn dashboard-btn" title="View Session Quota & Activity Dashboard">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+              <span>Stats</span>
+            </button>
+            <button type="button" id="reset-sandbox-btn" class="session-action-btn reset-sandbox-btn" title="Purge all sandbox mutations for this session">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Reset</span>
+            </button>
           </div>
           <div class="session-note">
-            Mutations are session-isolated via HTTP cookie. Global datasets
-            remain pristine.
+            Mutations are session-isolated & HMAC signed. Global datasets remain pristine.
+          </div>
+        </div>
+
+        <!-- Export API Collections Card -->
+        <div class="session-card export-collections-card" style="margin-top: 0.75rem;">
+          <div class="session-card-header">
+            <span>Export Collections</span>
+            <span style="font-size: 0.7rem; font-weight: 600; color: var(--primary-accent);">Schema / JSON</span>
+          </div>
+          <div style="margin-top: 0.5rem;">
+            <select id="export-resource-select" class="form-control" style="font-size: 0.78rem; padding: 0.25rem 0.5rem; height: 30px; width: 100%; border-radius: 4px; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); cursor: pointer;">
+              <option value="all" <%= (typeof currentNav !== 'undefined' && currentNav === 'overview') ? 'selected' : '' %>>📁 All Resources</option>
+              <option value="users" <%= (typeof currentNav !== 'undefined' && currentNav === 'users') ? 'selected' : '' %>>👤 Users Collection</option>
+              <option value="posts" <%= (typeof currentNav !== 'undefined' && currentNav === 'posts') ? 'selected' : '' %>>📝 Posts Collection</option>
+              <option value="comments" <%= (typeof currentNav !== 'undefined' && currentNav === 'comments') ? 'selected' : '' %>>💬 Comments Collection</option>
+              <option value="todos" <%= (typeof currentNav !== 'undefined' && currentNav === 'todos') ? 'selected' : '' %>>✅ Todos Collection</option>
+            </select>
+          </div>
+          <div class="export-collections-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.5rem;">
+            <% const initQuery = (typeof currentNav !== 'undefined' && currentNav !== 'overview') ? `?resource=${currentNav}` : ''; %>
+            <a id="export-btn-openapi" href="/downloads/openapi.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download OpenAPI 3.0 Specification">
+              <span>🌐 OpenAPI</span>
+            </a>
+            <a id="export-btn-postman" href="/downloads/postman.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Postman Collection v2.1">
+              <span>📦 Postman</span>
+            </a>
+            <a id="export-btn-bruno" href="/downloads/bruno.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Bruno API Collection">
+              <span>🐶 Bruno</span>
+            </a>
+            <a id="export-btn-insomnia" href="/downloads/insomnia.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Insomnia v4 Collection">
+              <span>💧 Insomnia</span>
+            </a>
           </div>
         </div>
 
@@ -102,6 +146,40 @@
           <p>Playground API — Built with 💖 by Nilesh Kumar</p>
         </footer>
       </main>
+    </div>
+
+    <!-- Session Dashboard Modal -->
+    <div id="session-dashboard-modal" class="modal-backdrop" hidden>
+      <div class="modal-card">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">📊</span>
+            <div>
+              <h3 style="margin: 0; font-size: 1.05rem; color: var(--text-primary);">Session Sandbox Dashboard</h3>
+              <p style="margin: 0; font-size: 0.76rem; color: var(--text-secondary);">Real-time identity metrics, sandbox quotas & mutation activity</p>
+            </div>
+          </div>
+          <button type="button" class="modal-close-btn" id="close-session-dashboard-btn" title="Close Modal">&times;</button>
+        </div>
+
+        <div class="modal-body" id="modal-dashboard-body">
+          <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            ⏳ Loading session statistics...
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="modal-copy-token-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+            📋 Copy Signed Token
+          </button>
+          <button type="button" id="modal-reset-sandbox-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; color: var(--delete-badge); border-color: rgba(239, 68, 68, 0.3);">
+            🧹 Reset Sandbox
+          </button>
+          <button type="button" id="modal-dismiss-btn" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+            Done
+          </button>
+        </div>
+      </div>
     </div>
 
     <script src="/public/js/endpoints-catalog.js"></script>

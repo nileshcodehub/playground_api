@@ -6,11 +6,28 @@ export const makeResourceController = (resource) => {
   return {
     list: async (req, res, next) => {
       try {
-        const { page, limit } = req.query;
+        const { page, limit, _sort, _order, _delay, _status, q, ...queryFilters } = req.query;
+        const rawFilters = { ...queryFilters, ...(req.resourceFilters || {}) };
+
+        // Type-cast known relational and boolean filter fields
+        const filters = {};
+        for (const [key, value] of Object.entries(rawFilters)) {
+          if (value === undefined || value === null || value === '') continue;
+
+          if (key.endsWith('_id') || key === 'id' || key === 'user_id' || key === 'post_id') {
+            const parsedInt = parseInt(value, 10);
+            filters[key] = isNaN(parsedInt) ? value : parsedInt;
+          } else if (key === 'completed') {
+            filters[key] = value === 'true' || value === true;
+          } else {
+            filters[key] = value;
+          }
+        }
+
         const result = await overlayService.getPaginatedResource(
           req.identityId,
           resource,
-          { page, limit }
+          { page, limit, filters, _sort, _order, q }
         );
         res.json(result);
       } catch (error) {

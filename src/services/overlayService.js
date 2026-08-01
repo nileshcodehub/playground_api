@@ -72,70 +72,117 @@ export const getVirtualList = async (identityId, resource) => {
   return { virtualList: [...createdIds, ...globalIds], overlay };
 };
 
-export const getPaginatedResource = async (identityId, resource, { page = 1, limit = 10 } = {}) => {
+export const getAllMergedRecords = async (identityId, resource) => {
+  const modelName = GLOBAL_MODELS[resource];
+  if (!modelName) {
+    throw new AppError(`Unknown resource: ${resource}`, 400);
+  }
+
+  const globalRows = await prisma[modelName].findMany({
+    orderBy: { id: 'asc' }
+  });
+
+  const overlay = await loadOverlay(identityId, resource);
+  const { deletedIds, updatesById, created } = overlay;
+
+  const activeGlobalRecords = globalRows
+    .filter(row => !deletedIds.has(row.id))
+    .map(row => {
+      if (updatesById.has(row.id)) {
+        const patch = updatesById.get(row.id);
+        return {
+          ...row,
+          ...(typeof patch === 'object' && patch !== null ? patch : {}),
+          _sandbox: 'updated'
+        };
+      }
+      return row;
+    });
+
+  // Created items top (newest first), then global items preserving DB order
+  return [...created, ...activeGlobalRecords];
+};
+
+export const getPaginatedResource = async (identityId, resource, { page = 1, limit = 10, filters = {}, _sort, _order = 'asc', q } = {}) => {
   const pageNum = Math.max(1, parseInt(page, 10) || 1);
   const limitNum = Math.min(30, Math.max(1, parseInt(limit, 10) || 10));
 
-  // getVirtualList now returns both the ID list AND the overlay data so we
-  // don't need to call loadOverlay a second time (eliminates one DB round-trip)
-  const { virtualList, overlay } = await getVirtualList(identityId, resource);
-  const total = virtualList.length;
-  const totalPages = Math.ceil(total / limitNum) || 1;
+  // Step 1: Fetch all merged records
+  let records = await getAllMergedRecords(identityId, resource);
 
-  const startIndex = (pageNum - 1) * limitNum;
-  const pageSliceIds = virtualList.slice(startIndex, startIndex + limitNum);
+  // Step 2: Apply Filters (01-feature-relational-filtering)
+  const filterEntries = Object.entries(filters).filter(([_, val]) => val !== undefined && val !== null && val !== '');
+  if (filterEntries.length > 0) {
+    records = records.filter(item => {
+      return filterEntries.every(([key, expectedValue]) => {
+        const itemVal = item[key];
+        if (itemVal === undefined) return false;
 
-  if (pageSliceIds.length === 0) {
-    return {
-      data: [],
-      pagination: {
-        page: pageNum,
-        limit: limitNum,
-        total,
-        totalPages,
-        hasNextPage: pageNum < totalPages,
-        hasPrevPage: pageNum > 1
-      }
-    };
+        if (typeof expectedValue === 'boolean') {
+          return Boolean(itemVal) === expectedValue;
+        }
+
+        if (typeof expectedValue === 'number') {
+          return Number(itemVal) === expectedValue;
+        }
+
+        return String(itemVal).toLowerCase() === String(expectedValue).toLowerCase();
+      });
+    });
   }
 
-  // Reuse overlay from getVirtualList — no second DB query needed
-  const { updatesById, created } = overlay;
-  const createdMap = new Map(created.map(item => [item.id, item]));
+  // Step 2.5: Apply Universal Full-Text Search (12-feature-full-text-search)
+  if (q && typeof q === 'string' && q.trim().length > 0) {
+    const searchTerm = q.trim().toLowerCase();
+    records = records.filter(item => {
+      return Object.values(item).some(val => {
+        if (val === undefined || val === null) return false;
+        if (typeof val === 'object') {
+          return JSON.stringify(val).toLowerCase().includes(searchTerm);
+        }
+        return String(val).toLowerCase().includes(searchTerm);
+      });
+    });
+  }
 
-  const globalIntIds = pageSliceIds
-    .filter(id => typeof id === 'number')
-    .map(id => parseInt(id, 10));
+  // Step 3: Apply Dynamic Sorting (13-feature-dynamic-sorting)
+  if (_sort && typeof _sort === 'string') {
+    const sortKey = _sort.trim();
+    const isDesc = String(_order).toLowerCase() === 'desc';
 
-  const modelName = GLOBAL_MODELS[resource];
-  const globalRecords = globalIntIds.length > 0
-    ? await prisma[modelName].findMany({ where: { id: { in: globalIntIds } } })
-    : [];
+    records.sort((a, b) => {
+      const valA = a[sortKey];
+      const valB = b[sortKey];
 
-  const globalRecordMap = new Map(globalRecords.map(rec => [rec.id, rec]));
+      if (valA === undefined && valB === undefined) return 0;
+      if (valA === undefined) return 1;
+      if (valB === undefined) return -1;
 
-  const resultData = pageSliceIds.map(id => {
-    if (typeof id === 'string' && id.startsWith('local-')) {
-      return createdMap.get(id);
-    }
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return isDesc ? valB - valA : valA - valB;
+      }
 
-    const baseRecord = globalRecordMap.get(id);
-    if (!baseRecord) return null;
+      if (typeof valA === 'boolean' && typeof valB === 'boolean') {
+        return isDesc ? (valB === valA ? 0 : valB ? 1 : -1) : (valA === valB ? 0 : valA ? 1 : -1);
+      }
 
-    if (updatesById.has(id)) {
-      const patch = updatesById.get(id);
-      return {
-        ...baseRecord,
-        ...(typeof patch === 'object' && patch !== null ? patch : {}),
-        _sandbox: 'updated'
-      };
-    }
+      const strA = String(valA).toLowerCase();
+      const strB = String(valB).toLowerCase();
 
-    return baseRecord;
-  }).filter(Boolean);
+      if (strA < strB) return isDesc ? 1 : -1;
+      if (strA > strB) return isDesc ? -1 : 1;
+      return 0;
+    });
+  }
+
+  // Step 4: Paginate
+  const total = records.length;
+  const totalPages = Math.ceil(total / limitNum) || 1;
+  const startIndex = (pageNum - 1) * limitNum;
+  const pageSlice = records.slice(startIndex, startIndex + limitNum);
 
   return {
-    data: resultData,
+    data: pageSlice,
     pagination: {
       page: pageNum,
       limit: limitNum,
@@ -345,3 +392,104 @@ export const deleteOverlayRecord = async (identityId, resource, publicId) => {
 
   return true;
 };
+
+export const resetSessionOverlay = async (identityId) => {
+  if (!identityId) {
+    throw new AppError('Identity required to reset session sandbox', 401);
+  }
+
+  const { count } = await prisma.overlayRecords.deleteMany({
+    where: { identity_id: identityId }
+  });
+
+  return { count };
+};
+
+export const cleanupInactiveIdentities = async (daysThreshold = 10) => {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - daysThreshold);
+
+  const inactiveIdentities = await prisma.identities.findMany({
+    where: {
+      last_seen_at: {
+        lt: cutoffDate
+      }
+    },
+    select: { id: true }
+  });
+
+  if (inactiveIdentities.length === 0) {
+    return 0;
+  }
+
+  const inactiveIds = inactiveIdentities.map((i) => i.id);
+
+  await prisma.$transaction([
+    prisma.overlayRecords.deleteMany({
+      where: { identity_id: { in: inactiveIds } }
+    }),
+    prisma.identities.deleteMany({
+      where: { id: { in: inactiveIds } }
+    })
+  ]);
+
+  return inactiveIds.length;
+};
+
+export const getSessionStats = async (identityId) => {
+  if (!identityId) {
+    throw new AppError('Identity required to fetch session statistics', 401);
+  }
+
+  const identity = await prisma.identities.findUnique({
+    where: { id: identityId }
+  });
+
+  const records = await prisma.overlayRecords.findMany({
+    where: { identity_id: identityId }
+  });
+
+  const resources = ['users', 'posts', 'comments', 'todos'];
+  const byResource = {};
+
+  resources.forEach((res) => {
+    byResource[res] = {
+      created: 0,
+      updated: 0,
+      deleted: 0,
+      total: 0,
+      quotaUsed: `0 / ${MAX_USER_CREATED_RECORDS}`
+    };
+  });
+
+  for (const record of records) {
+    const res = record.resource;
+    if (byResource[res]) {
+      if (record.op === 'create') byResource[res].created += 1;
+      else if (record.op === 'update') byResource[res].updated += 1;
+      else if (record.op === 'delete') byResource[res].deleted += 1;
+      byResource[res].total += 1;
+    }
+  }
+
+  resources.forEach((res) => {
+    byResource[res].quotaUsed = `${byResource[res].created} / ${MAX_USER_CREATED_RECORDS}`;
+  });
+
+  return {
+    identity: {
+      id: identityId,
+      createdAt: identity ? identity.created_at : new Date(),
+      lastSeenAt: identity ? identity.last_seen_at : new Date(),
+      inactivityTtlDays: 10
+    },
+    quota: {
+      maxCreatedPerResource: MAX_USER_CREATED_RECORDS
+    },
+    stats: {
+      totalRecords: records.length,
+      byResource
+    }
+  };
+};
+

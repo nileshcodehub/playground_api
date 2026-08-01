@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import config from '../config/env.js';
 import prisma from '../db/prismaClient.js';
+import { createSignedToken, verifySignedToken } from '../utils/sessionToken.js';
 
 // In-memory identity verification cache (5-minute TTL) to eliminate cloud DB latency on repeat requests
 const verifiedIdentitiesCache = new Map();
@@ -37,49 +38,87 @@ export const identityMiddleware = async (req, res, next) => {
 
     req.ipHash = ipHash;
 
-    // Check pg_identity cookie
-    let identityId = req.cookies ? req.cookies.pg_identity : null;
+    // Check X-Playground-Identity header or pg_identity cookie
+    const rawToken = req.headers['x-playground-identity'] || (req.cookies ? req.cookies.pg_identity : null);
+    let identityId = null;
     let validIdentity = false;
     const now = Date.now();
 
-    if (identityId) {
-      const cached = verifiedIdentitiesCache.get(identityId);
-      if (cached && (now - cached.verifiedAt < CACHE_TTL_MS)) {
-        validIdentity = true;
-        // Non-blocking background update if last_seen_at is older than 10 mins
-        if (now - cached.lastUpdated > UPDATE_THRESHOLD_MS) {
-          cached.lastUpdated = now;
-          prisma.identities.update({
-            where: { id: identityId },
-            data: { last_seen_at: new Date(), ip_hash: ipHash }
-          }).catch((err) => {
-            console.warn('[Identity] Background last_seen_at update failed:', err.message);
-          });
-        }
-      } else {
-        try {
-          const existing = await prisma.identities.findUnique({
-            where: { id: identityId }
-          });
-          if (existing) {
-            validIdentity = true;
-            verifiedIdentitiesCache.set(identityId, { verifiedAt: now, lastUpdated: now });
-            // Non-blocking background update
+    if (rawToken) {
+      // Step 1: Anti-Tamper Check — Verify token HMAC signature
+      let parsedUuid = verifySignedToken(rawToken);
+      if (!parsedUuid && typeof rawToken === 'string' && !rawToken.includes('.')) {
+        // Plain UUID fallback for testing or initial migration
+        parsedUuid = rawToken;
+      }
+
+      if (parsedUuid) {
+        const cached = verifiedIdentitiesCache.get(parsedUuid);
+        if (cached && (now - cached.verifiedAt < CACHE_TTL_MS)) {
+          validIdentity = true;
+          identityId = parsedUuid;
+          // Non-blocking background update if last_seen_at is older than 10 mins
+          if (now - cached.lastUpdated > UPDATE_THRESHOLD_MS) {
+            cached.lastUpdated = now;
             prisma.identities.update({
-              where: { id: identityId },
+              where: { id: parsedUuid },
               data: { last_seen_at: new Date(), ip_hash: ipHash }
             }).catch((err) => {
               console.warn('[Identity] Background last_seen_at update failed:', err.message);
             });
           }
-        } catch (err) {
-          // DB unreachable — log and fall through to create a new identity
-          console.warn('[Identity] DB error during identity lookup, will create new identity:', err.message);
+        } else {
+          try {
+            const existing = await prisma.identities.findUnique({
+              where: { id: parsedUuid }
+            });
+            if (existing) {
+              validIdentity = true;
+              identityId = parsedUuid;
+              verifiedIdentitiesCache.set(parsedUuid, { verifiedAt: now, lastUpdated: now });
+              // Non-blocking background update
+              prisma.identities.update({
+                where: { id: parsedUuid },
+                data: { last_seen_at: new Date(), ip_hash: ipHash }
+              }).catch((err) => {
+                console.warn('[Identity] Background last_seen_at update failed:', err.message);
+              });
+            }
+          } catch (err) {
+            console.warn('[Identity] DB error during identity lookup:', err.message);
+          }
         }
+      } else {
+        console.warn('[Identity] Rejected tampered or invalid session token signature.');
       }
     }
 
+    // Step 2: IP Auto-Recovery Fallback if no valid token was provided
     if (!validIdentity) {
+      try {
+        const existingIpIdentity = await prisma.identities.findFirst({
+          where: { ip_hash: ipHash },
+          orderBy: { last_seen_at: 'desc' }
+        });
+
+        if (existingIpIdentity) {
+          identityId = existingIpIdentity.id;
+          validIdentity = true;
+          verifiedIdentitiesCache.set(identityId, { verifiedAt: now, lastUpdated: now });
+          prisma.identities.update({
+            where: { id: identityId },
+            data: { last_seen_at: new Date() }
+          }).catch((err) => {
+            console.warn('[Identity] Background IP last_seen_at update failed:', err.message);
+          });
+        }
+      } catch (err) {
+        console.warn('[Identity] DB error during IP identity lookup:', err.message);
+      }
+    }
+
+    // Step 3: Create new identity if still not found
+    if (!validIdentity || !identityId) {
       identityId = uuidv4();
       verifiedIdentitiesCache.set(identityId, { verifiedAt: now, lastUpdated: now });
 
@@ -92,19 +131,24 @@ export const identityMiddleware = async (req, res, next) => {
           last_seen_at: new Date()
         }
       }).catch((err) => {
-        // DB unreachable or latency — identity lives in in-memory cache for this session
         console.warn('[Identity] Background DB identity creation warning:', err.message);
-      });
-
-      res.cookie('pg_identity', identityId, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: config.isProduction, // Only send over HTTPS in production
-        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
       });
     }
 
+    // Step 4: Emit signed session token to client cookie & response headers
+    const signedToken = createSignedToken(identityId);
+
+    res.cookie('pg_identity', signedToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: config.isProduction, // Only send over HTTPS in production
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    });
+
+    res.setHeader('X-Playground-Identity', signedToken);
+
     req.identityId = identityId;
+    req.signedToken = signedToken;
     next();
   } catch (error) {
     next(error);

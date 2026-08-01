@@ -2,27 +2,53 @@
   const sampleBodyStr = (typeof bodyExample !== 'undefined' && bodyExample) ? bodyExample.replace(/\n\s*/g, ' ') : '';
   const formattedBodyForCurl = (typeof bodyExample !== 'undefined' && bodyExample) ? bodyExample : '{}';
 
+  const origin = (typeof baseUrl !== 'undefined' && baseUrl)
+    ? baseUrl
+    : ((typeof canonicalUrl !== 'undefined' && canonicalUrl)
+      ? new URL(canonicalUrl).origin
+      : 'http://localhost:3000');
+
   const curlCmd = method === 'GET' 
-    ? `curl -X GET 'http://localhost:3000${path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
+    ? `curl -X GET '${origin}${path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
     : method === 'DELETE'
-    ? `curl -X DELETE 'http://localhost:3000${path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
-    : `curl -X ${method} 'http://localhost:3000${path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid" \\\n  -d '${formattedBodyForCurl}'`;
+    ? `curl -X DELETE '${origin}${path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
+    : `curl -X ${method} '${origin}${path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid" \\\n  -d '${formattedBodyForCurl}'`;
 
   const fetchCmd = method === 'GET' || method === 'DELETE'
-    ? `fetch('http://localhost:3000${path}', {\n  method: '${method}',\n  credentials: 'include'\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`
-    : `fetch('http://localhost:3000${path}', {\n  method: '${method}',\n  headers: { 'Content-Type': 'application/json' },\n  credentials: 'include',\n  body: JSON.stringify(${sampleBodyStr || '{}'})\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`;
+    ? `fetch('${origin}${path}', {\n  method: '${method}',\n  credentials: 'include'\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`
+    : `fetch('${origin}${path}', {\n  method: '${method}',\n  headers: { 'Content-Type': 'application/json' },\n  credentials: 'include',\n  body: JSON.stringify(${sampleBodyStr || '{}'})\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`;
 
   const axiosCmd = method === 'GET'
-    ? `import axios from 'axios';\n\naxios.get('http://localhost:3000${path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
+    ? `import axios from 'axios';\n\naxios.get('${origin}${path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
     : method === 'DELETE'
-    ? `import axios from 'axios';\n\naxios.delete('http://localhost:3000${path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
-    : `import axios from 'axios';\n\naxios.${method.toLowerCase()}('http://localhost:3000${path}', ${sampleBodyStr || '{}'}, {\n  withCredentials: true\n}).then(response => console.log(response.data));`;
+    ? `import axios from 'axios';\n\naxios.delete('${origin}${path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
+    : `import axios from 'axios';\n\naxios.${method.toLowerCase()}('${origin}${path}', ${sampleBodyStr || '{}'}, {\n  withCredentials: true\n}).then(response => console.log(response.data));`;
 
   const pythonCmd = method === 'GET'
-    ? `import requests\n\nresponse = requests.get('http://localhost:3000${path}')\nprint(response.json())`
+    ? `import requests\n\nresponse = requests.get('${origin}${path}')\nprint(response.json())`
     : method === 'DELETE'
-    ? `import requests\n\nresponse = requests.delete('http://localhost:3000${path}')\nprint(response.status_code)`
-    : `import requests\n\npayload = ${sampleBodyStr || '{}'}\nresponse = requests.${method.toLowerCase()}('http://localhost:3000${path}', json=payload)\nprint(response.json())`;
+    ? `import requests\n\nresponse = requests.delete('${origin}${path}')\nprint(response.status_code)`
+    : `import requests\n\npayload = ${sampleBodyStr || '{}'}\nresponse = requests.${method.toLowerCase()}('${origin}${path}', json=payload)\nprint(response.json())`;
+
+  const goCmd = method === 'GET' || method === 'DELETE'
+    ? `package main\n\nimport (\n\t"fmt"\n\t"io"\n\t"net/http"\n)\n\nfunc main() {\n\turl := "${origin}${path}"\n\treq, err := http.NewRequest("${method}", url, nil)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\treq.Header.Set("Content-Type", "application/json")\n\tclient := &http.Client{}\n\tresp, err := client.Do(req)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, _ := io.ReadAll(resp.Body)\n\tfmt.Println(string(body))\n}`
+    : `package main\n\nimport (\n\t"bytes"\n\t"fmt"\n\t"io"\n\t"net/http"\n)\n\nfunc main() {\n\turl := "${origin}${path}"\n\tpayload := []byte(\`${sampleBodyStr || '{}'}\`)\n\n\treq, err := http.NewRequest("${method}", url, bytes.NewBuffer(payload))\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\treq.Header.Set("Content-Type", "application/json")\n\tclient := &http.Client{}\n\tresp, err := client.Do(req)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, _ := io.ReadAll(resp.Body)\n\tfmt.Println(string(body))\n}`;
+
+  const swiftCmd = method === 'GET' || method === 'DELETE'
+    ? `import Foundation\n\nlet url = URL(string: "${origin}${path}")!\nvar request = URLRequest(url: url)\nrequest.httpMethod = "${method}"\nrequest.setValue("application/json", forHTTPHeaderField: "Content-Type")\n\nlet task = URLSession.shared.dataTask(with: request) { data, response, error in\n    guard let data = data, error == nil else { return }\n    let responseString = String(data: data, encoding: .utf8)\n    print(responseString ?? "")\n}\ntask.resume()`
+    : `import Foundation\n\nlet url = URL(string: "${origin}${path}")!\nvar request = URLRequest(url: url)\nrequest.httpMethod = "${method}"\nrequest.setValue("application/json", forHTTPHeaderField: "Content-Type")\n\nlet jsonString = """\n${sampleBodyStr || '{}'}\n"""\nrequest.httpBody = jsonString.data(using: .utf8)\n\nlet task = URLSession.shared.dataTask(with: request) { data, response, error in\n    guard let data = data, error == nil else { return }\n    let responseString = String(data: data, encoding: .utf8)\n    print(responseString ?? "")\n}\ntask.resume()`;
+
+  const kotlinCmd = method === 'GET' || method === 'DELETE'
+    ? `import okhttp3.OkHttpClient\nimport okhttp3.Request\n\nval client = OkHttpClient()\nval request = Request.Builder()\n    .url("${origin}${path}")\n    .${method.toLowerCase()}()\n    .addHeader("Content-Type", "application/json")\n    .build()\n\nclient.newCall(request).execute().use { response ->\n    println(response.body?.string())\n}`
+    : `import okhttp3.MediaType.Companion.toMediaType\nimport okhttp3.OkHttpClient\nimport okhttp3.Request\nimport okhttp3.RequestBody.Companion.toRequestBody\n\nval client = OkHttpClient()\nval mediaType = "application/json; charset=utf-8".toMediaType()\nval body = """${sampleBodyStr || '{}'}""".toRequestBody(mediaType)\n\nval request = Request.Builder()\n    .url("${origin}${path}")\n    .${method.toLowerCase()}(body)\n    .addHeader("Content-Type", "application/json")\n    .build()\n\nclient.newCall(request).execute().use { response ->\n    println(response.body?.string())\n}`;
+
+  const rustCmd = method === 'GET' || method === 'DELETE'
+    ? `use reqwest::Error;\n\n#[tokio::main]\nasync fn main() -> Result<(), Error> {\n    let client = reqwest::Client::new();\n    let response = client\n        .${method.toLowerCase()}("${origin}${path}")\n        .header("Content-Type", "application/json")\n        .send()\n        .await?\n        .text()\n        .await?;\n\n    println!("{}", response);\n    Ok(())\n}`
+    : `use reqwest::Error;\nuse serde_json::json;\n\n#[tokio::main]\nasync fn main() -> Result<(), Error> {\n    let client = reqwest::Client::new();\n    let payload = json!(${sampleBodyStr || '{}'});\n\n    let response = client\n        .${method.toLowerCase()}("${origin}${path}")\n        .header("Content-Type", "application/json")\n        .json(&payload)\n        .send()\n        .await?\n        .text()\n        .await?;\n\n    println!("{}", response);\n    Ok(())\n}`;
+
+  const phpCmd = method === 'GET' || method === 'DELETE'
+    ? `<?php\nrequire 'vendor/autoload.php';\n\nuse GuzzleHttp\\Client;\n\n$client = new Client();\n$response = $client->request('${method}', '${origin}${path}', [\n    'headers' => [\n        'Content-Type' => 'application/json'\n    ]\n]);\n\necho $response->getBody();`
+    : `<?php\nrequire 'vendor/autoload.php';\n\nuse GuzzleHttp\\Client;\n\n$client = new Client();\n$response = $client->request('${method}', '${origin}${path}', [\n    'headers' => [\n        'Content-Type' => 'application/json'\n    ],\n    'json' => json_decode('${sampleBodyStr || '{}'}', true)\n]);\n\necho $response->getBody();`;
 %>
 
 <div class="endpoint-card" data-endpoint-text="<%= method %> <%= path %> <%= summary %>">
@@ -31,10 +57,11 @@
       <span class="badge badge-<%= method.toLowerCase() %>"><%= method %></span>
       <span class="endpoint-path"><%= path %></span>
     </div>
-    <button type="button" class="copy-url-btn" data-url="http://localhost:3000<%= path %>">
+    <button type="button" class="copy-url-btn" data-url="<%= origin %><%= path %>">
       <span>🔗 Copy URL</span>
     </button>
   </div>
+
 
   <p class="endpoint-summary"><%= summary %></p>
 
@@ -64,7 +91,7 @@
     </div>
   <% } %>
 
-  <!-- Code Generator Tabs (cURL, Node, Axios, Python) -->
+  <!-- Code Generator Tabs (cURL, Node, Axios, Python, Go, Swift, Kotlin, Rust, PHP) -->
   <div class="snippet-container">
     <div class="snippet-header">
       <div class="snippet-tabs">
@@ -72,9 +99,15 @@
         <button type="button" class="snippet-tab-btn" data-target="node">Node (fetch)</button>
         <button type="button" class="snippet-tab-btn" data-target="axios">Axios</button>
         <button type="button" class="snippet-tab-btn" data-target="python">Python</button>
+        <button type="button" class="snippet-tab-btn" data-target="go">Go</button>
+        <button type="button" class="snippet-tab-btn" data-target="swift">Swift</button>
+        <button type="button" class="snippet-tab-btn" data-target="kotlin">Kotlin</button>
+        <button type="button" class="snippet-tab-btn" data-target="rust">Rust</button>
+        <button type="button" class="snippet-tab-btn" data-target="php">PHP</button>
       </div>
-      <button type="button" class="copy-btn">
-        <span>📋 Copy Code</span>
+      <button type="button" class="copy-btn" title="Copy code snippet">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span>Copy</span>
       </button>
     </div>
     <div class="snippet-content">
@@ -82,8 +115,14 @@
       <pre class="snippet-code-block" data-snippet="node" hidden><code><%= fetchCmd %></code></pre>
       <pre class="snippet-code-block" data-snippet="axios" hidden><code><%= axiosCmd %></code></pre>
       <pre class="snippet-code-block" data-snippet="python" hidden><code><%= pythonCmd %></code></pre>
+      <pre class="snippet-code-block" data-snippet="go" hidden><code><%= goCmd %></code></pre>
+      <pre class="snippet-code-block" data-snippet="swift" hidden><code><%= swiftCmd %></code></pre>
+      <pre class="snippet-code-block" data-snippet="kotlin" hidden><code><%= kotlinCmd %></code></pre>
+      <pre class="snippet-code-block" data-snippet="rust" hidden><code><%= rustCmd %></code></pre>
+      <pre class="snippet-code-block" data-snippet="php" hidden><code><%= phpCmd %></code></pre>
     </div>
   </div>
+
 
   <div class="examples-grid">
     <% if (typeof bodyExample !== 'undefined' && bodyExample) { %>
@@ -139,7 +178,37 @@
             </div>
           <% } %>
 
-          <div style="margin-top: 0.5rem;">
+          <!-- Optional Network Simulation Inputs -->
+          <div class="simulation-inputs-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.5rem;">
+            <div class="form-group">
+              <label for="sim-delay-<%= method %>-<%= path %>">
+                ⏱️ Simulate Delay (ms):
+              </label>
+              <input 
+                type="number" 
+                id="sim-delay-<%= method %>-<%= path %>" 
+                placeholder="e.g. 1500 (0-20000ms)"
+                min="0"
+                max="20000"
+                class="form-control sim-delay-input"
+              >
+            </div>
+            <div class="form-group">
+              <label for="sim-status-<%= method %>-<%= path %>">
+                ⚠️ Simulate Status Code:
+              </label>
+              <input 
+                type="number" 
+                id="sim-status-<%= method %>-<%= path %>" 
+                placeholder="e.g. 500, 404, 503"
+                min="400"
+                max="599"
+                class="form-control sim-status-input"
+              >
+            </div>
+          </div>
+
+          <div style="margin-top: 0.75rem;">
             <button type="submit" class="btn btn-primary">Execute Request</button>
           </div>
         </form>

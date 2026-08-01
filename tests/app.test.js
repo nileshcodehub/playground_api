@@ -48,4 +48,19 @@ describe('App & Core Routes', () => {
     assert.ok(setCookie, 'Expected set-cookie header in response');
     assert.match(setCookie, /pg_identity=/);
   });
+
+  test('GET /health returns HTTP 200 and system health metrics JSON', async () => {
+    const response = await fetch(`${baseUrl}/health`);
+    assert.equal(response.status, 200);
+    const json = await response.json();
+    assert.equal(json.status, 'ok');
+    assert.equal(typeof json.timestamp, 'string');
+    assert.equal(typeof json.uptimeSeconds, 'number');
+    assert.equal(json.database.status, 'connected');
+    assert.equal(typeof json.database.latencyMs, 'number');
+    assert.equal(typeof json.activeIdentities, 'number');
+    assert.equal(typeof json.memory.rssMb, 'number');
+    assert.equal(typeof json.memory.heapUsedMb, 'number');
+  });
 });
+

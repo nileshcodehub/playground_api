@@ -6,6 +6,19 @@
   </p>
 </div>
 
+<!-- Per-Resource Collection Export Banner -->
+<div class="endpoint-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; padding: 0.85rem 1.25rem;">
+  <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">
+    📥 Export Todos Collection:
+  </span>
+  <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+    <a href="/downloads/openapi.json?resource=todos" download class="session-action-btn" style="text-decoration: none;" title="Download Todos OpenAPI 3.0 Spec">🌐 OpenAPI</a>
+    <a href="/downloads/postman.json?resource=todos" download class="session-action-btn" style="text-decoration: none;" title="Download Todos Postman Collection">📦 Postman</a>
+    <a href="/downloads/bruno.json?resource=todos" download class="session-action-btn" style="text-decoration: none;" title="Download Todos Bruno Collection">🐶 Bruno</a>
+    <a href="/downloads/insomnia.json?resource=todos" download class="session-action-btn" style="text-decoration: none;" title="Download Todos Insomnia Collection">💧 Insomnia</a>
+  </div>
+</div>
+
 <% if (typeof endpoints !== 'undefined' && endpoints && endpoints.length > 0) { %>
   <% endpoints.forEach(ep => { %>
     <%- include('partials/endpoint', { 

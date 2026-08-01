@@ -168,27 +168,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const sampleBodyStr = ep.bodyExample ? ep.bodyExample.replace(/\n\s*/g, ' ') : '';
     const formattedBodyForCurl = ep.bodyExample || '{}';
 
+    const origin = (typeof window !== 'undefined' && window.location && window.location.origin)
+      ? window.location.origin
+      : 'http://localhost:3000';
+
     const curlCmd = ep.method === 'GET' 
-      ? `curl -X GET 'http://localhost:3000${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
+      ? `curl -X GET '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
       : ep.method === 'DELETE'
-      ? `curl -X DELETE 'http://localhost:3000${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
-      : `curl -X ${ep.method} 'http://localhost:3000${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid" \\\n  -d '${formattedBodyForCurl}'`;
+      ? `curl -X DELETE '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid"`
+      : `curl -X ${ep.method} '${origin}${ep.path}' \\\n  -H 'Content-Type: application/json' \\\n  -b "pg_identity=your_cookie_uuid" \\\n  -d '${formattedBodyForCurl}'`;
 
     const fetchCmd = ep.method === 'GET' || ep.method === 'DELETE'
-      ? `fetch('http://localhost:3000${ep.path}', {\n  method: '${ep.method}',\n  credentials: 'include'\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`
-      : `fetch('http://localhost:3000${ep.path}', {\n  method: '${ep.method}',\n  headers: { 'Content-Type': 'application/json' },\n  credentials: 'include',\n  body: JSON.stringify(${sampleBodyStr || '{}'})\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`;
+      ? `fetch('${origin}${ep.path}', {\n  method: '${ep.method}',\n  credentials: 'include'\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`
+      : `fetch('${origin}${ep.path}', {\n  method: '${ep.method}',\n  headers: { 'Content-Type': 'application/json' },\n  credentials: 'include',\n  body: JSON.stringify(${sampleBodyStr || '{}'})\n})\n  .then(res => res.json())\n  .then(data => console.log(data));`;
 
     const axiosCmd = ep.method === 'GET'
-      ? `import axios from 'axios';\n\naxios.get('http://localhost:3000${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
+      ? `import axios from 'axios';\n\naxios.get('${origin}${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
       : ep.method === 'DELETE'
-      ? `import axios from 'axios';\n\naxios.delete('http://localhost:3000${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
-      : `import axios from 'axios';\n\naxios.${ep.method.toLowerCase()}('http://localhost:3000${ep.path}', ${sampleBodyStr || '{}'}, {\n  withCredentials: true\n}).then(response => console.log(response.data));`;
+      ? `import axios from 'axios';\n\naxios.delete('${origin}${ep.path}', {\n  withCredentials: true\n}).then(response => console.log(response.data));`
+      : `import axios from 'axios';\n\naxios.${ep.method.toLowerCase()}('${origin}${ep.path}', ${sampleBodyStr || '{}'}, {\n  withCredentials: true\n}).then(response => console.log(response.data));`;
 
     const pythonCmd = ep.method === 'GET'
-      ? `import requests\n\nresponse = requests.get('http://localhost:3000${ep.path}')\nprint(response.json())`
+      ? `import requests\n\nresponse = requests.get('${origin}${ep.path}')\nprint(response.json())`
       : ep.method === 'DELETE'
-      ? `import requests\n\nresponse = requests.delete('http://localhost:3000${ep.path}')\nprint(response.status_code)`
-      : `import requests\n\npayload = ${sampleBodyStr || '{}'}\nresponse = requests.${ep.method.toLowerCase()}('http://localhost:3000${ep.path}', json=payload)\nprint(response.json())`;
+      ? `import requests\n\nresponse = requests.delete('${origin}${ep.path}')\nprint(response.status_code)`
+      : `import requests\n\npayload = ${sampleBodyStr || '{}'}\nresponse = requests.${ep.method.toLowerCase()}('${origin}${ep.path}', json=payload)\nprint(response.json())`;
+
+    const goCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `package main\n\nimport (\n\t"fmt"\n\t"io"\n\t"net/http"\n)\n\nfunc main() {\n\turl := "${origin}${ep.path}"\n\treq, err := http.NewRequest("${ep.method}", url, nil)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\treq.Header.Set("Content-Type", "application/json")\n\tclient := &http.Client{}\n\tresp, err := client.Do(req)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, _ := io.ReadAll(resp.Body)\n\tfmt.Println(string(body))\n}`
+      : `package main\n\nimport (\n\t"bytes"\n\t"fmt"\n\t"io"\n\t"net/http"\n)\n\nfunc main() {\n\turl := "${origin}${ep.path}"\n\tpayload := []byte(\`${sampleBodyStr || '{}'}\`)\n\n\treq, err := http.NewRequest("${ep.method}", url, bytes.NewBuffer(payload))\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\treq.Header.Set("Content-Type", "application/json")\n\tclient := &http.Client{}\n\tresp, err := client.Do(req)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, _ := io.ReadAll(resp.Body)\n\tfmt.Println(string(body))\n}`;
+
+    const swiftCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `import Foundation\n\nlet url = URL(string: "${origin}${ep.path}")!\nvar request = URLRequest(url: url)\nrequest.httpMethod = "${ep.method}"\nrequest.setValue("application/json", forHTTPHeaderField: "Content-Type")\n\nlet task = URLSession.shared.dataTask(with: request) { data, response, error in\n    guard let data = data, error == nil else { return }\n    let responseString = String(data: data, encoding: .utf8)\n    print(responseString ?? "")\n}\ntask.resume()`
+      : `import Foundation\n\nlet url = URL(string: "${origin}${ep.path}")!\nvar request = URLRequest(url: url)\nrequest.httpMethod = "${ep.method}"\nrequest.setValue("application/json", forHTTPHeaderField: "Content-Type")\n\nlet jsonString = """\n${sampleBodyStr || '{}'}\n"""\nrequest.httpBody = jsonString.data(using: .utf8)\n\nlet task = URLSession.shared.dataTask(with: request) { data, response, error in\n    guard let data = data, error == nil else { return }\n    let responseString = String(data: data, encoding: .utf8)\n    print(responseString ?? "")\n}\ntask.resume()`;
+
+    const kotlinCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `import okhttp3.OkHttpClient\nimport okhttp3.Request\n\nval client = OkHttpClient()\nval request = Request.Builder()\n    .url("${origin}${ep.path}")\n    .${ep.method.toLowerCase()}()\n    .addHeader("Content-Type", "application/json")\n    .build()\n\nclient.newCall(request).execute().use { response ->\n    println(response.body?.string())\n}`
+      : `import okhttp3.MediaType.Companion.toMediaType\nimport okhttp3.OkHttpClient\nimport okhttp3.Request\nimport okhttp3.RequestBody.Companion.toRequestBody\n\nval client = OkHttpClient()\nval mediaType = "application/json; charset=utf-8".toMediaType()\nval body = """${sampleBodyStr || '{}'}""".toRequestBody(mediaType)\n\nval request = Request.Builder()\n    .url("${origin}${ep.path}")\n    .${ep.method.toLowerCase()}(body)\n    .addHeader("Content-Type", "application/json")\n    .build()\n\nclient.newCall(request).execute().use { response ->\n    println(response.body?.string())\n}`;
+
+    const rustCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `use reqwest::Error;\n\n#[tokio::main]\nasync fn main() -> Result<(), Error> {\n    let client = reqwest::Client::new();\n    let response = client\n        .${ep.method.toLowerCase()}("${origin}${ep.path}")\n        .header("Content-Type", "application/json")\n        .send()\n        .await?\n        .text()\n        .await?;\n\n    println!("{}", response);\n    Ok(())\n}`
+      : `use reqwest::Error;\nuse serde_json::json;\n\n#[tokio::main]\nasync fn main() -> Result<(), Error> {\n    let client = reqwest::Client::new();\n    let payload = json!(${sampleBodyStr || '{}'});\n\n    let response = client\n        .${ep.method.toLowerCase()}("${origin}${ep.path}")\n        .header("Content-Type", "application/json")\n        .json(&payload)\n        .send()\n        .await?\n        .text()\n        .await?;\n\n    println!("{}", response);\n    Ok(())\n}`;
+
+    const phpCmd = ep.method === 'GET' || ep.method === 'DELETE'
+      ? `<?php\nrequire 'vendor/autoload.php';\n\nuse GuzzleHttp\\Client;\n\n$client = new Client();\n$response = $client->request('${ep.method}', '${origin}${ep.path}', [\n    'headers' => [\n        'Content-Type' => 'application/json'\n    ]\n]);\n\necho $response->getBody();`
+      : `<?php\nrequire 'vendor/autoload.php';\n\nuse GuzzleHttp\\Client;\n\n$client = new Client();\n$response = $client->request('${ep.method}', '${origin}${ep.path}', [\n    'headers' => [\n        'Content-Type' => 'application/json'\n    ],\n    'json' => json_decode('${sampleBodyStr || '{}'}', true)\n]);\n\necho $response->getBody();`;
 
     let paramsHTML = '';
     if (ep.params && ep.params.length > 0) {
@@ -255,10 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="endpoint-path">${escapeHTML(ep.path)}</span>
             <span class="resource-badge-tag">/${escapeHTML(ep.resource)}</span>
           </div>
-          <button type="button" class="copy-url-btn" data-url="http://localhost:3000${escapeHTML(ep.path)}">
+          <button type="button" class="copy-url-btn" data-url="${origin}${escapeHTML(ep.path)}">
             <span>🔗 Copy URL</span>
           </button>
         </div>
+
 
         <p class="endpoint-summary">${escapeHTML(ep.summary)}</p>
 
@@ -271,9 +296,15 @@ document.addEventListener('DOMContentLoaded', () => {
               <button type="button" class="snippet-tab-btn" data-target="node">Node (fetch)</button>
               <button type="button" class="snippet-tab-btn" data-target="axios">Axios</button>
               <button type="button" class="snippet-tab-btn" data-target="python">Python</button>
+              <button type="button" class="snippet-tab-btn" data-target="go">Go</button>
+              <button type="button" class="snippet-tab-btn" data-target="swift">Swift</button>
+              <button type="button" class="snippet-tab-btn" data-target="kotlin">Kotlin</button>
+              <button type="button" class="snippet-tab-btn" data-target="rust">Rust</button>
+              <button type="button" class="snippet-tab-btn" data-target="php">PHP</button>
             </div>
-            <button type="button" class="copy-btn">
-              <span>📋 Copy Code</span>
+            <button type="button" class="copy-btn" title="Copy code snippet">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
             </button>
           </div>
           <div class="snippet-content">
@@ -281,8 +312,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <pre class="snippet-code-block" data-snippet="node" hidden><code>${escapeHTML(fetchCmd)}</code></pre>
             <pre class="snippet-code-block" data-snippet="axios" hidden><code>${escapeHTML(axiosCmd)}</code></pre>
             <pre class="snippet-code-block" data-snippet="python" hidden><code>${escapeHTML(pythonCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="go" hidden><code>${escapeHTML(goCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="swift" hidden><code>${escapeHTML(swiftCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="kotlin" hidden><code>${escapeHTML(kotlinCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="rust" hidden><code>${escapeHTML(rustCmd)}</code></pre>
+            <pre class="snippet-code-block" data-snippet="php" hidden><code>${escapeHTML(phpCmd)}</code></pre>
           </div>
         </div>
+
 
         <div class="examples-grid">
           ${ep.bodyExample ? `<div class="example-box"><h4>Request Payload Example</h4><pre><code>${escapeHTML(ep.bodyExample)}</code></pre></div>` : ''}
@@ -487,12 +524,13 @@ document.addEventListener('DOMContentLoaded', () => {
         copyBtn.addEventListener('click', () => {
           const visibleBlock = Array.from(codeBlocks).find(b => !b.hidden);
           if (visibleBlock) {
-            const codeText = visibleBlock.textContent;
+            const originalHTML = copyBtn.innerHTML;
+            const successHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span style="color:#10b981;">Copied!</span>`;
+
             navigator.clipboard.writeText(codeText).then(() => {
-              const originalText = copyBtn.innerHTML;
-              copyBtn.innerHTML = '<span>✅ Copied!</span>';
+              copyBtn.innerHTML = successHTML;
               setTimeout(() => {
-                copyBtn.innerHTML = originalText;
+                copyBtn.innerHTML = originalHTML;
               }, 2000);
             }).catch(err => console.error('Copy error:', err));
           }
@@ -567,13 +605,26 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
+        const delayInput = form.querySelector('.sim-delay-input');
+        const statusInput = form.querySelector('.sim-status-input');
+
         // Execute request
         try {
+          const headers = {
+            'Content-Type': 'application/json'
+          };
+
+          if (delayInput && delayInput.value.trim()) {
+            headers['X-Simulate-Delay'] = delayInput.value.trim();
+          }
+
+          if (statusInput && statusInput.value.trim()) {
+            headers['X-Simulate-Status'] = statusInput.value.trim();
+          }
+
           const options = {
             method,
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers,
             credentials: 'include' // Crucial: send pg_identity cookie
           };
 
@@ -581,37 +632,87 @@ document.addEventListener('DOMContentLoaded', () => {
             options.body = JSON.stringify(requestBody);
           }
 
+          const startTime = performance.now();
           const response = await fetch(fullUrl, options);
-          const statusPillClass = response.ok ? 'status-2xx' : 'status-4xx';
-          const statusHeader = `HTTP ${response.status} ${response.statusText}`;
+          const durationMs = Math.round(performance.now() - startTime);
 
-          if (response.status === 204) {
-            resultBlock.textContent = '';
-            const badge = document.createElement('span');
-            badge.className = `status-badge-pill ${statusPillClass}`;
-            badge.textContent = statusHeader;
-            resultBlock.appendChild(badge);
-            resultBlock.appendChild(document.createTextNode('\n\n204 No Content (Record updated/deleted in session overlay)'));
-            return;
-          }
+          const statusPillClass = response.ok ? 'status-2xx' : (response.status >= 500 ? 'status-5xx' : 'status-4xx');
+          const statusHeader = `HTTP ${response.status} ${response.statusText || (response.ok ? 'OK' : 'Error')}`;
 
-          let data;
-          const contentType = response.headers.get('content-type');
-          if (contentType && contentType.includes('application/json')) {
-            data = await response.json();
-          } else {
-            data = await response.text();
-          }
-          
+          const rawText = await response.text();
+          const sizeBytes = new Blob([rawText]).size;
+          const sizeFormatted = sizeBytes >= 1024 ? `${(sizeBytes / 1024).toFixed(2)} KB` : `${sizeBytes} B`;
+
+          // Extract response headers
+          const responseHeaders = {};
+          response.headers.forEach((value, key) => {
+            responseHeaders[key] = value;
+          });
+
           resultBlock.textContent = '';
-          const badge = document.createElement('span');
-          badge.className = `status-badge-pill ${statusPillClass}`;
-          badge.textContent = statusHeader;
-          resultBlock.appendChild(badge);
-          const body = typeof data === 'object'
-            ? JSON.stringify(data, null, 2)
-            : String(data);
-          resultBlock.appendChild(document.createTextNode('\n\n' + body));
+          resultBlock.innerHTML = '';
+
+          // Inspector Toolbar
+          const inspectorBar = document.createElement('div');
+          inspectorBar.className = 'try-it-inspector-bar';
+
+          const statusBadge = document.createElement('span');
+          statusBadge.className = `status-badge-pill ${statusPillClass}`;
+          statusBadge.textContent = statusHeader;
+          inspectorBar.appendChild(statusBadge);
+
+          const timeBadge = document.createElement('span');
+          timeBadge.className = 'inspector-badge';
+          timeBadge.textContent = `⏱️ ${durationMs} ms`;
+          inspectorBar.appendChild(timeBadge);
+
+          const sizeBadge = document.createElement('span');
+          sizeBadge.className = 'inspector-badge';
+          sizeBadge.textContent = `📦 ${sizeFormatted}`;
+          inspectorBar.appendChild(sizeBadge);
+
+          const cookieBadge = document.createElement('span');
+          cookieBadge.className = 'inspector-badge inspector-badge--cookie';
+          cookieBadge.textContent = `🍪 Session Identity Active`;
+          inspectorBar.appendChild(cookieBadge);
+
+          resultBlock.appendChild(inspectorBar);
+
+          // Collapsible Response Headers Drawer
+          const headersDetails = document.createElement('details');
+          headersDetails.className = 'inspector-headers-details';
+          const summary = document.createElement('summary');
+          summary.textContent = `📋 Response Headers (${Object.keys(responseHeaders).length})`;
+          headersDetails.appendChild(summary);
+
+          const headersGrid = document.createElement('div');
+          headersGrid.className = 'inspector-headers-grid';
+          Object.entries(responseHeaders).forEach(([k, v]) => {
+            const row = document.createElement('div');
+            row.className = 'inspector-header-row';
+            row.innerHTML = `<span class="header-name">${k}:</span> <span class="header-val">${v}</span>`;
+            headersGrid.appendChild(row);
+          });
+          headersDetails.appendChild(headersGrid);
+          resultBlock.appendChild(headersDetails);
+
+          // Response Body Content
+          let dataText = rawText;
+          if (response.status === 204) {
+            dataText = '204 No Content (Record updated/deleted in session overlay)';
+          } else {
+            try {
+              const json = JSON.parse(rawText);
+              dataText = JSON.stringify(json, null, 2);
+            } catch {
+              dataText = rawText;
+            }
+          }
+
+          const preBody = document.createElement('pre');
+          preBody.className = 'inspector-response-body';
+          preBody.textContent = dataText;
+          resultBlock.appendChild(preBody);
         } catch (err) {
           resultBlock.textContent = `❌ Network Error: ${err.message}`;
         }
@@ -621,4 +722,254 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial wiring for pre-rendered DOM elements
   wireAllInteractions(document);
+
+  // Copy Session Token Button Wiring
+  const copyBtn = document.getElementById('copy-session-id-btn');
+  const sessionDisplay = document.getElementById('session-id-display');
+  if (copyBtn && sessionDisplay) {
+    copyBtn.addEventListener('click', async () => {
+      const token = sessionDisplay.getAttribute('data-session-token');
+      if (!token) {
+        alert('No active session token found.');
+        return;
+      }
+      const originalHTML = copyBtn.innerHTML;
+      const successHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span style="color:#10b981;">Copied!</span>`;
+
+      try {
+        await navigator.clipboard.writeText(token);
+        copyBtn.innerHTML = successHTML;
+        setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 2000);
+      } catch (err) {
+        const textarea = document.createElement('textarea');
+        textarea.value = token;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        copyBtn.innerHTML = successHTML;
+        setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 2000);
+      }
+    });
+  }
+
+  // Reset Session Sandbox Button Wiring
+  const resetBtn = document.getElementById('reset-sandbox-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async () => {
+      const confirmReset = confirm('Are you sure you want to reset your session sandbox? All your created, updated, and deleted records will be purged.');
+      if (!confirmReset) return;
+
+      const originalText = resetBtn.innerHTML;
+      resetBtn.disabled = true;
+      resetBtn.innerHTML = '⏳ Resetting...';
+
+      try {
+        let res = await fetch('/session/reset', { method: 'DELETE' });
+        if (!res.ok) {
+          // Fallback to POST /session/reset if DELETE fails
+          res = await fetch('/session/reset', { method: 'POST' });
+        }
+
+        if (res.ok) {
+          resetBtn.innerHTML = '✅ Reset Done!';
+          setTimeout(() => {
+            window.location.reload();
+          }, 400);
+        } else {
+          alert('Failed to reset session sandbox. Please try again.');
+          resetBtn.disabled = false;
+          resetBtn.innerHTML = originalText;
+        }
+      } catch (err) {
+        alert('Network error resetting session sandbox: ' + err.message);
+        resetBtn.disabled = false;
+        resetBtn.innerHTML = originalText;
+      }
+    });
+  }
+
+  // Dynamic Export Resource Select Wiring
+  const exportSelect = document.getElementById('export-resource-select');
+  if (exportSelect) {
+    const updateExportHrefs = () => {
+      const selected = exportSelect.value;
+      const query = (selected && selected !== 'all') ? `?resource=${selected}` : '';
+
+      const openapiBtn = document.getElementById('export-btn-openapi');
+      const postmanBtn = document.getElementById('export-btn-postman');
+      const brunoBtn = document.getElementById('export-btn-bruno');
+      const insomniaBtn = document.getElementById('export-btn-insomnia');
+
+      if (openapiBtn) openapiBtn.href = `/downloads/openapi.json${query}`;
+      if (postmanBtn) postmanBtn.href = `/downloads/postman.json${query}`;
+      if (brunoBtn) brunoBtn.href = `/downloads/bruno.json${query}`;
+      if (insomniaBtn) insomniaBtn.href = `/downloads/insomnia.json${query}`;
+    };
+
+    exportSelect.addEventListener('change', updateExportHrefs);
+  }
+
+  // Session Dashboard Modal Wiring
+  const openModalBtn = document.getElementById('open-session-dashboard-btn');
+  const dashboardModal = document.getElementById('session-dashboard-modal');
+  const closeModalBtn = document.getElementById('close-session-dashboard-btn');
+  const dismissModalBtn = document.getElementById('modal-dismiss-btn');
+  const modalCopyTokenBtn = document.getElementById('modal-copy-token-btn');
+  const modalResetBtn = document.getElementById('modal-reset-sandbox-btn');
+  const modalBody = document.getElementById('modal-dashboard-body');
+
+  const openDashboard = async () => {
+    if (!dashboardModal || !modalBody) return;
+    dashboardModal.removeAttribute('hidden');
+    modalBody.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">⏳ Loading session statistics...</div>`;
+
+    try {
+      const res = await fetch('/session/stats');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      const createdDate = new Date(data.identity.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      const lastSeenDate = new Date(data.identity.lastSeenAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+      let resourcesHtml = '';
+      const resources = ['users', 'posts', 'comments', 'todos'];
+      let totalCreated = 0;
+      let totalUpdated = 0;
+      let totalDeleted = 0;
+
+      resources.forEach((resKey) => {
+        const item = data.stats.byResource[resKey] || { created: 0, updated: 0, deleted: 0, total: 0 };
+        totalCreated += item.created;
+        totalUpdated += item.updated;
+        totalDeleted += item.deleted;
+
+        const pct = Math.min(100, Math.round((item.created / data.quota.maxCreatedPerResource) * 100));
+        resourcesHtml += `
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem 0.5rem; font-weight: 600; text-transform: capitalize;">/${resKey}</td>
+            <td style="padding: 0.6rem 0.5rem; text-align: center;">${item.created} / ${data.quota.maxCreatedPerResource}</td>
+            <td style="padding: 0.6rem 0.5rem; text-align: center;">${item.updated}</td>
+            <td style="padding: 0.6rem 0.5rem; text-align: center;">${item.deleted}</td>
+            <td style="padding: 0.6rem 0.5rem; width: 110px;">
+              <div class="quota-progress-container">
+                <div class="quota-progress-bar" style="width: ${pct}%;"></div>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      modalBody.innerHTML = `
+        <!-- Identity Summary Row -->
+        <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">IDENTITY UUID</span>
+            <span class="resource-badge-tag" style="margin: 0; font-size: 0.72rem;">10-DAY INACTIVITY RETENTION ACTIVE</span>
+          </div>
+          <div style="font-family: 'Fira Code', monospace; font-size: 0.88rem; color: var(--primary-accent); word-break: break-all;">
+            ${data.identity.id}
+          </div>
+          <div style="display: flex; gap: 1.25rem; font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;">
+            <span>📅 Created: ${createdDate}</span>
+            <span>⚡ Last Active: ${lastSeenDate}</span>
+          </div>
+        </div>
+
+        <!-- Metric Stat Counters Grid -->
+        <div class="metric-stat-grid">
+          <div class="metric-stat-card">
+            <div class="metric-stat-value">${data.stats.totalRecords}</div>
+            <div class="metric-stat-label">Total Sandbox Records</div>
+          </div>
+          <div class="metric-stat-card">
+            <div class="metric-stat-value" style="color: var(--get-badge);">${totalCreated}</div>
+            <div class="metric-stat-label">Records Created</div>
+          </div>
+          <div class="metric-stat-card">
+            <div class="metric-stat-value" style="color: #f59e0b;">${totalUpdated}</div>
+            <div class="metric-stat-label">Records Updated</div>
+          </div>
+          <div class="metric-stat-card">
+            <div class="metric-stat-value" style="color: var(--delete-badge);">${totalDeleted}</div>
+            <div class="metric-stat-label">Records Deleted</div>
+          </div>
+        </div>
+
+        <!-- Quotas & Activity Table -->
+        <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--text-primary);">Resource Quotas & Mutations</h4>
+        <div style="overflow-x: auto; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); background: rgba(255,255,255,0.02);">
+                <th style="padding: 0.6rem 0.5rem;">Resource</th>
+                <th style="padding: 0.6rem 0.5rem; text-align: center;">Created (Quota)</th>
+                <th style="padding: 0.6rem 0.5rem; text-align: center;">Updated</th>
+                <th style="padding: 0.6rem 0.5rem; text-align: center;">Deleted</th>
+                <th style="padding: 0.6rem 0.5rem;">Usage</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${resourcesHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+    } catch (err) {
+      modalBody.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--delete-badge);">❌ Failed to load session stats: ${err.message}</div>`;
+    }
+  };
+
+  const closeModal = () => {
+    if (dashboardModal) dashboardModal.setAttribute('hidden', '');
+  };
+
+  if (openModalBtn) openModalBtn.addEventListener('click', openDashboard);
+  if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+  if (dismissModalBtn) dismissModalBtn.addEventListener('click', closeModal);
+
+  if (dashboardModal) {
+    dashboardModal.addEventListener('click', (e) => {
+      if (e.target === dashboardModal) closeModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dashboardModal && !dashboardModal.hasAttribute('hidden')) {
+      closeModal();
+    }
+  });
+
+  if (modalCopyTokenBtn) {
+    modalCopyTokenBtn.addEventListener('click', async () => {
+      const sessionDisplay = document.getElementById('session-id-display');
+      const token = sessionDisplay ? sessionDisplay.getAttribute('data-session-token') : null;
+      if (!token) return alert('No active session token found.');
+
+      try {
+        await navigator.clipboard.writeText(token);
+        modalCopyTokenBtn.textContent = '✅ Copied!';
+        setTimeout(() => { modalCopyTokenBtn.textContent = '📋 Copy Signed Token'; }, 2000);
+      } catch {
+        alert(token);
+      }
+    });
+  }
+
+  if (modalResetBtn) {
+    modalResetBtn.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to reset all session sandbox mutations?')) return;
+      try {
+        const res = await fetch('/session/reset', { method: 'DELETE' });
+        if (res.ok) {
+          closeModal();
+          window.location.reload();
+        } else {
+          alert('Failed to reset session sandbox.');
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    });
+  }
 });
