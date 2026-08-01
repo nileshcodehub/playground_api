@@ -42,20 +42,21 @@ describe('12 — Universal Full-Text Search (GET /<resource>?q=<term>)', () => {
 
   test('GET /posts?q=<term> searches session sandbox created records', async () => {
     const initRes = await fetch(`${baseUrl}/users?limit=1`);
-    const cookie = initRes.headers.get('set-cookie');
+    const token = initRes.headers.get('x-playground-identity');
+    assert.ok(token);
 
     const uniqueTerm = 'ZebraXylophone99';
     await fetch(`${baseUrl}/posts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Cookie: cookie
+        'X-Playground-Identity': token
       },
       body: JSON.stringify({ title: `Post about ${uniqueTerm}`, body: 'Custom content', userId: 1 })
     });
 
     const searchRes = await fetch(`${baseUrl}/posts?q=${uniqueTerm}`, {
-      headers: { Cookie: cookie }
+      headers: { 'X-Playground-Identity': token }
     });
     assert.equal(searchRes.status, 200);
 

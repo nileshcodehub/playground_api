@@ -972,4 +972,78 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Header & Footer Triggers Wiring
+  const headerStatsBtn = document.getElementById('header-stats-btn');
+  const footerStatsTrigger = document.getElementById('footer-stats-trigger');
+  if (headerStatsBtn) headerStatsBtn.addEventListener('click', openDashboard);
+  if (footerStatsTrigger) {
+    footerStatsTrigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      openDashboard();
+    });
+  }
+
+  const headerCopyBtn = document.getElementById('header-copy-token-btn');
+  if (headerCopyBtn) {
+    headerCopyBtn.addEventListener('click', async () => {
+      const sessionDisplay = document.getElementById('session-id-display');
+      const token = sessionDisplay ? sessionDisplay.getAttribute('data-session-token') : null;
+      if (!token) return alert('No active session token found.');
+
+      try {
+        await navigator.clipboard.writeText(token);
+        headerCopyBtn.textContent = '✅ Copied!';
+        setTimeout(() => { headerCopyBtn.textContent = '📋 Copy Token'; }, 2000);
+      } catch {
+        alert(token);
+      }
+    });
+  }
+
+  // Mobile Drawer Toggle Wiring
+  const mobileToggleBtn = document.getElementById('mobile-menu-toggle');
+  const appSidebar = document.getElementById('app-sidebar');
+  if (mobileToggleBtn && appSidebar) {
+    mobileToggleBtn.addEventListener('click', () => {
+      appSidebar.classList.toggle('mobile-open');
+    });
+  }
+
+  // Architecture Explainer Modal Wiring
+  const openExplainerBtn = document.getElementById('open-explainer-modal-btn');
+  const footerExplainerTrigger = document.getElementById('footer-explainer-trigger');
+  const explainerModal = document.getElementById('sandbox-explainer-modal');
+  const closeExplainerBtn = document.getElementById('close-explainer-modal-btn');
+  const dismissExplainerBtn = document.getElementById('dismiss-explainer-modal-btn');
+
+  const openExplainer = () => {
+    if (explainerModal) explainerModal.removeAttribute('hidden');
+  };
+
+  const closeExplainer = () => {
+    if (explainerModal) explainerModal.setAttribute('hidden', '');
+  };
+
+  if (openExplainerBtn) openExplainerBtn.addEventListener('click', openExplainer);
+  if (footerExplainerTrigger) {
+    footerExplainerTrigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      openExplainer();
+    });
+  }
+  if (closeExplainerBtn) closeExplainerBtn.addEventListener('click', closeExplainer);
+  if (dismissExplainerBtn) dismissExplainerBtn.addEventListener('click', closeExplainer);
+
+  if (explainerModal) {
+    explainerModal.addEventListener('click', (e) => {
+      if (e.target === explainerModal) closeExplainer();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && explainerModal && !explainerModal.hasAttribute('hidden')) {
+      closeExplainer();
+    }
+  });
 });
