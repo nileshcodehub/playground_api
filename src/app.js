@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import config from './config/env.js';
 import { identityMiddleware } from './middleware/identity.js';
 import { generalLimiter } from './middleware/rateLimit.js';
+import { simulationMiddleware } from './middleware/simulation.js';
 import { errorHandler, AppError } from './middleware/errorHandler.js';
 import { makeResourceRouter } from './routes/resourceRoutes.js';
 import { makeResourceController } from './controllers/resourceController.js';
@@ -50,9 +51,10 @@ if (!config.isProduction) {
 // Static file serving (bypasses DB identity check for speed)
 app.use('/public', express.static(path.join(rootDir, 'public')));
 
-// Identity Cookie Middleware & Global Rate Limiter
+// Identity Cookie Middleware, Global Rate Limiter & Network Simulation
 app.use(identityMiddleware);
 app.use(generalLimiter);
+app.use(simulationMiddleware);
 
 // Health Check & System Metrics Endpoint
 app.get('/health', getHealth);

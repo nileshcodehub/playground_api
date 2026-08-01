@@ -178,7 +178,37 @@
             </div>
           <% } %>
 
-          <div style="margin-top: 0.5rem;">
+          <!-- Optional Network Simulation Inputs -->
+          <div class="simulation-inputs-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.5rem;">
+            <div class="form-group">
+              <label for="sim-delay-<%= method %>-<%= path %>">
+                ⏱️ Simulate Delay (ms):
+              </label>
+              <input 
+                type="number" 
+                id="sim-delay-<%= method %>-<%= path %>" 
+                placeholder="e.g. 1500 (0-20000ms)"
+                min="0"
+                max="20000"
+                class="form-control sim-delay-input"
+              >
+            </div>
+            <div class="form-group">
+              <label for="sim-status-<%= method %>-<%= path %>">
+                ⚠️ Simulate Status Code:
+              </label>
+              <input 
+                type="number" 
+                id="sim-status-<%= method %>-<%= path %>" 
+                placeholder="e.g. 500, 404, 503"
+                min="400"
+                max="599"
+                class="form-control sim-status-input"
+              >
+            </div>
+          </div>
+
+          <div style="margin-top: 0.75rem;">
             <button type="submit" class="btn btn-primary">Execute Request</button>
           </div>
         </form>

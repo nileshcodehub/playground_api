@@ -6,7 +6,7 @@ export const makeResourceController = (resource) => {
   return {
     list: async (req, res, next) => {
       try {
-        const { page, limit, _sort, _order, ...queryFilters } = req.query;
+        const { page, limit, _sort, _order, _delay, _status, ...queryFilters } = req.query;
         const rawFilters = { ...queryFilters, ...(req.resourceFilters || {}) };
 
         // Type-cast known relational and boolean filter fields

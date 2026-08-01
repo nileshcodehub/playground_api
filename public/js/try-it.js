@@ -605,13 +605,26 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
+        const delayInput = form.querySelector('.sim-delay-input');
+        const statusInput = form.querySelector('.sim-status-input');
+
         // Execute request
         try {
+          const headers = {
+            'Content-Type': 'application/json'
+          };
+
+          if (delayInput && delayInput.value.trim()) {
+            headers['X-Simulate-Delay'] = delayInput.value.trim();
+          }
+
+          if (statusInput && statusInput.value.trim()) {
+            headers['X-Simulate-Status'] = statusInput.value.trim();
+          }
+
           const options = {
             method,
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers,
             credentials: 'include' // Crucial: send pg_identity cookie
           };
 
