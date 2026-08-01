@@ -13,6 +13,8 @@ import { errorHandler, AppError } from './middleware/errorHandler.js';
 import { makeResourceRouter } from './routes/resourceRoutes.js';
 import { makeResourceController } from './controllers/resourceController.js';
 import docsRouter from './routes/docsRoutes.js';
+import cronRouter from './routes/cronRoutes.js';
+import downloadRouter from './routes/downloadRoutes.js';
 import sessionRouter from './routes/sessionRoutes.js';
 import { getHealth } from './controllers/healthController.js';
 
@@ -59,8 +61,10 @@ app.use(simulationMiddleware);
 // Health Check & System Metrics Endpoint
 app.get('/health', getHealth);
 
-// Session Sandbox Management Endpoints (/session/reset)
+// Session Sandbox Management, Cron & Collection Downloads Endpoints
 app.use('/session', sessionRouter);
+app.use('/api/cron', cronRouter);
+app.use('/downloads', downloadRouter);
 
 // Nested Sub-Resource Routes (JSONPlaceholder parity)
 app.get('/users/:userId/posts', (req, res, next) => {

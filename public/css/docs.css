@@ -835,6 +835,88 @@ pre {
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+/* Inspector Toolbar & Response Headers Drawer */
+.try-it-inspector-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.inspector-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  background-color: var(--bg-sidebar);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.inspector-badge--cookie {
+  color: var(--primary-accent);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.inspector-headers-details {
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-card);
+  overflow: hidden;
+}
+
+.inspector-headers-details summary {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.inspector-headers-grid {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-height: 180px;
+  overflow-y: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.75rem;
+}
+
+.inspector-header-row {
+  display: flex;
+  gap: 0.5rem;
+  word-break: break-all;
+}
+
+.inspector-header-row .header-name {
+  color: var(--primary-accent);
+  font-weight: 600;
+}
+
+.inspector-header-row .header-val {
+  color: var(--text-primary);
+}
+
+.inspector-response-body {
+  margin: 0;
+  padding: 0.75rem;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.82rem;
+  max-height: 400px;
+  overflow: auto;
+}
+
 .footer {
   margin-top: 3rem;
   padding-top: 1.5rem;

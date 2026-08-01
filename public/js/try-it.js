@@ -632,37 +632,87 @@ document.addEventListener('DOMContentLoaded', () => {
             options.body = JSON.stringify(requestBody);
           }
 
+          const startTime = performance.now();
           const response = await fetch(fullUrl, options);
-          const statusPillClass = response.ok ? 'status-2xx' : 'status-4xx';
-          const statusHeader = `HTTP ${response.status} ${response.statusText}`;
+          const durationMs = Math.round(performance.now() - startTime);
 
-          if (response.status === 204) {
-            resultBlock.textContent = '';
-            const badge = document.createElement('span');
-            badge.className = `status-badge-pill ${statusPillClass}`;
-            badge.textContent = statusHeader;
-            resultBlock.appendChild(badge);
-            resultBlock.appendChild(document.createTextNode('\n\n204 No Content (Record updated/deleted in session overlay)'));
-            return;
-          }
+          const statusPillClass = response.ok ? 'status-2xx' : (response.status >= 500 ? 'status-5xx' : 'status-4xx');
+          const statusHeader = `HTTP ${response.status} ${response.statusText || (response.ok ? 'OK' : 'Error')}`;
 
-          let data;
-          const contentType = response.headers.get('content-type');
-          if (contentType && contentType.includes('application/json')) {
-            data = await response.json();
-          } else {
-            data = await response.text();
-          }
-          
+          const rawText = await response.text();
+          const sizeBytes = new Blob([rawText]).size;
+          const sizeFormatted = sizeBytes >= 1024 ? `${(sizeBytes / 1024).toFixed(2)} KB` : `${sizeBytes} B`;
+
+          // Extract response headers
+          const responseHeaders = {};
+          response.headers.forEach((value, key) => {
+            responseHeaders[key] = value;
+          });
+
           resultBlock.textContent = '';
-          const badge = document.createElement('span');
-          badge.className = `status-badge-pill ${statusPillClass}`;
-          badge.textContent = statusHeader;
-          resultBlock.appendChild(badge);
-          const body = typeof data === 'object'
-            ? JSON.stringify(data, null, 2)
-            : String(data);
-          resultBlock.appendChild(document.createTextNode('\n\n' + body));
+          resultBlock.innerHTML = '';
+
+          // Inspector Toolbar
+          const inspectorBar = document.createElement('div');
+          inspectorBar.className = 'try-it-inspector-bar';
+
+          const statusBadge = document.createElement('span');
+          statusBadge.className = `status-badge-pill ${statusPillClass}`;
+          statusBadge.textContent = statusHeader;
+          inspectorBar.appendChild(statusBadge);
+
+          const timeBadge = document.createElement('span');
+          timeBadge.className = 'inspector-badge';
+          timeBadge.textContent = `⏱️ ${durationMs} ms`;
+          inspectorBar.appendChild(timeBadge);
+
+          const sizeBadge = document.createElement('span');
+          sizeBadge.className = 'inspector-badge';
+          sizeBadge.textContent = `📦 ${sizeFormatted}`;
+          inspectorBar.appendChild(sizeBadge);
+
+          const cookieBadge = document.createElement('span');
+          cookieBadge.className = 'inspector-badge inspector-badge--cookie';
+          cookieBadge.textContent = `🍪 Session Identity Active`;
+          inspectorBar.appendChild(cookieBadge);
+
+          resultBlock.appendChild(inspectorBar);
+
+          // Collapsible Response Headers Drawer
+          const headersDetails = document.createElement('details');
+          headersDetails.className = 'inspector-headers-details';
+          const summary = document.createElement('summary');
+          summary.textContent = `📋 Response Headers (${Object.keys(responseHeaders).length})`;
+          headersDetails.appendChild(summary);
+
+          const headersGrid = document.createElement('div');
+          headersGrid.className = 'inspector-headers-grid';
+          Object.entries(responseHeaders).forEach(([k, v]) => {
+            const row = document.createElement('div');
+            row.className = 'inspector-header-row';
+            row.innerHTML = `<span class="header-name">${k}:</span> <span class="header-val">${v}</span>`;
+            headersGrid.appendChild(row);
+          });
+          headersDetails.appendChild(headersGrid);
+          resultBlock.appendChild(headersDetails);
+
+          // Response Body Content
+          let dataText = rawText;
+          if (response.status === 204) {
+            dataText = '204 No Content (Record updated/deleted in session overlay)';
+          } else {
+            try {
+              const json = JSON.parse(rawText);
+              dataText = JSON.stringify(json, null, 2);
+            } catch {
+              dataText = rawText;
+            }
+          }
+
+          const preBody = document.createElement('pre');
+          preBody.className = 'inspector-response-body';
+          preBody.textContent = dataText;
+          resultBlock.appendChild(preBody);
         } catch (err) {
           resultBlock.textContent = `❌ Network Error: ${err.message}`;
         }
@@ -737,5 +787,26 @@ document.addEventListener('DOMContentLoaded', () => {
         resetBtn.innerHTML = originalText;
       }
     });
+  }
+
+  // Dynamic Export Resource Select Wiring
+  const exportSelect = document.getElementById('export-resource-select');
+  if (exportSelect) {
+    const updateExportHrefs = () => {
+      const selected = exportSelect.value;
+      const query = (selected && selected !== 'all') ? `?resource=${selected}` : '';
+
+      const openapiBtn = document.getElementById('export-btn-openapi');
+      const postmanBtn = document.getElementById('export-btn-postman');
+      const brunoBtn = document.getElementById('export-btn-bruno');
+      const insomniaBtn = document.getElementById('export-btn-insomnia');
+
+      if (openapiBtn) openapiBtn.href = `/downloads/openapi.json${query}`;
+      if (postmanBtn) postmanBtn.href = `/downloads/postman.json${query}`;
+      if (brunoBtn) brunoBtn.href = `/downloads/bruno.json${query}`;
+      if (insomniaBtn) insomniaBtn.href = `/downloads/insomnia.json${query}`;
+    };
+
+    exportSelect.addEventListener('change', updateExportHrefs);
   }
 });

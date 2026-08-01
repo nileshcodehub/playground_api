@@ -58,6 +58,38 @@
           </div>
         </div>
 
+        <!-- Export API Collections Card -->
+        <div class="session-card export-collections-card" style="margin-top: 0.75rem;">
+          <div class="session-card-header">
+            <span>Export Collections</span>
+            <span style="font-size: 0.7rem; font-weight: 600; color: var(--primary-accent);">Schema / JSON</span>
+          </div>
+          <div style="margin-top: 0.5rem;">
+            <select id="export-resource-select" class="form-control" style="font-size: 0.78rem; padding: 0.25rem 0.5rem; height: 30px; width: 100%; border-radius: 4px; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); cursor: pointer;">
+              <option value="all" <%= (typeof currentNav !== 'undefined' && currentNav === 'overview') ? 'selected' : '' %>>📁 All Resources</option>
+              <option value="users" <%= (typeof currentNav !== 'undefined' && currentNav === 'users') ? 'selected' : '' %>>👤 Users Collection</option>
+              <option value="posts" <%= (typeof currentNav !== 'undefined' && currentNav === 'posts') ? 'selected' : '' %>>📝 Posts Collection</option>
+              <option value="comments" <%= (typeof currentNav !== 'undefined' && currentNav === 'comments') ? 'selected' : '' %>>💬 Comments Collection</option>
+              <option value="todos" <%= (typeof currentNav !== 'undefined' && currentNav === 'todos') ? 'selected' : '' %>>✅ Todos Collection</option>
+            </select>
+          </div>
+          <div class="export-collections-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.5rem;">
+            <% const initQuery = (typeof currentNav !== 'undefined' && currentNav !== 'overview') ? `?resource=${currentNav}` : ''; %>
+            <a id="export-btn-openapi" href="/downloads/openapi.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download OpenAPI 3.0 Specification">
+              <span>🌐 OpenAPI</span>
+            </a>
+            <a id="export-btn-postman" href="/downloads/postman.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Postman Collection v2.1">
+              <span>📦 Postman</span>
+            </a>
+            <a id="export-btn-bruno" href="/downloads/bruno.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Bruno API Collection">
+              <span>🐶 Bruno</span>
+            </a>
+            <a id="export-btn-insomnia" href="/downloads/insomnia.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Insomnia v4 Collection">
+              <span>💧 Insomnia</span>
+            </a>
+          </div>
+        </div>
+
         <!-- Navigation Menu -->
         <nav class="nav-section">
           <div class="nav-section-title">Documentation</div>

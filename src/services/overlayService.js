@@ -391,3 +391,34 @@ export const resetSessionOverlay = async (identityId) => {
   return { count };
 };
 
+export const cleanupInactiveIdentities = async (daysThreshold = 10) => {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - daysThreshold);
+
+  const inactiveIdentities = await prisma.identities.findMany({
+    where: {
+      last_seen_at: {
+        lt: cutoffDate
+      }
+    },
+    select: { id: true }
+  });
+
+  if (inactiveIdentities.length === 0) {
+    return 0;
+  }
+
+  const inactiveIds = inactiveIdentities.map((i) => i.id);
+
+  await prisma.$transaction([
+    prisma.overlayRecords.deleteMany({
+      where: { identity_id: { in: inactiveIds } }
+    }),
+    prisma.identities.deleteMany({
+      where: { id: { in: inactiveIds } }
+    })
+  ]);
+
+  return inactiveIds.length;
+};
+
