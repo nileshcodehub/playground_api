@@ -43,13 +43,17 @@
           <div class="session-id" id="session-id-display" data-session-token="<%= (typeof signedToken !== 'undefined' && signedToken) ? signedToken : (typeof identityId !== 'undefined' ? identityId : '') %>">
             <%= (typeof identityId !== 'undefined' && identityId) ? (identityId.slice(0, 8) + '...') : 'Active Session' %>
           </div>
-          <div class="session-actions">
+          <div class="session-actions" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.25rem;">
             <button type="button" id="copy-session-id-btn" class="session-action-btn copy-session-btn" title="Copy signed Session Token for X-Playground-Identity header">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               <span>Copy</span>
             </button>
+            <button type="button" id="open-session-dashboard-btn" class="session-action-btn dashboard-btn" title="View Session Quota & Activity Dashboard">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+              <span>Stats</span>
+            </button>
             <button type="button" id="reset-sandbox-btn" class="session-action-btn reset-sandbox-btn" title="Purge all sandbox mutations for this session">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
               <span>Reset</span>
             </button>
           </div>
@@ -142,6 +146,40 @@
           <p>Playground API — Built with 💖 by Nilesh Kumar</p>
         </footer>
       </main>
+    </div>
+
+    <!-- Session Dashboard Modal -->
+    <div id="session-dashboard-modal" class="modal-backdrop" hidden>
+      <div class="modal-card">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">📊</span>
+            <div>
+              <h3 style="margin: 0; font-size: 1.05rem; color: var(--text-primary);">Session Sandbox Dashboard</h3>
+              <p style="margin: 0; font-size: 0.76rem; color: var(--text-secondary);">Real-time identity metrics, sandbox quotas & mutation activity</p>
+            </div>
+          </div>
+          <button type="button" class="modal-close-btn" id="close-session-dashboard-btn" title="Close Modal">&times;</button>
+        </div>
+
+        <div class="modal-body" id="modal-dashboard-body">
+          <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            ⏳ Loading session statistics...
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="modal-copy-token-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+            📋 Copy Signed Token
+          </button>
+          <button type="button" id="modal-reset-sandbox-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; color: var(--delete-badge); border-color: rgba(239, 68, 68, 0.3);">
+            🧹 Reset Sandbox
+          </button>
+          <button type="button" id="modal-dismiss-btn" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+            Done
+          </button>
+        </div>
+      </div>
     </div>
 
     <script src="/public/js/endpoints-catalog.js"></script>

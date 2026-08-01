@@ -422,3 +422,60 @@ export const cleanupInactiveIdentities = async (daysThreshold = 10) => {
   return inactiveIds.length;
 };
 
+export const getSessionStats = async (identityId) => {
+  if (!identityId) {
+    throw new AppError('Identity required to fetch session statistics', 401);
+  }
+
+  const identity = await prisma.identities.findUnique({
+    where: { id: identityId }
+  });
+
+  const records = await prisma.overlayRecords.findMany({
+    where: { identity_id: identityId }
+  });
+
+  const resources = ['users', 'posts', 'comments', 'todos'];
+  const byResource = {};
+
+  resources.forEach((res) => {
+    byResource[res] = {
+      created: 0,
+      updated: 0,
+      deleted: 0,
+      total: 0,
+      quotaUsed: `0 / ${MAX_USER_CREATED_RECORDS}`
+    };
+  });
+
+  for (const record of records) {
+    const res = record.resource;
+    if (byResource[res]) {
+      if (record.op === 'create') byResource[res].created += 1;
+      else if (record.op === 'update') byResource[res].updated += 1;
+      else if (record.op === 'delete') byResource[res].deleted += 1;
+      byResource[res].total += 1;
+    }
+  }
+
+  resources.forEach((res) => {
+    byResource[res].quotaUsed = `${byResource[res].created} / ${MAX_USER_CREATED_RECORDS}`;
+  });
+
+  return {
+    identity: {
+      id: identityId,
+      createdAt: identity ? identity.created_at : new Date(),
+      lastSeenAt: identity ? identity.last_seen_at : new Date(),
+      inactivityTtlDays: 10
+    },
+    quota: {
+      maxCreatedPerResource: MAX_USER_CREATED_RECORDS
+    },
+    stats: {
+      totalRecords: records.length,
+      byResource
+    }
+  };
+};
+

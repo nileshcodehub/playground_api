@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import { resetSession } from '../controllers/sessionController.js';
+import { resetSession, getSessionStatsController } from '../controllers/sessionController.js';
 
 const router = Router();
+
+// Retrieve active session identity stats, quotas, and record breakdown
+router.get('/stats', getSessionStatsController);
 
 // Delete all overlay records for the current session sandbox
 router.delete('/reset', resetSession);

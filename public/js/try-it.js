@@ -809,4 +809,167 @@ document.addEventListener('DOMContentLoaded', () => {
 
     exportSelect.addEventListener('change', updateExportHrefs);
   }
+
+  // Session Dashboard Modal Wiring
+  const openModalBtn = document.getElementById('open-session-dashboard-btn');
+  const dashboardModal = document.getElementById('session-dashboard-modal');
+  const closeModalBtn = document.getElementById('close-session-dashboard-btn');
+  const dismissModalBtn = document.getElementById('modal-dismiss-btn');
+  const modalCopyTokenBtn = document.getElementById('modal-copy-token-btn');
+  const modalResetBtn = document.getElementById('modal-reset-sandbox-btn');
+  const modalBody = document.getElementById('modal-dashboard-body');
+
+  const openDashboard = async () => {
+    if (!dashboardModal || !modalBody) return;
+    dashboardModal.removeAttribute('hidden');
+    modalBody.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">⏳ Loading session statistics...</div>`;
+
+    try {
+      const res = await fetch('/session/stats');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      const createdDate = new Date(data.identity.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      const lastSeenDate = new Date(data.identity.lastSeenAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+      let resourcesHtml = '';
+      const resources = ['users', 'posts', 'comments', 'todos'];
+      let totalCreated = 0;
+      let totalUpdated = 0;
+      let totalDeleted = 0;
+
+      resources.forEach((resKey) => {
+        const item = data.stats.byResource[resKey] || { created: 0, updated: 0, deleted: 0, total: 0 };
+        totalCreated += item.created;
+        totalUpdated += item.updated;
+        totalDeleted += item.deleted;
+
+        const pct = Math.min(100, Math.round((item.created / data.quota.maxCreatedPerResource) * 100));
+        resourcesHtml += `
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem 0.5rem; font-weight: 600; text-transform: capitalize;">/${resKey}</td>
+            <td style="padding: 0.6rem 0.5rem; text-align: center;">${item.created} / ${data.quota.maxCreatedPerResource}</td>
+            <td style="padding: 0.6rem 0.5rem; text-align: center;">${item.updated}</td>
+            <td style="padding: 0.6rem 0.5rem; text-align: center;">${item.deleted}</td>
+            <td style="padding: 0.6rem 0.5rem; width: 110px;">
+              <div class="quota-progress-container">
+                <div class="quota-progress-bar" style="width: ${pct}%;"></div>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      modalBody.innerHTML = `
+        <!-- Identity Summary Row -->
+        <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">IDENTITY UUID</span>
+            <span class="resource-badge-tag" style="margin: 0; font-size: 0.72rem;">10-DAY INACTIVITY RETENTION ACTIVE</span>
+          </div>
+          <div style="font-family: 'Fira Code', monospace; font-size: 0.88rem; color: var(--primary-accent); word-break: break-all;">
+            ${data.identity.id}
+          </div>
+          <div style="display: flex; gap: 1.25rem; font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;">
+            <span>📅 Created: ${createdDate}</span>
+            <span>⚡ Last Active: ${lastSeenDate}</span>
+          </div>
+        </div>
+
+        <!-- Metric Stat Counters Grid -->
+        <div class="metric-stat-grid">
+          <div class="metric-stat-card">
+            <div class="metric-stat-value">${data.stats.totalRecords}</div>
+            <div class="metric-stat-label">Total Sandbox Records</div>
+          </div>
+          <div class="metric-stat-card">
+            <div class="metric-stat-value" style="color: var(--get-badge);">${totalCreated}</div>
+            <div class="metric-stat-label">Records Created</div>
+          </div>
+          <div class="metric-stat-card">
+            <div class="metric-stat-value" style="color: #f59e0b;">${totalUpdated}</div>
+            <div class="metric-stat-label">Records Updated</div>
+          </div>
+          <div class="metric-stat-card">
+            <div class="metric-stat-value" style="color: var(--delete-badge);">${totalDeleted}</div>
+            <div class="metric-stat-label">Records Deleted</div>
+          </div>
+        </div>
+
+        <!-- Quotas & Activity Table -->
+        <h4 style="font-size: 0.9rem; margin-bottom: 0.6rem; color: var(--text-primary);">Resource Quotas & Mutations</h4>
+        <div style="overflow-x: auto; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); background: rgba(255,255,255,0.02);">
+                <th style="padding: 0.6rem 0.5rem;">Resource</th>
+                <th style="padding: 0.6rem 0.5rem; text-align: center;">Created (Quota)</th>
+                <th style="padding: 0.6rem 0.5rem; text-align: center;">Updated</th>
+                <th style="padding: 0.6rem 0.5rem; text-align: center;">Deleted</th>
+                <th style="padding: 0.6rem 0.5rem;">Usage</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${resourcesHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+    } catch (err) {
+      modalBody.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--delete-badge);">❌ Failed to load session stats: ${err.message}</div>`;
+    }
+  };
+
+  const closeModal = () => {
+    if (dashboardModal) dashboardModal.setAttribute('hidden', '');
+  };
+
+  if (openModalBtn) openModalBtn.addEventListener('click', openDashboard);
+  if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+  if (dismissModalBtn) dismissModalBtn.addEventListener('click', closeModal);
+
+  if (dashboardModal) {
+    dashboardModal.addEventListener('click', (e) => {
+      if (e.target === dashboardModal) closeModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dashboardModal && !dashboardModal.hasAttribute('hidden')) {
+      closeModal();
+    }
+  });
+
+  if (modalCopyTokenBtn) {
+    modalCopyTokenBtn.addEventListener('click', async () => {
+      const sessionDisplay = document.getElementById('session-id-display');
+      const token = sessionDisplay ? sessionDisplay.getAttribute('data-session-token') : null;
+      if (!token) return alert('No active session token found.');
+
+      try {
+        await navigator.clipboard.writeText(token);
+        modalCopyTokenBtn.textContent = '✅ Copied!';
+        setTimeout(() => { modalCopyTokenBtn.textContent = '📋 Copy Signed Token'; }, 2000);
+      } catch {
+        alert(token);
+      }
+    });
+  }
+
+  if (modalResetBtn) {
+    modalResetBtn.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to reset all session sandbox mutations?')) return;
+      try {
+        const res = await fetch('/session/reset', { method: 'DELETE' });
+        if (res.ok) {
+          closeModal();
+          window.location.reload();
+        } else {
+          alert('Failed to reset session sandbox.');
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    });
+  }
 });
