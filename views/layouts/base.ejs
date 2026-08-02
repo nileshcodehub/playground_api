@@ -216,6 +216,11 @@
           <span>auth</span>
           <span class="nav-count" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">JWT</span>
         </a>
+        <a href="/docs/media"
+          class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'media') ? 'active' : '' %>">
+          <span>media (avatars)</span>
+          <span class="nav-count" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">SVG</span>
+        </a>
       </nav>
 
       <!-- Export API Collections Card (Below Documentation Section) -->
@@ -239,6 +244,8 @@
               Todos Collection</option>
             <option value="auth" <%=(typeof currentNav !=='undefined' && currentNav==='auth' ) ? 'selected' : '' %>>🔐
               Auth Collection</option>
+            <option value="media" <%=(typeof currentNav !=='undefined' && currentNav==='media' ) ? 'selected' : '' %>>🖼️
+              Media & Avatars Collection</option>
           </select>
         </div>
         <div class="export-collections-grid"

@@ -12,6 +12,7 @@ import { simulationMiddleware } from './middleware/simulation.js';
 import { errorHandler, AppError } from './middleware/errorHandler.js';
 import { makeResourceRouter } from './routes/resourceRoutes.js';
 import { makeResourceController } from './controllers/resourceController.js';
+import avatarRoutes from './routes/avatarRoutes.js';
 import docsRouter from './routes/docsRoutes.js';
 import cronRouter from './routes/cronRoutes.js';
 import downloadRouter from './routes/downloadRoutes.js';
@@ -52,7 +53,8 @@ if (!config.isProduction) {
   app.use(morgan('dev'));
 }
 
-// Static file serving (bypasses DB identity check for speed)
+// Static file serving & Dynamic SVG Avatars / Thumbnails (bypasses DB identity check for speed)
+app.use('/public', avatarRoutes);
 app.use('/public', express.static(path.join(rootDir, 'public')));
 
 // Identity Cookie Middleware, Global Rate Limiter & Network Simulation

@@ -27,6 +27,7 @@ export interface User {
   name: string;
   username: string;
   email: string;
+  avatar?: string;
   phone?: string;
   website?: string;
   address?: Address;
@@ -40,6 +41,7 @@ export interface Post {
   user_id?: number | string;
   title: string;
   body: string;
+  thumbnail?: string;
   _sandbox?: 'created' | 'updated';
 }
 

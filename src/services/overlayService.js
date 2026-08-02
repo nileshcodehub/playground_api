@@ -72,6 +72,28 @@ export const getVirtualList = async (identityId, resource) => {
   return { virtualList: [...createdIds, ...globalIds], overlay };
 };
 
+export const enrichRecordWithMedia = (resource, record) => {
+  if (!record || typeof record !== 'object') return record;
+
+  if (resource === 'users') {
+    const seed = record.username || record.name || record.id || 'user';
+    return {
+      ...record,
+      avatar: record.avatar || `/public/avatars/${encodeURIComponent(seed)}.svg`
+    };
+  }
+
+  if (resource === 'posts') {
+    const seed = `post-${record.id}`;
+    return {
+      ...record,
+      thumbnail: record.thumbnail || `/public/thumbnails/${encodeURIComponent(seed)}.svg`
+    };
+  }
+
+  return record;
+};
+
 export const getAllMergedRecords = async (identityId, resource) => {
   const modelName = GLOBAL_MODELS[resource];
   if (!modelName) {
@@ -100,7 +122,8 @@ export const getAllMergedRecords = async (identityId, resource) => {
     });
 
   // Created items top (newest first), then global items preserving DB order
-  return [...created, ...activeGlobalRecords];
+  const allMerged = [...created, ...activeGlobalRecords];
+  return allMerged.map(record => enrichRecordWithMedia(resource, record));
 };
 
 export const getPaginatedResource = async (identityId, resource, { page = 1, limit = 10, filters = {}, _sort, _order = 'asc', q } = {}) => {
@@ -199,7 +222,7 @@ export const getSingleResource = async (identityId, resource, publicId) => {
 
   if (typeof publicId === 'string' && publicId.startsWith('local-')) {
     const found = created.find(item => item.id === publicId);
-    return found || null;
+    return found ? enrichRecordWithMedia(resource, found) : null;
   }
 
   const intId = parseInt(publicId, 10);
@@ -217,14 +240,15 @@ export const getSingleResource = async (identityId, resource, publicId) => {
 
   if (updatesById.has(intId)) {
     const patch = updatesById.get(intId);
-    return {
+    const updated = {
       ...baseRecord,
       ...(typeof patch === 'object' && patch !== null ? patch : {}),
       _sandbox: 'updated'
     };
+    return enrichRecordWithMedia(resource, updated);
   }
 
-  return baseRecord;
+  return enrichRecordWithMedia(resource, baseRecord);
 };
 
 export const createOverlayRecord = async (identityId, resource, data) => {

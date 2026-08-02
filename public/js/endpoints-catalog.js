@@ -536,5 +536,39 @@ window.ALL_ENDPOINTS_CATALOG = [
       email: "sincere@april.biz",
       _sandbox: "updated"
     }, null, 2)
+  },
+  // MEDIA (AVATARS & THUMBNAILS)
+  {
+    resource: 'media',
+    method: 'GET',
+    path: '/public/avatars/:seed.svg',
+    summary: 'Generate deterministic vector SVG avatar for a user seed string or ID with custom size and squircle/circle background.',
+    params: [
+      { name: 'seed', in: 'path', type: 'string', description: 'Seed string (e.g. bret, alice, user-1) for gradient hashing and initials extraction.' },
+      { name: 'size', in: 'query', type: 'integer', description: 'Avatar dimension in pixels (default 128).' },
+      { name: 'rounded', in: 'query', type: 'boolean', description: 'Circular vs squircle rendering (default true).' }
+    ],
+    bodyExample: null,
+    responseExample: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="64" fill="#059669" />
+  <text x="50%" y="54%" font-family="Inter, sans-serif" font-size="54" font-weight="700" fill="#ffffff" text-anchor="middle">BR</text>
+</svg>`
+  },
+  {
+    resource: 'media',
+    method: 'GET',
+    path: '/public/thumbnails/:seed.svg',
+    summary: 'Generate 600x400 landscape vector SVG placeholder image with mesh gradient background, custom text, and dimension badge.',
+    params: [
+      { name: 'seed', in: 'path', type: 'string', description: 'Seed string (e.g. post-1, react-tutorial) for background color hashing.' },
+      { name: 'width', in: 'query', type: 'integer', description: 'Thumbnail width in pixels (default 600).' },
+      { name: 'height', in: 'query', type: 'integer', description: 'Thumbnail height in pixels (default 400).' },
+      { name: 'text', in: 'query', type: 'string', description: 'Custom label text override.' }
+    ],
+    bodyExample: null,
+    responseExample: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <rect width="600" height="400" fill="#4f46e5" />
+  <text x="50%" y="46%" font-family="Inter, sans-serif" font-size="33" font-weight="700" fill="#ffffff" text-anchor="middle">Post #1</text>
+</svg>`
   }
 ];

@@ -3,6 +3,7 @@ import { getPostsEndpoints } from './catalog/posts.js';
 import { getCommentsEndpoints } from './catalog/comments.js';
 import { getTodosEndpoints } from './catalog/todos.js';
 import { getAuthEndpoints } from './catalog/auth.js';
+import { getMediaEndpoints } from './catalog/media.js';
 
 export const getEndpointsForResource = (resource, sampleRecord = null) => {
   switch (resource) {
@@ -16,6 +17,8 @@ export const getEndpointsForResource = (resource, sampleRecord = null) => {
       return getTodosEndpoints(sampleRecord);
     case 'auth':
       return getAuthEndpoints();
+    case 'media':
+      return getMediaEndpoints();
     default:
       return [];
   }

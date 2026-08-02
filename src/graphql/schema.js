@@ -65,6 +65,7 @@ UserType = new GraphQLObjectType({
     name: { type: GraphQLString },
     username: { type: GraphQLString },
     email: { type: GraphQLString },
+    avatar: { type: GraphQLString },
     phone: { type: GraphQLString },
     website: { type: GraphQLString },
     address: { type: AddressType },
@@ -106,6 +107,7 @@ PostType = new GraphQLObjectType({
     },
     title: { type: GraphQLString },
     body: { type: GraphQLString },
+    thumbnail: { type: GraphQLString },
     user: {
       type: UserType,
       resolve: async (post, _args, context) => {

@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 const publicDir = path.resolve(__dirname, '../../public');
 
 const router = Router();
-export const RESOURCES = ['users', 'posts', 'comments', 'todos', 'auth'];
+export const RESOURCES = ['users', 'posts', 'comments', 'todos', 'auth', 'media'];
 
 // In-memory cache for sample records with 1-hour TTL
 const sampleCache = new Map();
@@ -138,7 +138,8 @@ const RESOURCE_SUBTITLES = {
   posts: "Read operations merge shared global posts with your session's overlay (newly created posts appear at the top, updates apply in-place, deletes are filtered). Each post belongs to a user (`user_id` foreign key). Mutations are session-scoped and capped at 30 created records.",
   comments: "Read operations merge shared global comments with your session's overlay (newly created comments appear at the top, updates apply in-place, deletes are filtered). Each comment belongs to a post (`post_id` foreign key). Mutations are session-scoped and capped at 30 created records.",
   todos: "Read operations merge shared global todos with your session's overlay (newly created todos appear at the top, updates apply in-place, deletes are filtered). Each todo belongs to a user (`user_id` foreign key). Mutations are session-scoped and capped at 30 created records.",
-  auth: "Simulated JWT authentication endpoints (login, register, token refresh, profile read/update). Returns signed JWT access and refresh tokens linked to your session sandbox."
+  auth: "Simulated JWT authentication endpoints (login, register, token refresh, profile read/update). Returns signed JWT access and refresh tokens linked to your session sandbox.",
+  media: "Built-in dynamic SVG avatar and landscape thumbnail placeholder image generator helper endpoints (/public/avatars/:seed.svg and /public/thumbnails/:seed.svg) for frontends and prototypes."
 };
 
   const locals = {
