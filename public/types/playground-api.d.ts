@@ -110,3 +110,35 @@ export type UpdateUserInput = Partial<CreateUserInput>;
 export type UpdatePostInput = Partial<CreatePostInput>;
 export type UpdateCommentInput = Partial<CreateCommentInput>;
 export type UpdateTodoInput = Partial<CreateTodoInput>;
+
+// Auth Simulation Types
+export interface AuthLoginInput {
+  username?: string;
+  email?: string;
+  password?: string;
+}
+
+export interface AuthRegisterInput {
+  name: string;
+  username: string;
+  email: string;
+  password?: string;
+  company?: Company;
+  address?: Address;
+  phone?: string;
+  website?: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: 'Bearer';
+  expires_in: number;
+  user: User;
+}
+
+export interface RefreshTokenResponse {
+  access_token: string;
+  token_type: 'Bearer';
+  expires_in: number;
+}

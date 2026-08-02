@@ -100,10 +100,16 @@
           <td style="padding: 0.6rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-accent);">
             post: Post</td>
         </tr>
-        <tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
           <td style="padding: 0.6rem; font-weight: 600; color: #c084fc;">Todo</td>
           <td style="padding: 0.6rem; font-family: var(--font-mono); font-size: 0.8rem;">id, user_id, title, completed
           </td>
+          <td style="padding: 0.6rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-accent);">
+            user: User</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.6rem; font-weight: 600; color: #c084fc;">AuthPayload</td>
+          <td style="padding: 0.6rem; font-family: var(--font-mono); font-size: 0.8rem;">access_token, refresh_token, token_type, expires_in</td>
           <td style="padding: 0.6rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-accent);">
             user: User</td>
         </tr>
@@ -133,3 +139,10 @@
     title\n body\n }\n}`, variables: { userId: "1" , title: "New GraphQL Post" , body: "Created via GraphQL Gateway!" }
     }, null, 2), responseExample: JSON.stringify({ data: { createPost: { id: "local-a1b2c3d4-5678-90ef" , user_id: "1" ,
     title: "New GraphQL Post" , body: "Created via GraphQL Gateway!" } } }, null, 2) }) %>
+
+  <!-- Endpoint Block 3: GraphQL Auth Mutation & Profile Query -->
+  <%- include('partials/endpoint', { method: 'POST' , path: '/graphql' ,
+    summary: 'Authenticate via GraphQL login mutation & query authenticated profile (me)' , params: [ { name: 'query' , type: 'String (Required)' ,
+    desc: 'GraphQL login mutation or me query.' }, { name: 'variables' , type: 'Object (Optional)' ,
+    desc: 'Auth credentials.' } ], bodyExample: JSON.stringify({ query: `mutation Login($username: String!) {\n login(username: $username) {\n access_token\n refresh_token\n token_type\n user {\n id\n name\n email\n }\n }\n}`, variables: { username: "Bret" }
+    }, null, 2), responseExample: JSON.stringify({ data: { login: { access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...", refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...", token_type: "Bearer", user: { id: "1", name: "Leanne Graham", email: "sincere@april.biz" } } } }, null, 2) }) %>

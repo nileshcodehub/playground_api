@@ -439,5 +439,102 @@ window.ALL_ENDPOINTS_CATALOG = [
     ],
     bodyExample: null,
     responseExample: "204 No Content"
+  },
+  // AUTH
+  {
+    resource: 'auth',
+    method: 'POST',
+    path: '/auth/login',
+    summary: 'Authenticate user with username/email & password to receive signed JWT access and refresh tokens.',
+    params: [
+      { name: 'username', in: 'body', type: 'string', description: 'Username (e.g. Bret or custom registered username).' },
+      { name: 'password', in: 'body', type: 'string', description: 'Password string.' }
+    ],
+    bodyExample: JSON.stringify({ username: "Bret", password: "password123" }, null, 2),
+    responseExample: JSON.stringify({
+      access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      token_type: "Bearer",
+      expires_in: 900,
+      user: {
+        id: 1,
+        name: "Leanne Graham",
+        username: "bret",
+        email: "sincere@april.biz"
+      }
+    }, null, 2)
+  },
+  {
+    resource: 'auth',
+    method: 'POST',
+    path: '/auth/register',
+    summary: 'Register a new session user and immediately receive signed JWT access and refresh tokens.',
+    params: [
+      { name: 'name', in: 'body', type: 'string', description: 'Full name of the user.' },
+      { name: 'username', in: 'body', type: 'string', description: 'Unique username.' },
+      { name: 'email', in: 'body', type: 'string', description: 'User email address.' }
+    ],
+    bodyExample: JSON.stringify({ name: "Alice Smith", username: "alice", email: "alice@example.com", password: "password123" }, null, 2),
+    responseExample: JSON.stringify({
+      access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      token_type: "Bearer",
+      expires_in: 900,
+      user: {
+        id: "local-d4e5f6a7-8901-bcde-f123-456789012345",
+        name: "Alice Smith",
+        username: "alice",
+        email: "alice@example.com",
+        _sandbox: "created"
+      }
+    }, null, 2)
+  },
+  {
+    resource: 'auth',
+    method: 'POST',
+    path: '/auth/refresh',
+    summary: 'Exchange a valid refresh token for a fresh 15-minute JWT access token.',
+    params: [
+      { name: 'refreshToken', in: 'body', type: 'string', description: 'Valid refresh token string.' }
+    ],
+    bodyExample: JSON.stringify({ refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6..." }, null, 2),
+    responseExample: JSON.stringify({
+      access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      token_type: "Bearer",
+      expires_in: 900
+    }, null, 2)
+  },
+  {
+    resource: 'auth',
+    method: 'GET',
+    path: '/auth/me',
+    summary: 'Retrieve current authenticated user profile using Authorization: Bearer <access_token>.',
+    params: [
+      { name: 'Authorization', in: 'header', type: 'string', description: 'Bearer <access_token>' }
+    ],
+    bodyExample: null,
+    responseExample: JSON.stringify({
+      id: 1,
+      name: "Leanne Graham",
+      username: "bret",
+      email: "sincere@april.biz"
+    }, null, 2)
+  },
+  {
+    resource: 'auth',
+    method: 'PATCH',
+    path: '/auth/me',
+    summary: 'Update current authenticated user profile in the session sandbox using Authorization: Bearer <access_token>.',
+    params: [
+      { name: 'Authorization', in: 'header', type: 'string', description: 'Bearer <access_token>' }
+    ],
+    bodyExample: JSON.stringify({ name: "Bret - Updated Profile" }, null, 2),
+    responseExample: JSON.stringify({
+      id: 1,
+      name: "Bret - Updated Profile",
+      username: "bret",
+      email: "sincere@april.biz",
+      _sandbox: "updated"
+    }, null, 2)
   }
 ];

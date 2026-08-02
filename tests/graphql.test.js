@@ -174,6 +174,55 @@ describe('17 — GraphQL Sandbox Gateway (/graphql)', () => {
     assert.ok(html.includes('Open GraphiQL IDE'));
   });
 
+  test('POST /graphql supports auth login mutation and me query with Bearer token', async () => {
+    const loginRes = await fetch(`${baseUrl}/graphql`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          mutation Login($username: String!) {
+            login(username: $username) {
+              access_token
+              refresh_token
+              user {
+                id
+                username
+              }
+            }
+          }
+        `,
+        variables: { username: 'Bret' }
+      })
+    });
+
+    assert.equal(loginRes.status, 200);
+    const loginPayload = await loginRes.json();
+    assert.ok(loginPayload.data.login.access_token);
+    assert.equal(loginPayload.data.login.user.username.toLowerCase(), 'bret');
+
+    const meRes = await fetch(`${baseUrl}/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${loginPayload.data.login.access_token}`
+      },
+      body: JSON.stringify({
+        query: `
+          query Me {
+            me {
+              id
+              username
+            }
+          }
+        `
+      })
+    });
+
+    assert.equal(meRes.status, 200);
+    const mePayload = await meRes.json();
+    assert.equal(mePayload.data.me.username.toLowerCase(), 'bret');
+  });
+
   test('GET /downloads/schema.graphql returns GraphQL SDL Schema download', async () => {
     const res = await fetch(`${baseUrl}/downloads/schema.graphql`);
     assert.equal(res.status, 200);
@@ -182,5 +231,6 @@ describe('17 — GraphQL Sandbox Gateway (/graphql)', () => {
     assert.ok(sdl.includes('type Post'));
     assert.ok(sdl.includes('type Comment'));
     assert.ok(sdl.includes('type Todo'));
+    assert.ok(sdl.includes('type AuthPayload'));
   });
 });

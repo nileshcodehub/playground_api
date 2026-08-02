@@ -211,6 +211,11 @@
           <span>todos</span>
           <span class="nav-count">REST</span>
         </a>
+        <a href="/docs/auth"
+          class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'auth') ? 'active' : '' %>">
+          <span>auth</span>
+          <span class="nav-count" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">JWT</span>
+        </a>
       </nav>
 
       <!-- Export API Collections Card (Below Documentation Section) -->
@@ -232,6 +237,8 @@
               %>>💬 Comments Collection</option>
             <option value="todos" <%=(typeof currentNav !=='undefined' && currentNav==='todos' ) ? 'selected' : '' %>>✅
               Todos Collection</option>
+            <option value="auth" <%=(typeof currentNav !=='undefined' && currentNav==='auth' ) ? 'selected' : '' %>>🔐
+              Auth Collection</option>
           </select>
         </div>
         <div class="export-collections-grid"
@@ -313,6 +320,7 @@
             <li><a href="/docs/posts">/posts</a></li>
             <li><a href="/docs/comments">/comments</a></li>
             <li><a href="/docs/todos">/todos</a></li>
+            <li><a href="/docs/auth">/auth</a></li>
           </ul>
         </div>
 

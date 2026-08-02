@@ -121,6 +121,7 @@ fetch('https://playground-api-xi.vercel.app/posts?_status=500');</code></pre>
         <a href="/docs/posts" class="session-action-btn" style="text-decoration: none;">📝 Posts Docs</a>
         <a href="/docs/comments" class="session-action-btn" style="text-decoration: none;">💬 Comments Docs</a>
         <a href="/docs/todos" class="session-action-btn" style="text-decoration: none;">✅ Todos Docs</a>
+        <a href="/docs/auth" class="session-action-btn" style="text-decoration: none;">🔐 Auth Docs</a>
       </div>
     </div>
 
@@ -153,11 +154,23 @@ fetch('https://playground-api-xi.vercel.app/posts?_status=500');</code></pre>
             <td style="padding: 0.6rem; color: var(--text-secondary);">Update record in session overlay</td>
             <td style="padding: 0.7rem; color: #22c55e;">✅ Session Scope</td>
           </tr>
-          <tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
             <td style="padding: 0.6rem;"><span class="badge badge-delete">DELETE</span></td>
             <td style="padding: 0.6rem; font-family: var(--font-mono);">/:resource/:id</td>
             <td style="padding: 0.6rem; color: var(--text-secondary);">Remove record from session overlay</td>
             <td style="padding: 0.7rem; color: #22c55e;">✅ Session Scope</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem;"><span class="badge badge-post">POST</span></td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/auth/login, /auth/register, /auth/refresh</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">JWT login, user registration & token refresh</td>
+            <td style="padding: 0.7rem; color: #22c55e;">✅ JWT & Session</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.6rem;"><span class="badge badge-get">GET</span> / <span class="badge badge-patch">PATCH</span></td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/auth/me</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">Read & update authenticated profile via Bearer token</td>
+            <td style="padding: 0.7rem; color: #22c55e;">✅ Bearer Token</td>
           </tr>
         </tbody>
       </table>
