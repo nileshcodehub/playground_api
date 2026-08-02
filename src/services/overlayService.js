@@ -95,6 +95,11 @@ export const enrichRecordWithMedia = (resource, record) => {
 };
 
 export const getAllMergedRecords = async (identityId, resource) => {
+  if (resource.startsWith('custom_')) {
+    const overlay = await loadOverlay(identityId, resource);
+    return overlay.created.map(record => enrichRecordWithMedia(resource, record));
+  }
+
   const modelName = GLOBAL_MODELS[resource];
   if (!modelName) {
     throw new AppError(`Unknown resource: ${resource}`, 400);
@@ -220,8 +225,9 @@ export const getPaginatedResource = async (identityId, resource, { page = 1, lim
 export const getSingleResource = async (identityId, resource, publicId) => {
   const { deletedIds, updatesById, created } = await loadOverlay(identityId, resource);
 
-  if (typeof publicId === 'string' && publicId.startsWith('local-')) {
-    const found = created.find(item => item.id === publicId);
+  if (resource.startsWith('custom_') || (typeof publicId === 'string' && publicId.startsWith('local-'))) {
+    const target = String(publicId).startsWith('local-') ? publicId : `local-${publicId}`;
+    const found = created.find(item => item.id === publicId || item.id === target);
     return found ? enrichRecordWithMedia(resource, found) : null;
   }
 
@@ -269,19 +275,25 @@ export const createOverlayRecord = async (identityId, resource, data) => {
   }
 
   const newUuid = uuidv4();
+  const now = new Date().toISOString();
+  const rawData = typeof data === 'object' && data !== null ? data : {};
+  const enrichedData = resource.startsWith('custom_')
+    ? { id: `local-${newUuid}`, createdAt: now, updatedAt: now, ...rawData }
+    : rawData;
+
   const createdRecord = await prisma.overlayRecords.create({
     data: {
       id: newUuid,
       identity_id: identityId,
       resource: resource,
       op: 'create',
-      data: data || {}
+      data: enrichedData
     }
   });
 
   return {
     id: `local-${createdRecord.id}`,
-    ...(typeof data === 'object' && data !== null ? data : {}),
+    ...enrichedData,
     _sandbox: 'created'
   };
 };
@@ -640,6 +652,90 @@ export const importSessionSnapshot = async (identityId, snapshotData, options = 
     importedRecords: recordsToImport.length,
     strategy,
     affectedResources
+  };
+};
+
+export const getCustomCollections = async (identityId) => {
+  if (!identityId) return { totalCollections: 0, collections: [] };
+
+  const records = await prisma.overlayRecords.findMany({
+    where: {
+      identity_id: identityId,
+      resource: { startsWith: 'custom_' },
+      op: 'create'
+    },
+    orderBy: { created_at: 'desc' }
+  });
+
+  const collectionsMap = new Map();
+  for (const r of records) {
+    const cleanName = r.resource.replace(/^custom_/, '');
+    if (!collectionsMap.has(cleanName)) {
+      collectionsMap.set(cleanName, {
+        name: cleanName,
+        endpoint: `/custom/${cleanName}`,
+        count: 0,
+        lastUpdated: r.created_at
+      });
+    }
+    collectionsMap.get(cleanName).count += 1;
+  }
+
+  const collections = Array.from(collectionsMap.values());
+  return {
+    totalCollections: collections.length,
+    collections
+  };
+};
+
+const TEMPLATE_PRESETS = {
+  ecommerce: [
+    { resource: 'custom_products', data: { name: 'MacBook Pro M3 16"', price: 2499, category: 'Laptops', stock: 15 } },
+    { resource: 'custom_products', data: { name: 'Sony WH-1000XM5 Headphones', price: 399, category: 'Audio', stock: 30 } },
+    { resource: 'custom_products', data: { name: 'Herman Miller Ergonomic Chair', price: 1250, category: 'Furniture', stock: 8 } },
+    { resource: 'custom_orders', data: { orderNumber: 'ORD-9910', customerName: 'Leanne Graham', total: 2898.00, status: 'Shipped' } },
+    { resource: 'custom_orders', data: { orderNumber: 'ORD-9911', customerName: 'Ervin Howell', total: 399.00, status: 'Processing' } }
+  ],
+  crm: [
+    { resource: 'custom_leads', data: { company: 'Acme Corporation', contactPerson: 'John Smith', dealValue: 50000, stage: 'Qualified' } },
+    { resource: 'custom_leads', data: { company: 'Globex Industries', contactPerson: 'Sarah Jenkins', dealValue: 120000, stage: 'Proposal Sent' } },
+    { resource: 'custom_contacts', data: { name: 'John Smith', email: 'john@acme.corp', phone: '+1-555-0192', title: 'VP of Technology' } },
+    { resource: 'custom_contacts', data: { name: 'Sarah Jenkins', email: 'sjenkins@globex.com', phone: '+1-555-0843', title: 'Procurement Director' } }
+  ],
+  saas: [
+    { resource: 'custom_invoices', data: { invoiceNumber: 'INV-2026-001', clientName: 'Initech LLC', amount: 3500.00, dueDate: '2026-08-15', status: 'Paid' } },
+    { resource: 'custom_invoices', data: { invoiceNumber: 'INV-2026-002', clientName: 'Umbrella Corp', amount: 8900.00, dueDate: '2026-08-30', status: 'Pending' } },
+    { resource: 'custom_subscriptions', data: { planName: 'Enterprise Pro Tier', billingCycle: 'Annual', priceMonthly: 499, seats: 25 } },
+    { resource: 'custom_subscriptions', data: { planName: 'Developer Starter Tier', billingCycle: 'Monthly', priceMonthly: 29, seats: 2 } }
+  ],
+  healthcare: [
+    { resource: 'custom_patients', data: { name: 'Alice Johnson', dob: '1988-04-12', bloodType: 'O+', primaryDoctor: 'Dr. Smith' } },
+    { resource: 'custom_patients', data: { name: 'Bob Miller', dob: '1975-11-23', bloodType: 'A-', primaryDoctor: 'Dr. Taylor' } },
+    { resource: 'custom_appointments', data: { patientName: 'Alice Johnson', doctorName: 'Dr. Smith', date: '2026-08-10T10:00:00Z', department: 'Cardiology' } },
+    { resource: 'custom_appointments', data: { patientName: 'Bob Miller', doctorName: 'Dr. Taylor', date: '2026-08-12T14:30:00Z', department: 'Orthopedics' } }
+  ]
+};
+
+export const seedCustomTemplate = async (identityId, templateName = 'ecommerce') => {
+  if (!identityId) {
+    throw new AppError('Identity required for seeding template', 401);
+  }
+
+  const key = String(templateName).toLowerCase();
+  const presets = TEMPLATE_PRESETS[key] || TEMPLATE_PRESETS.ecommerce;
+
+  const seeded = [];
+  for (const item of presets) {
+    const res = await createOverlayRecord(identityId, item.resource, item.data);
+    seeded.push(res);
+  }
+
+  const uniqueCollections = Array.from(new Set(presets.map(p => p.resource.replace(/^custom_/, ''))));
+  return {
+    message: `Seeded ${seeded.length} records across custom collections: ${uniqueCollections.join(', ')}.`,
+    template: key,
+    collections: uniqueCollections,
+    totalSeeded: seeded.length
   };
 };
 

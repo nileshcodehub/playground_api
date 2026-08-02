@@ -174,3 +174,22 @@ export interface ImportResponse {
   strategy: 'replace' | 'merge';
   affectedResources: string[];
 }
+
+export interface CustomCollectionSummary {
+  name: string;
+  endpoint: string;
+  count: number;
+  lastUpdated: string;
+}
+
+export interface CustomCollectionsDirectoryResponse {
+  totalCollections: number;
+  collections: CustomCollectionSummary[];
+}
+
+export interface CustomSeedResult {
+  message: string;
+  template: 'ecommerce' | 'crm' | 'saas' | 'healthcare';
+  collections: string[];
+  totalSeeded: number;
+}

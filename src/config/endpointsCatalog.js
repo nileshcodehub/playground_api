@@ -5,6 +5,7 @@ import { getTodosEndpoints } from './catalog/todos.js';
 import { getAuthEndpoints } from './catalog/auth.js';
 import { getMediaEndpoints } from './catalog/media.js';
 import { getSessionEndpoints } from './catalog/session.js';
+import { getCustomEndpoints } from './catalog/custom.js';
 
 export const getEndpointsForResource = (resource, sampleRecord = null) => {
   switch (resource) {
@@ -22,6 +23,8 @@ export const getEndpointsForResource = (resource, sampleRecord = null) => {
       return getMediaEndpoints();
     case 'session':
       return getSessionEndpoints();
+    case 'custom':
+      return getCustomEndpoints();
     default:
       return [];
   }

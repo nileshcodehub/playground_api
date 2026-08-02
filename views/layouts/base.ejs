@@ -154,7 +154,7 @@
               <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
             </svg>
             <span>Reset</span>
-        <div class="session-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; margin-top: 0.35rem;">
+          </button>
           <a href="/session/export" id="export-sandbox-btn" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Export session sandbox snapshot as JSON file">
             <span>📥 Export</span>
           </a>
@@ -232,6 +232,11 @@
           <span>session (snapshot)</span>
           <span class="nav-count" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">JSON</span>
         </a>
+        <a href="/docs/custom"
+          class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'custom') ? 'active' : '' %>">
+          <span>custom (dynamic)</span>
+          <span class="nav-count" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">REST</span>
+        </a>
       </nav>
 
       <!-- Export API Collections Card (Below Documentation Section) -->
@@ -259,6 +264,8 @@
               Media & Avatars Collection</option>
             <option value="session" <%=(typeof currentNav !=='undefined' && currentNav==='session' ) ? 'selected' : '' %>>💾
               Session Snapshot Collection</option>
+            <option value="custom" <%=(typeof currentNav !=='undefined' && currentNav==='custom' ) ? 'selected' : '' %>>🛠️
+              Custom Dynamic Collections</option>
           </select>
         </div>
         <div class="export-collections-grid"

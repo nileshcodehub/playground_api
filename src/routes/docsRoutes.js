@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 const publicDir = path.resolve(__dirname, '../../public');
 
 const router = Router();
-export const RESOURCES = ['users', 'posts', 'comments', 'todos', 'auth', 'media', 'session'];
+export const RESOURCES = ['users', 'posts', 'comments', 'todos', 'auth', 'media', 'session', 'custom'];
 
 // In-memory cache for sample records with 1-hour TTL
 const sampleCache = new Map();
@@ -140,7 +140,8 @@ router.get('/docs/:resource', async (req, res, next) => {
     todos: "Read operations merge shared global todos with your session's overlay (newly created todos appear at the top, updates apply in-place, deletes are filtered). Each todo belongs to a user (`user_id` foreign key). Mutations are session-scoped and capped at 30 created records.",
     auth: "Simulated JWT authentication endpoints (login, register, token refresh, profile read/update). Returns signed JWT access and refresh tokens linked to your session sandbox.",
     media: "Built-in dynamic SVG avatar and landscape thumbnail placeholder image generator helper endpoints (/public/avatars/:seed.svg and /public/thumbnails/:seed.svg) for frontends and prototypes.",
-    session: "Session sandbox management endpoints for exporting state snapshots as downloadable JSON files, restoring/importing snapshot payloads, and purging overlay data."
+    session: "Session sandbox management endpoints for exporting state snapshots as downloadable JSON files, restoring/importing snapshot payloads, and purging overlay data.",
+    custom: "Dynamic custom resource collections engine (/custom/:collection) allowing developers to create arbitrary collections on the fly (products, orders, notes, leads) with 1-click domain templates."
   };
 
   const locals = {

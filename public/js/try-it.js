@@ -1220,4 +1220,33 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
+
+  // 1-Click Custom Collection Template Seed Buttons
+  const seedBtns = document.querySelectorAll('.seed-template-btn');
+  seedBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const template = btn.getAttribute('data-template');
+      const originalText = btn.textContent;
+      try {
+        btn.textContent = '⏳ Seeding template...';
+        btn.disabled = true;
+        const res = await fetch(`/custom/seed?template=${template}`, { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+          btn.textContent = `✅ ${data.message}`;
+          setTimeout(() => {
+            window.location.reload();
+          }, 1200);
+        } else {
+          alert(`❌ Failed to seed template: ${data.error || data.message}`);
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert(`❌ Network error: ${err.message}`);
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    });
+  });
 });

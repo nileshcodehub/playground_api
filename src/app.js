@@ -19,6 +19,7 @@ import downloadRouter from './routes/downloadRoutes.js';
 import sessionRouter from './routes/sessionRoutes.js';
 import graphqlRouter from './routes/graphqlRoutes.js';
 import authRouter from './routes/authRoutes.js';
+import customRouter from './routes/customRoutes.js';
 import { getHealth } from './controllers/healthController.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -68,6 +69,7 @@ app.get('/health', getHealth);
 // Session Sandbox Management, Cron, Downloads & Auth Simulation Endpoints
 app.use('/session', sessionRouter);
 app.use('/auth', authRouter);
+app.use('/custom', customRouter);
 app.use('/api/cron', cronRouter);
 app.use('/downloads', downloadRouter);
 app.use('/graphql', graphqlRouter);
