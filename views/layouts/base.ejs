@@ -124,6 +124,25 @@
           </a>
 
           <div class="nav-section-title" style="margin-top: 1rem">
+            GraphQL Gateway
+          </div>
+          <a
+            href="/docs/graphql"
+            class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'graphql') ? 'active' : '' %>"
+          >
+            <span>GraphQL Docs</span>
+            <span class="nav-count" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">DOCS</span>
+          </a>
+          <a
+            href="/graphql"
+            target="_blank"
+            class="nav-item"
+          >
+            <span>GraphiQL IDE</span>
+            <span class="nav-count" style="background: rgba(236, 72, 153, 0.2); color: #f472b6;">IDE ↗</span>
+          </a>
+
+          <div class="nav-section-title" style="margin-top: 1rem">
             API Resources
           </div>
           <a
@@ -184,6 +203,9 @@
             </a>
             <a id="export-btn-insomnia" href="/downloads/insomnia.json<%= initQuery %>" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Download Insomnia v4 Collection">
               <span>💧 Insomnia</span>
+            </a>
+            <a id="export-btn-graphql" href="/downloads/schema.graphql" download class="session-action-btn" style="text-decoration: none; justify-content: center; grid-column: span 2;" title="Download GraphQL SDL Schema">
+              <span>⚡ GraphQL Schema.graphql</span>
             </a>
           </div>
         </div>

@@ -1,4 +1,6 @@
 import express from 'express';
+import { printSchema } from 'graphql';
+import { schema } from '../graphql/schema.js';
 import {
   generateOpenApiSpec,
   generatePostmanCollection,
@@ -61,6 +63,14 @@ router.get('/insomnia.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.send(JSON.stringify(collection, null, 2));
+});
+
+// 5. GraphQL SDL Schema Download
+router.get('/schema.graphql', (req, res) => {
+  const sdl = printSchema(schema);
+  res.setHeader('Content-Type', 'text/plain');
+  res.setHeader('Content-Disposition', 'attachment; filename="playground-api.graphql"');
+  res.send(sdl);
 });
 
 export default router;

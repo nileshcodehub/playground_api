@@ -56,6 +56,29 @@ router.get('/docs', (req, res) => {
   res.redirect('/');
 });
 
+// GraphQL Gateway Documentation Page
+router.get('/docs/graphql', (req, res, next) => {
+  const locals = {
+    title: 'GraphQL Sandbox Gateway Documentation & Interactive Runner — Playground API',
+    metaDescription: 'Test stateful GraphQL queries, mutations, and Apollo/Relay integrations with per-session sandbox overlays on Playground API.',
+    keywords: 'graphql mock api, sandbox graphql, graphql gateway, graphiql ide, stateful graphql, jsonplaceholder graphql',
+    canonicalUrl: `${req.protocol}://${req.get('host')}/docs/graphql`,
+    baseUrl: `${req.protocol}://${req.get('host')}`,
+    resources: RESOURCES,
+    currentNav: 'graphql',
+    identityId: req.identityId,
+    signedToken: req.signedToken
+  };
+
+  res.render('graphql-docs', locals, (err, htmlContent) => {
+    if (err) return next(err);
+    res.render('layouts/base', {
+      ...locals,
+      body: htmlContent
+    });
+  });
+});
+
 // Resource specific documentation page
 router.get('/docs/:resource', async (req, res, next) => {
   const { resource } = req.params;
