@@ -253,6 +253,7 @@ query GetUserWithPosts {
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
         <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Response Inspector Output:</span>
         <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button type="button" id="studio-copy-json-btn" class="session-action-btn" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;" title="Copy Response JSON">📋 Copy JSON</button>
           <span id="studio-res-status-badge" class="badge badge-get" style="font-size: 0.75rem;">Status: Waiting...</span>
           <span id="studio-res-time-badge" style="font-size: 0.75rem; color: var(--text-secondary);">0 ms</span>
         </div>
@@ -424,6 +425,20 @@ query GetUserWithPosts {
           statusBadge.textContent = 'Status: Error';
           statusBadge.style.color = '#ef4444';
           resOutput.innerHTML = `<code>Error: ${err.message}</code>`;
+        }
+      });
+    }
+
+    const studioCopyJsonBtn = document.getElementById('studio-copy-json-btn');
+    if (studioCopyJsonBtn && resOutput) {
+      studioCopyJsonBtn.addEventListener('click', () => {
+        const text = resOutput.textContent || resOutput.innerText;
+        if (text && !text.includes('Click "Send Request"')) {
+          if (typeof window.copyTextToClipboard === 'function') {
+            window.copyTextToClipboard(text.trim(), '📄 Response JSON copied to clipboard!');
+          } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(text.trim());
+          }
         }
       });
     }
