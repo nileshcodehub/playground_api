@@ -26,25 +26,27 @@
   </div>
 
   <!-- Portal Top Tab Bar -->
-  <div class="portal-tab-bar" style="display: flex; gap: 0.5rem; margin-top: 2rem; border-bottom: 1px solid var(--border-color); overflow-x: auto; padding-bottom: 0.5rem;">
-    <button type="button" class="portal-tab-btn active" data-tab="quickstart" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: var(--bg-card); color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem;">
-      <span>🚀 Quickstart</span>
-    </button>
-    <button type="button" class="portal-tab-btn" data-tab="rest" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
-      <span>🌐 REST API</span>
-    </button>
-    <button type="button" class="portal-tab-btn" data-tab="graphql" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
-      <span>⚡ GraphQL</span>
-    </button>
-    <button type="button" class="portal-tab-btn" data-tab="studio" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: #c084fc; display: flex; align-items: center; gap: 0.4rem;">
-      <span>🎮 API Studio</span>
-    </button>
-    <button type="button" class="portal-tab-btn" data-tab="sdks" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
-      <span>💻 SDKs & Code</span>
-    </button>
-    <button type="button" class="portal-tab-btn" data-tab="session" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
-      <span>📊 Session & Health</span>
-    </button>
+  <div class="portal-tab-wrapper">
+    <div class="portal-tab-bar">
+      <button type="button" class="portal-tab-btn active" data-tab="quickstart">
+        <span>🚀 Quickstart</span>
+      </button>
+      <button type="button" class="portal-tab-btn" data-tab="rest">
+        <span>🌐 REST API</span>
+      </button>
+      <button type="button" class="portal-tab-btn" data-tab="graphql">
+        <span>⚡ GraphQL</span>
+      </button>
+      <button type="button" class="portal-tab-btn" data-tab="studio">
+        <span>🎮 API Studio</span>
+      </button>
+      <button type="button" class="portal-tab-btn" data-tab="sdks">
+        <span>💻 SDKs & Code</span>
+      </button>
+      <button type="button" class="portal-tab-btn" data-tab="session">
+        <span>📊 Session & Health</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -55,9 +57,9 @@
   <div class="endpoint-card">
     <h2 style="margin: 0 0 1rem 0; font-size: 1.3rem; color: var(--text-primary);">🚀 3-Minute Quickstart Guide</h2>
     
-    <div style="display: grid; gap: 1.5rem;">
+    <div style="display: grid; gap: 1.25rem;">
       <!-- Step 1 -->
-      <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+      <div class="quickstart-step-card">
         <div style="font-weight: 700; font-size: 1rem; color: var(--get-badge); margin-bottom: 0.5rem;">
           Step 1: Fetch Baseline Mock Data (GET /posts)
         </div>
@@ -70,7 +72,7 @@
       </div>
 
       <!-- Step 2 -->
-      <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+      <div class="quickstart-step-card">
         <div style="font-weight: 700; font-size: 1.0rem; color: var(--post-badge); margin-bottom: 0.5rem;">
           Step 2: Create a Sandboxed Record with State Persistence (POST /posts)
         </div>
@@ -90,7 +92,7 @@
       </div>
 
       <!-- Step 3 -->
-      <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+      <div class="quickstart-step-card">
         <div style="font-weight: 700; font-size: 1.0rem; color: var(--patch-badge); margin-bottom: 0.5rem;">
           Step 3: Simulate Network Latency & HTTP Error States
         </div>
@@ -112,9 +114,9 @@ fetch('https://playground-api-xi.vercel.app/posts?_status=500');</code></pre>
 <!-- ========================================== -->
 <div id="portal-tab-rest" class="portal-tab-content" style="display: none; margin-top: 1.5rem;">
   <div class="endpoint-card">
-    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
-      <h2 style="margin: 0; font-size: 1.3rem; color: var(--text-primary);">🌐 REST API Endpoints Directory</h2>
-      <div style="display: flex; gap: 0.5rem;">
+    <div class="portal-card-header">
+      <h2 style="margin: 0; font-size: clamp(1.05rem, 4vw, 1.3rem); color: var(--text-primary);">🌐 REST API Endpoints Directory</h2>
+      <div class="portal-action-group">
         <a href="/docs/users" class="session-action-btn" style="text-decoration: none;">👤 Users Docs</a>
         <a href="/docs/posts" class="session-action-btn" style="text-decoration: none;">📝 Posts Docs</a>
         <a href="/docs/comments" class="session-action-btn" style="text-decoration: none;">💬 Comments Docs</a>
@@ -122,8 +124,8 @@ fetch('https://playground-api-xi.vercel.app/posts?_status=500');</code></pre>
       </div>
     </div>
 
-    <div style="overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
+    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
+      <table style="width: 100%; min-width: 500px; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
         <thead>
           <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary);">
             <th style="padding: 0.6rem;">Method</th>
@@ -168,14 +170,14 @@ fetch('https://playground-api-xi.vercel.app/posts?_status=500');</code></pre>
 <!-- ========================================== -->
 <div id="portal-tab-graphql" class="portal-tab-content" style="display: none; margin-top: 1.5rem;">
   <div class="endpoint-card">
-    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+    <div class="portal-card-header">
       <div>
-        <h2 style="margin: 0; font-size: 1.3rem; color: var(--text-primary);">⚡ GraphQL Sandbox Gateway</h2>
+        <h2 style="margin: 0; font-size: clamp(1.05rem, 4vw, 1.3rem); color: var(--text-primary);">⚡ GraphQL Sandbox Gateway</h2>
         <p style="margin: 0.25rem 0 0 0; font-size: 0.88rem; color: var(--text-secondary);">
           Query baseline data and execute mutations using GraphQL at <code>POST /graphql</code>.
         </p>
       </div>
-      <div style="display: flex; gap: 0.5rem;">
+      <div class="portal-action-group">
         <a href="/graphql" target="_blank" class="session-action-btn" style="background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); color: #fff; text-decoration: none;">🎮 Launch GraphiQL IDE ↗</a>
         <a href="/downloads/schema.graphql" download class="session-action-btn" style="text-decoration: none;">⚡ Schema.graphql</a>
       </div>
@@ -201,12 +203,12 @@ query GetUserWithPosts {
 <!-- ========================================== -->
 <div id="portal-tab-studio" class="portal-tab-content" style="display: none; margin-top: 1.5rem;">
   <div class="endpoint-card" style="padding: 1.25rem;">
-    <h2 style="margin: 0 0 1rem 0; font-size: 1.3rem; color: #c084fc; display: flex; align-items: center; gap: 0.5rem;">
+    <h2 style="margin: 0 0 1rem 0; font-size: clamp(1.05rem, 4vw, 1.3rem); color: #c084fc; display: flex; align-items: center; gap: 0.5rem;">
       <span>🎮 Interactive API Studio & Request Builder</span>
     </h2>
 
     <!-- Request Builder Header -->
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+    <div class="studio-request-bar" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
       <select id="studio-method-select" class="form-control" style="width: 120px; font-weight: 700; background: var(--bg-sidebar); color: var(--get-badge); border: 1px solid var(--border-color); border-radius: 6px;">
         <option value="GET">GET</option>
         <option value="POST">POST</option>
@@ -214,26 +216,26 @@ query GetUserWithPosts {
         <option value="PATCH">PATCH</option>
         <option value="DELETE">DELETE</option>
       </select>
-      <input type="text" id="studio-url-input" class="form-control" value="/posts?page=1&limit=5" style="flex: 1; min-width: 250px; font-family: var(--font-mono); font-size: 0.9rem; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem 0.75rem;" />
-      <button type="button" id="studio-send-btn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #fff; padding: 0.5rem 1.25rem; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+      <input type="text" id="studio-url-input" class="form-control" value="/posts?page=1&limit=5" style="flex: 1; min-width: 200px; font-family: var(--font-mono); font-size: 0.9rem; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem 0.75rem;" />
+      <button type="button" id="studio-send-btn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #fff; padding: 0.5rem 1.25rem; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
         <span>▶ Send Request</span>
       </button>
     </div>
 
     <!-- Simulation Toggles -->
-    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; background: var(--bg-sidebar); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); flex-wrap: wrap; align-items: center;">
-      <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">⚙️ Network Simulations:</span>
-      <label style="font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+    <div class="studio-simulations-box">
+      <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">⚙️ Network Simulations:</span>
+      <label class="studio-sim-item">
         Delay:
-        <select id="studio-delay-select" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.2rem 0.4rem; font-size: 0.8rem;">
+        <select id="studio-delay-select">
           <option value="0">0 ms (Default)</option>
           <option value="1000">1000 ms (Slow 3G)</option>
           <option value="2500">2500 ms (High Latency)</option>
         </select>
       </label>
-      <label style="font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+      <label class="studio-sim-item">
         Status Error:
-        <select id="studio-status-select" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.2rem 0.4rem; font-size: 0.8rem;">
+        <select id="studio-status-select">
           <option value="200">Normal (Default)</option>
           <option value="400">400 Bad Request</option>
           <option value="404">404 Not Found</option>
@@ -250,9 +252,9 @@ query GetUserWithPosts {
 
     <!-- Live Response Inspector -->
     <div id="studio-response-container" style="margin-top: 1rem;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Response Inspector Output:</span>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <div class="studio-inspector-header">
+        <span class="studio-inspector-title">Response Inspector Output:</span>
+        <div class="studio-inspector-actions">
           <button type="button" id="studio-copy-json-btn" class="session-action-btn" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;" title="Copy Response JSON">📋 Copy JSON</button>
           <span id="studio-res-status-badge" class="badge badge-get" style="font-size: 0.75rem;">Status: Waiting...</span>
           <span id="studio-res-time-badge" style="font-size: 0.75rem; color: var(--text-secondary);">0 ms</span>
@@ -283,6 +285,71 @@ query GetUserWithPosts {
       <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Kotlin</span>
       <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Rust</span>
       <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">PHP</span>
+    </div>
+  </div>
+
+  <!-- Export API Collections & Specs Card -->
+  <div class="endpoint-card" style="margin-top: 1.25rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary);">📦 Export API Collections & Schemas</h3>
+        <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
+          Download ready-to-import API specs and collection files for Postman, Bruno, Insomnia, OpenAPI, GraphQL, and TypeScript.
+        </p>
+      </div>
+      <div>
+        <select id="portal-export-resource-select" class="form-control" style="font-size: 0.85rem; padding: 0.35rem 0.75rem; border-radius: 6px; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); cursor: pointer;">
+          <option value="all">📁 All Resources</option>
+          <option value="users">👤 Users Collection</option>
+          <option value="posts">📝 Posts Collection</option>
+          <option value="comments">💬 Comments Collection</option>
+          <option value="todos">✅ Todos Collection</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.85rem; margin-top: 1rem;">
+      <a id="portal-export-openapi" href="/downloads/openapi.json" download class="portal-export-card" title="Download OpenAPI 3.0 Spec">
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.92rem; color: var(--text-primary);">
+          <span>🌐 OpenAPI 3.0 Spec</span>
+        </div>
+        <span style="font-size: 0.78rem; color: var(--text-secondary);">JSON Schema format for Swagger/OpenAPI</span>
+      </a>
+
+      <a id="portal-export-postman" href="/downloads/postman.json" download class="portal-export-card" title="Download Postman Collection">
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.92rem; color: var(--text-primary);">
+          <span>📦 Postman Collection</span>
+        </div>
+        <span style="font-size: 0.78rem; color: var(--text-secondary);">v2.1 Format with environment variables</span>
+      </a>
+
+      <a id="portal-export-bruno" href="/downloads/bruno.json" download class="portal-export-card" title="Download Bruno Collection">
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.92rem; color: var(--text-primary);">
+          <span>🐶 Bruno Collection</span>
+        </div>
+        <span style="font-size: 0.78rem; color: var(--text-secondary);">Open-source Bruno API client format</span>
+      </a>
+
+      <a id="portal-export-insomnia" href="/downloads/insomnia.json" download class="portal-export-card" title="Download Insomnia Collection">
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.92rem; color: var(--text-primary);">
+          <span>💧 Insomnia Collection</span>
+        </div>
+        <span style="font-size: 0.78rem; color: var(--text-secondary);">v4 Export format for Insomnia REST client</span>
+      </a>
+
+      <a href="/downloads/schema.graphql" download class="portal-export-card" title="Download GraphQL Schema">
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.92rem; color: #c084fc;">
+          <span>⚡ GraphQL Schema (.graphql)</span>
+        </div>
+        <span style="font-size: 0.78rem; color: var(--text-secondary);">GraphQL SDL schema definition</span>
+      </a>
+
+      <a href="/downloads/playground-api.d.ts" download class="portal-export-card" style="background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.3);" title="Download TypeScript Definitions">
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.92rem; color: var(--primary-accent);">
+          <span>📘 TypeScript Types (.d.ts)</span>
+        </div>
+        <span style="font-size: 0.78rem; color: var(--text-secondary);">Full TypeScript interfaces and models</span>
+      </a>
     </div>
   </div>
 
@@ -380,14 +447,8 @@ export type CreateTodoInput = Omit<Todo, 'id' | '_sandbox'>;</code></pre>
       tabBtns.forEach(btn => {
         if (btn.dataset.tab === targetTab) {
           btn.classList.add('active');
-          btn.style.background = 'var(--bg-card)';
-          btn.style.color = 'var(--primary-accent)';
-          btn.style.borderColor = 'var(--border-color)';
         } else {
           btn.classList.remove('active');
-          btn.style.background = 'transparent';
-          btn.style.color = 'var(--text-secondary)';
-          btn.style.borderColor = 'transparent';
         }
       });
 
@@ -526,6 +587,23 @@ export type CreateTodoInput = Omit<Todo, 'id' | '_sandbox'>;</code></pre>
               navigator.clipboard.writeText(text);
             }
           });
+      });
+    }
+
+    const portalExportSelect = document.getElementById('portal-export-resource-select');
+    if (portalExportSelect) {
+      portalExportSelect.addEventListener('change', () => {
+        const val = portalExportSelect.value;
+        const q = (val && val !== 'all') ? `?resource=${val}` : '';
+        const openapiBtn = document.getElementById('portal-export-openapi');
+        const postmanBtn = document.getElementById('portal-export-postman');
+        const brunoBtn = document.getElementById('portal-export-bruno');
+        const insomniaBtn = document.getElementById('portal-export-insomnia');
+
+        if (openapiBtn) openapiBtn.href = `/downloads/openapi.json${q}`;
+        if (postmanBtn) postmanBtn.href = `/downloads/postman.json${q}`;
+        if (brunoBtn) brunoBtn.href = `/downloads/bruno.json${q}`;
+        if (insomniaBtn) insomniaBtn.href = `/downloads/insomnia.json${q}`;
       });
     }
   });

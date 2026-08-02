@@ -42,7 +42,7 @@
           <span>📋 Copy Token</span>
         </button>
 
-        <a href="/docs" class="header-action-btn"
+        <a href="/docs" class="header-action-btn header-dev-portal-btn"
           style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); border: 1px solid rgba(59, 130, 246, 0.3); text-decoration: none;"
           title="Developer Portal & Interactive API Studio">
           <span>📚 Dev Portal</span>
@@ -87,18 +87,37 @@
         </div>
 
         <div class="sidebar-mobile-actions-grid">
+          <a href="/docs" class="sidebar-mobile-action-btn header-dev-portal-btn" title="Developer Portal & Interactive API Studio">
+            <div class="sidebar-mobile-btn-title">
+              <span class="btn-icon">📚</span>
+              <span>Dev Portal</span>
+            </div>
+            <span class="sidebar-mobile-btn-desc">API Studio & Code</span>
+          </a>
+
           <button type="button" class="sidebar-mobile-action-btn header-stats-btn"
             title="View Session Quota & Activity Dashboard">
-            <span class="btn-icon">📊</span>
-            <span>Stats</span>
+            <div class="sidebar-mobile-btn-title">
+              <span class="btn-icon">📊</span>
+              <span>Session Stats</span>
+            </div>
+            <span class="sidebar-mobile-btn-desc">Quota & Activity</span>
           </button>
+
           <button type="button" class="sidebar-mobile-action-btn header-copy-btn" title="Copy signed Session Token">
-            <span class="btn-icon">📋</span>
-            <span>Copy Token</span>
+            <div class="sidebar-mobile-btn-title">
+              <span class="btn-icon">📋</span>
+              <span>Copy Token</span>
+            </div>
+            <span class="sidebar-mobile-btn-desc">Auth Header Key</span>
           </button>
+
           <a href="/health" class="sidebar-mobile-action-btn header-health-btn" title="System Health & Metrics">
-            <span class="btn-icon">🏥</span>
-            <span>Health</span>
+            <div class="sidebar-mobile-btn-title">
+              <span class="btn-icon">🏥</span>
+              <span>System Health</span>
+            </div>
+            <span class="sidebar-mobile-btn-desc">DB & Latency ms</span>
           </a>
         </div>
       </div>
@@ -220,33 +239,33 @@
           <% const initQuery=(typeof currentNav !=='undefined' && currentNav !=='overview' ) ? `?resource=${currentNav}`
             : '' ; %>
             <a id="export-btn-openapi" href="/downloads/openapi.json<%= initQuery %>" download
-              class="session-action-btn" style="text-decoration: none; justify-content: center;"
+              class="session-action-btn" style="text-decoration: none; justify-content: center; font-size: 0.78rem; padding: 0.35rem 0.3rem; white-space: nowrap;"
               title="Download OpenAPI 3.0 Specification">
               <span>🌐 OpenAPI</span>
             </a>
             <a id="export-btn-postman" href="/downloads/postman.json<%= initQuery %>" download
-              class="session-action-btn" style="text-decoration: none; justify-content: center;"
+              class="session-action-btn" style="text-decoration: none; justify-content: center; font-size: 0.78rem; padding: 0.35rem 0.3rem; white-space: nowrap;"
               title="Download Postman Collection v2.1">
               <span>📦 Postman</span>
             </a>
             <a id="export-btn-bruno" href="/downloads/bruno.json<%= initQuery %>" download class="session-action-btn"
-              style="text-decoration: none; justify-content: center;" title="Download Bruno API Collection">
+              style="text-decoration: none; justify-content: center; font-size: 0.78rem; padding: 0.35rem 0.3rem; white-space: nowrap;" title="Download Bruno API Collection">
               <span>🐶 Bruno</span>
             </a>
             <a id="export-btn-insomnia" href="/downloads/insomnia.json<%= initQuery %>" download
-              class="session-action-btn" style="text-decoration: none; justify-content: center;"
+              class="session-action-btn" style="text-decoration: none; justify-content: center; font-size: 0.78rem; padding: 0.35rem 0.3rem; white-space: nowrap;"
               title="Download Insomnia v4 Collection">
               <span>💧 Insomnia</span>
             </a>
             <a id="export-btn-graphql" href="/downloads/schema.graphql" download class="session-action-btn"
-              style="text-decoration: none; justify-content: center;"
+              style="text-decoration: none; justify-content: center; grid-column: span 2; font-size: 0.78rem; padding: 0.4rem 0.5rem;"
               title="Download GraphQL SDL Schema">
               <span>⚡ GraphQL Schema</span>
             </a>
             <a id="export-btn-typescript" href="/downloads/playground-api.d.ts" download class="session-action-btn"
-              style="text-decoration: none; justify-content: center;"
+              style="text-decoration: none; justify-content: center; grid-column: span 2; font-size: 0.78rem; padding: 0.4rem 0.5rem; background: rgba(59, 130, 246, 0.12); color: var(--primary-accent); border-color: rgba(59, 130, 246, 0.3);"
               title="Download TypeScript Definition File (.d.ts)">
-              <span>📘 TypeScript (.d.ts)</span>
+              <span>📘 TypeScript Types (.d.ts)</span>
             </a>
         </div>
       </div>
