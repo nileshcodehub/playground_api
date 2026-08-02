@@ -1,4 +1,71 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Toast Notification System
+  function showToast(message, type = 'copy', duration = 3000) {
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.id = 'toast-container';
+      document.body.appendChild(toastContainer);
+    }
+
+    const icons = {
+      success: '✅',
+      copy: '📋',
+      info: 'ℹ️',
+      warning: '⚠️',
+      error: '❌'
+    };
+    const icon = icons[type] || icons.copy;
+
+    const toast = document.createElement('div');
+    toast.className = `toast-message toast-${type}`;
+    toast.innerHTML = `<span style="font-size: 1.1rem;">${icon}</span><span>${message}</span>`;
+
+    toastContainer.appendChild(toast);
+
+    requestAnimationFrame(() => {
+      toast.classList.add('toast-visible');
+    });
+
+    setTimeout(() => {
+      toast.classList.remove('toast-visible');
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, duration);
+  }
+
+  window.showToast = showToast;
+
+  // Unified Copy Helper with Clipboard API + Fallback + Toast
+  async function copyTextToClipboard(text, toastMsg = 'Copied to clipboard!') {
+    if (!text) return false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      showToast(toastMsg, 'copy');
+      return true;
+    } catch (err) {
+      console.error('Copy to clipboard failed:', err);
+      showToast('Failed to copy to clipboard', 'error');
+      return false;
+    }
+  }
+
+  window.copyTextToClipboard = copyTextToClipboard;
+
   // 0. Theme Controller Switcher
   const themeBtns = document.querySelectorAll('.theme-btn');
   const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
@@ -479,16 +546,17 @@ document.addEventListener('DOMContentLoaded', () => {
     copyUrlBtns.forEach(btn => {
       if (btn.dataset.wired) return;
       btn.dataset.wired = 'true';
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const url = btn.getAttribute('data-url');
         if (url) {
-          navigator.clipboard.writeText(url).then(() => {
-            const originalText = btn.innerHTML;
+          const originalText = btn.innerHTML;
+          const success = await copyTextToClipboard(url, '🔗 Endpoint URL copied to clipboard!');
+          if (success) {
             btn.innerHTML = '<span>✅ Copied URL!</span>';
             setTimeout(() => {
               btn.innerHTML = originalText;
             }, 2000);
-          }).catch(err => console.error('Copy URL error:', err));
+          }
         }
       });
     });
@@ -513,26 +581,37 @@ document.addEventListener('DOMContentLoaded', () => {
           codeBlocks.forEach(block => {
             if (block.getAttribute('data-snippet') === target) {
               block.hidden = false;
+              block.removeAttribute('hidden');
+              block.style.display = 'block';
             } else {
               block.hidden = true;
+              block.setAttribute('hidden', '');
+              block.style.display = 'none';
             }
           });
         });
       });
 
       if (copyBtn) {
-        copyBtn.addEventListener('click', () => {
-          const visibleBlock = Array.from(codeBlocks).find(b => !b.hidden);
+        copyBtn.addEventListener('click', async () => {
+          const activeTab = container.querySelector('.snippet-tab-btn.active');
+          const target = activeTab ? activeTab.getAttribute('data-target') : 'curl';
+          const visibleBlock = container.querySelector(`.snippet-code-block[data-snippet="${target}"]`) 
+            || Array.from(codeBlocks).find(b => !b.hidden && b.style.display !== 'none')
+            || codeBlocks[0];
+
           if (visibleBlock) {
+            const codeText = visibleBlock.textContent || visibleBlock.innerText;
             const originalHTML = copyBtn.innerHTML;
             const successHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span style="color:#10b981;">Copied!</span>`;
 
-            navigator.clipboard.writeText(codeText).then(() => {
+            const success = await copyTextToClipboard(codeText.trim(), '📋 Code snippet copied to clipboard!');
+            if (success) {
               copyBtn.innerHTML = successHTML;
               setTimeout(() => {
                 copyBtn.innerHTML = originalHTML;
               }, 2000);
-            }).catch(err => console.error('Copy error:', err));
+            }
           }
         });
       }
@@ -730,23 +809,14 @@ document.addEventListener('DOMContentLoaded', () => {
     copyBtn.addEventListener('click', async () => {
       const token = sessionDisplay.getAttribute('data-session-token');
       if (!token) {
-        alert('No active session token found.');
+        showToast('No active session token found.', 'warning');
         return;
       }
       const originalHTML = copyBtn.innerHTML;
       const successHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span style="color:#10b981;">Copied!</span>`;
 
-      try {
-        await navigator.clipboard.writeText(token);
-        copyBtn.innerHTML = successHTML;
-        setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 2000);
-      } catch (err) {
-        const textarea = document.createElement('textarea');
-        textarea.value = token;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
+      const success = await copyTextToClipboard(token, '🔑 Session token copied for X-Playground-Identity header!');
+      if (success) {
         copyBtn.innerHTML = successHTML;
         setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 2000);
       }
@@ -989,15 +1059,13 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', async () => {
       const sessionDisplay = document.getElementById('session-id-display');
       const token = sessionDisplay ? sessionDisplay.getAttribute('data-session-token') : null;
-      if (!token) return alert('No active session token found.');
+      if (!token) return showToast('No active session token found.', 'warning');
 
-      try {
-        await navigator.clipboard.writeText(token);
-        const origText = btn.innerHTML;
+      const origText = btn.innerHTML;
+      const success = await copyTextToClipboard(token, '🔑 Session token copied for X-Playground-Identity header!');
+      if (success) {
         btn.innerHTML = '<span>✅ Copied!</span>';
         setTimeout(() => { btn.innerHTML = origText; }, 2000);
-      } catch {
-        alert(token);
       }
     });
   });
@@ -1006,8 +1074,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileToggleBtn = document.getElementById('mobile-menu-toggle');
   const appSidebar = document.getElementById('app-sidebar');
   if (mobileToggleBtn && appSidebar) {
+    const hamburgerSVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+    const closeSVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
     mobileToggleBtn.addEventListener('click', () => {
-      appSidebar.classList.toggle('mobile-open');
+      const isOpen = appSidebar.classList.toggle('mobile-open');
+      mobileToggleBtn.innerHTML = isOpen ? closeSVG : hamburgerSVG;
+      mobileToggleBtn.setAttribute('title', isOpen ? 'Close Navigation Drawer' : 'Toggle Navigation Drawer');
     });
   }
 
