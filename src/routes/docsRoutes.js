@@ -163,4 +163,11 @@ router.get('/docs/:resource', async (req, res, next) => {
   });
 });
 
+// Full TypeScript Definitions Endpoint (/types/ts)
+router.get('/types/ts', (req, res) => {
+  const filePath = path.join(publicDir, 'types', 'playground-api.d.ts');
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.sendFile(filePath);
+});
+
 export default router;

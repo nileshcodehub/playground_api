@@ -273,6 +273,7 @@ query GetUserWithPosts {
       Every endpoint on Playground API provides ready-to-use snippets in 9 programming languages:
     </p>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">TypeScript (.d.ts)</span>
       <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">cURL</span>
       <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">JavaScript (Fetch)</span>
       <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Axios</span>
@@ -283,6 +284,65 @@ query GetUserWithPosts {
       <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Rust</span>
       <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">PHP</span>
     </div>
+  </div>
+
+  <div class="endpoint-card" style="margin-top: 1.25rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary);">📘 TypeScript Type Definitions (.d.ts)</h3>
+        <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
+          Copy-paste or download full type safety definitions for User, Post, Comment, Todo, and PaginatedResponse.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button type="button" id="copy-ts-types-btn" class="session-action-btn">📋 Copy .d.ts</button>
+        <a href="/downloads/playground-api.d.ts" download class="session-action-btn" style="text-decoration: none;">⬇️ Download .d.ts</a>
+        <a href="/types/ts" target="_blank" class="session-action-btn" style="text-decoration: none;">🔗 Raw /types/ts ↗</a>
+      </div>
+    </div>
+
+    <pre class="code-block" style="max-height: 380px; overflow-y: auto;"><code id="ts-types-code-block">export interface User {
+  id: number | string;
+  name: string;
+  username: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  address?: Address;
+  company?: Company;
+}
+
+export interface Post {
+  id: number | string;
+  userId: number | string;
+  title: string;
+  body: string;
+}
+
+export interface Comment {
+  id: number | string;
+  postId: number | string;
+  name: string;
+  email: string;
+  body: string;
+}
+
+export interface Todo {
+  id: number | string;
+  userId: number | string;
+  title: string;
+  completed: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: { page: number; limit: number; total: number; totalPages: number; };
+}
+
+export type CreateUserInput = Omit<User, 'id' | '_sandbox'>;
+export type CreatePostInput = Omit<Post, 'id' | '_sandbox'>;
+export type CreateCommentInput = Omit<Comment, 'id' | '_sandbox'>;
+export type CreateTodoInput = Omit<Todo, 'id' | '_sandbox'>;</code></pre>
   </div>
 </div>
 
@@ -440,6 +500,32 @@ query GetUserWithPosts {
             navigator.clipboard.writeText(text.trim());
           }
         }
+      });
+    }
+
+    const copyTsBtn = document.getElementById('copy-ts-types-btn');
+    const tsBlock = document.getElementById('ts-types-code-block');
+
+    if (tsBlock) {
+      fetch('/types/ts')
+        .then(res => res.text())
+        .then(text => {
+          if (text) tsBlock.textContent = text;
+        })
+        .catch(err => console.warn('[TypeScript] Failed to fetch /types/ts:', err));
+    }
+
+    if (copyTsBtn) {
+      copyTsBtn.addEventListener('click', () => {
+        fetch('/types/ts')
+          .then(res => res.text())
+          .then(text => {
+            if (typeof window.copyTextToClipboard === 'function') {
+              window.copyTextToClipboard(text, '📘 TypeScript definitions copied to clipboard!');
+            } else if (navigator.clipboard) {
+              navigator.clipboard.writeText(text);
+            }
+          });
       });
     }
   });

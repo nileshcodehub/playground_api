@@ -73,4 +73,9 @@ router.get('/schema.graphql', (req, res) => {
   res.send(sdl);
 });
 
+// 6. Full TypeScript Definitions Download (.d.ts)
+router.get('/playground-api.d.ts', (req, res) => {
+  res.download('public/types/playground-api.d.ts', 'playground-api.d.ts');
+});
+
 export default router;
