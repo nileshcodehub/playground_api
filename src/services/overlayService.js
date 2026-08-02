@@ -429,6 +429,16 @@ export const resetSessionOverlay = async (identityId) => {
   return { count };
 };
 
+export const purgeSessionOverlay = async (identityId) => {
+  if (!identityId) {
+    throw new AppError('Identity session required to purge overlay', 401);
+  }
+  const result = await prisma.overlayRecords.deleteMany({
+    where: { identity_id: identityId }
+  });
+  return { count: result.count };
+};
+
 export const cleanupInactiveIdentities = async (daysThreshold = 10) => {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - daysThreshold);
@@ -514,6 +524,122 @@ export const getSessionStats = async (identityId) => {
       totalRecords: records.length,
       byResource
     }
+  };
+};
+
+export const exportSessionSnapshot = async (identityId, targetResource = 'all') => {
+  if (!identityId) {
+    throw new AppError('Identity session required for exporting snapshot', 401);
+  }
+
+  const whereClause = { identity_id: identityId };
+  if (targetResource && targetResource !== 'all') {
+    whereClause.resource = targetResource.toLowerCase();
+  }
+
+  const records = await prisma.overlayRecords.findMany({
+    where: whereClause,
+    orderBy: { created_at: 'asc' }
+  });
+
+  const formattedRecords = records.map(r => ({
+    id: r.id,
+    resource: r.resource,
+    op: r.op,
+    targetId: r.target_id,
+    data: r.data,
+    createdAt: r.created_at
+  }));
+
+  const stats = {
+    totalRecords: records.length,
+    creates: records.filter(r => r.op === 'create').length,
+    updates: records.filter(r => r.op === 'update').length,
+    deletes: records.filter(r => r.op === 'delete').length
+  };
+
+  return {
+    version: '1.0',
+    exportedAt: new Date().toISOString(),
+    identityId,
+    targetResource,
+    stats,
+    records: formattedRecords
+  };
+};
+
+export const importSessionSnapshot = async (identityId, snapshotData, options = {}) => {
+  if (!identityId) {
+    throw new AppError('Identity session required for importing snapshot', 401);
+  }
+
+  if (!snapshotData || typeof snapshotData !== 'object') {
+    throw new AppError('Invalid snapshot payload. Expected JSON object.', 400);
+  }
+
+  const records = Array.isArray(snapshotData.records) ? snapshotData.records : [];
+  if (records.length === 0 && !Array.isArray(snapshotData)) {
+    throw new AppError('Snapshot contains no valid overlay records.', 400);
+  }
+
+  const recordsToImport = Array.isArray(snapshotData) ? snapshotData : records;
+  const targetResource = options.targetResource ? options.targetResource.toLowerCase() : null;
+  const strategy = options.strategy === 'merge' ? 'merge' : 'replace';
+
+  // Resource mismatch check
+  if (targetResource && targetResource !== 'all') {
+    const mismatched = recordsToImport.find(r => r.resource && r.resource.toLowerCase() !== targetResource);
+    if (mismatched) {
+      throw new AppError(`Resource mismatch. Snapshot contains '${mismatched.resource}' records, but target destination is '${targetResource}'.`, 400);
+    }
+  }
+
+  // Schema validation
+  for (let i = 0; i < recordsToImport.length; i++) {
+    const rec = recordsToImport[i];
+    if (!rec.resource || !rec.op) {
+      throw new AppError(`Record #${i + 1} is missing required 'resource' or 'op' fields.`, 400);
+    }
+    if (!['create', 'update', 'delete'].includes(rec.op)) {
+      throw new AppError(`Record #${i + 1} has invalid operation type '${rec.op}'. Expected create, update, or delete.`, 400);
+    }
+  }
+
+  // Determine affected resources
+  const affectedResources = Array.from(new Set(recordsToImport.map(r => r.resource.toLowerCase())));
+
+  // Execute import transaction
+  await prisma.$transaction(async (tx) => {
+    // If strategy is 'replace', purge existing overlay for affected resources
+    if (strategy === 'replace') {
+      await tx.overlayRecords.deleteMany({
+        where: {
+          identity_id: identityId,
+          resource: { in: affectedResources }
+        }
+      });
+    }
+
+    // Insert records
+    for (const r of recordsToImport) {
+      await tx.overlayRecords.create({
+        data: {
+          identity_id: identityId,
+          resource: r.resource.toLowerCase(),
+          target_id: r.targetId || r.target_id || null,
+          op: r.op,
+          data: r.data || {},
+          created_at: r.createdAt ? new Date(r.createdAt) : new Date()
+        }
+      });
+    }
+  });
+
+  return {
+    message: 'Session sandbox snapshot imported successfully.',
+    importedRecords: recordsToImport.length,
+    strategy,
+    affectedResources
   };
 };
 

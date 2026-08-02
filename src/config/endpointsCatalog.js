@@ -4,6 +4,7 @@ import { getCommentsEndpoints } from './catalog/comments.js';
 import { getTodosEndpoints } from './catalog/todos.js';
 import { getAuthEndpoints } from './catalog/auth.js';
 import { getMediaEndpoints } from './catalog/media.js';
+import { getSessionEndpoints } from './catalog/session.js';
 
 export const getEndpointsForResource = (resource, sampleRecord = null) => {
   switch (resource) {
@@ -19,6 +20,8 @@ export const getEndpointsForResource = (resource, sampleRecord = null) => {
       return getAuthEndpoints();
     case 'media':
       return getMediaEndpoints();
+    case 'session':
+      return getSessionEndpoints();
     default:
       return [];
   }

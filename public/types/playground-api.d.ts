@@ -144,3 +144,33 @@ export interface RefreshTokenResponse {
   token_type: 'Bearer';
   expires_in: number;
 }
+
+export interface SnapshotRecord {
+  id?: string;
+  resource: string;
+  op: 'create' | 'update' | 'delete';
+  targetId?: number | string | null;
+  data?: Record<string, any>;
+  createdAt?: string;
+}
+
+export interface SnapshotPayload {
+  version: string;
+  exportedAt: string;
+  identityId: string;
+  targetResource: string;
+  stats: {
+    totalRecords: number;
+    creates: number;
+    updates: number;
+    deletes: number;
+  };
+  records: SnapshotRecord[];
+}
+
+export interface ImportResponse {
+  message: string;
+  importedRecords: number;
+  strategy: 'replace' | 'merge';
+  affectedResources: string[];
+}
