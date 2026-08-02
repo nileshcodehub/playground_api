@@ -133,6 +133,13 @@ router.get('/docs/:resource', async (req, res, next) => {
 
   const endpoints = getEndpointsForResource(resource, sampleRecord);
 
+const RESOURCE_SUBTITLES = {
+  users: "Read operations merge shared global users data with your session's overlay (creates appear at the top, deletes are removed, updates preserve position). All mutations are session-scoped via an HTTP cookie/header and never affect shared global data or other visitors.",
+  posts: "Read operations merge shared global posts with your session's overlay (newly created posts appear at the top, updates apply in-place, deletes are filtered). Each post belongs to a user (`user_id` foreign key). Mutations are session-scoped and capped at 30 created records.",
+  comments: "Read operations merge shared global comments with your session's overlay (newly created comments appear at the top, updates apply in-place, deletes are filtered). Each comment belongs to a post (`post_id` foreign key). Mutations are session-scoped and capped at 30 created records.",
+  todos: "Read operations merge shared global todos with your session's overlay (newly created todos appear at the top, updates apply in-place, deletes are filtered). Each todo belongs to a user (`user_id` foreign key). Mutations are session-scoped and capped at 30 created records."
+};
+
   const locals = {
     title: `Fake ${resource.charAt(0).toUpperCase() + resource.slice(1)} REST API Endpoints & Docs — Playground API`,
     metaDescription: `Free mock REST API for /${resource}. Test GET, POST, PUT, and DELETE HTTP requests with session-isolated sandbox mutations and live interactive request runner.`,
@@ -140,6 +147,7 @@ router.get('/docs/:resource', async (req, res, next) => {
     canonicalUrl: `${req.protocol}://${req.get('host')}/docs/${resource}`,
     baseUrl: `${req.protocol}://${req.get('host')}`,
     resource,
+    resourceSubtitle: RESOURCE_SUBTITLES[resource],
     resources: RESOURCES,
     currentNav: resource,
     sampleRecord,
@@ -150,10 +158,18 @@ router.get('/docs/:resource', async (req, res, next) => {
 
   res.render(resource, locals, (err, htmlContent) => {
     if (err) {
-      return res.render('docs-index', {
-        ...locals,
-        title: `${resource.toUpperCase()} Docs Coming Soon`,
-        info: `Documentation for "${resource}" is currently being prepared.`
+      return res.render('resource-doc', locals, (err2, fallbackHtml) => {
+        if (err2) {
+          return res.render('docs-index', {
+            ...locals,
+            title: `${resource.toUpperCase()} Docs Coming Soon`,
+            info: `Documentation for "${resource}" is currently being prepared.`
+          });
+        }
+        res.render('layouts/base', {
+          ...locals,
+          body: fallbackHtml
+        });
       });
     }
     res.render('layouts/base', {

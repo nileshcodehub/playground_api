@@ -35,4 +35,15 @@ describe('Developer Portal & API Studio (/docs)', () => {
     assert.ok(html.includes('/docs'));
     assert.ok(html.includes('Launch Developer Portal &amp; API Studio') || html.includes('Launch Developer Portal & API Studio') || html.includes('Dev Portal'));
   });
+
+  test('GET /docs/:resource renders consolidated resource-doc documentation page', async () => {
+    const resources = ['users', 'posts', 'comments', 'todos'];
+    for (const resName of resources) {
+      const res = await fetch(`${baseUrl}/docs/${resName}`);
+      assert.equal(res.status, 200);
+      const html = await res.text();
+      assert.ok(html.includes(`Export ${resName.charAt(0).toUpperCase() + resName.slice(1)} Collection`));
+      assert.ok(html.includes(`openapi.json?resource=${resName}`));
+    }
+  });
 });
