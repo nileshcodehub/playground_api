@@ -34,6 +34,10 @@
             <span>📋 Copy Token</span>
           </button>
 
+          <a href="/docs" class="header-action-btn" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); border: 1px solid rgba(59, 130, 246, 0.3); text-decoration: none;" title="Developer Portal & Interactive API Studio">
+            <span>📚 Dev Portal</span>
+          </a>
+
           <a href="/health" class="header-action-btn header-health-btn" title="System Health & Metrics">
             <span>🏥 Health</span>
           </a>
@@ -121,6 +125,13 @@
             class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'overview') ? 'active' : '' %>"
           >
             <span>Overview</span>
+          </a>
+          <a
+            href="/docs"
+            class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'docs-portal') ? 'active' : '' %>"
+          >
+            <span>Dev Portal & Studio</span>
+            <span class="nav-count" style="background: rgba(59, 130, 246, 0.2); color: var(--primary-accent);">PORTAL</span>
           </a>
 
           <div class="nav-section-title" style="margin-top: 1rem">

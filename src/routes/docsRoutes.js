@@ -51,9 +51,27 @@ router.get('/', (req, res, next) => {
   });
 });
 
-// Alias for /docs
-router.get('/docs', (req, res) => {
-  res.redirect('/');
+// Developer Portal & API Studio Route (/docs)
+router.get('/docs', (req, res, next) => {
+  const locals = {
+    title: 'Developer Portal & Interactive API Studio — Playground API',
+    metaDescription: 'Complete Playground API developer portal featuring interactive quickstarts, REST API reference, GraphQL gateway, visual API Studio, SDK code generators, and quota monitoring.',
+    keywords: 'playground api docs, developer portal, api studio, interactive mock api explorer, quickstart guide',
+    canonicalUrl: `${req.protocol}://${req.get('host')}/docs`,
+    baseUrl: `${req.protocol}://${req.get('host')}`,
+    resources: RESOURCES,
+    currentNav: 'docs-portal',
+    identityId: req.identityId,
+    signedToken: req.signedToken
+  };
+
+  res.render('docs-portal', locals, (err, htmlContent) => {
+    if (err) return next(err);
+    res.render('layouts/base', {
+      ...locals,
+      body: htmlContent
+    });
+  });
 });
 
 // GraphQL Gateway Documentation Page

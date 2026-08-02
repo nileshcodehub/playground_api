@@ -1,0 +1,431 @@
+<div class="hero" style="position: relative; overflow: hidden; padding: 2rem 1.5rem 1.5rem 1.5rem;">
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: var(--primary-accent); border: 1px solid rgba(59, 130, 246, 0.4); font-size: 0.8rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+          📚 DEVELOPER PORTAL & STUDIO
+        </span>
+        <span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+          STATEFUL SANDBOX
+        </span>
+      </div>
+      <h1 class="hero-title" style="margin: 0; font-size: 2rem;">Playground API Developer Portal</h1>
+      <p class="hero-subtitle" style="margin-top: 0.5rem; max-width: 750px;">
+        Everything you need to build, test, and prototype with Playground API. Explore REST endpoints, execute GraphQL queries, build requests in the interactive API Studio, and monitor session quotas.
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <a href="/graphql" target="_blank" class="session-action-btn" style="background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); color: #ffffff; padding: 0.6rem 1.1rem; font-size: 0.85rem; font-weight: 600; text-decoration: none; border-radius: 6px;" title="Open GraphiQL IDE">
+        <span>🎮 GraphiQL IDE ↗</span>
+      </a>
+      <a href="/health" target="_blank" class="session-action-btn" style="padding: 0.6rem 1.1rem; font-size: 0.85rem; font-weight: 600; text-decoration: none; border-radius: 6px;" title="System Health Status">
+        <span>🏥 Health Metrics</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Portal Top Tab Bar -->
+  <div class="portal-tab-bar" style="display: flex; gap: 0.5rem; margin-top: 2rem; border-bottom: 1px solid var(--border-color); overflow-x: auto; padding-bottom: 0.5rem;">
+    <button type="button" class="portal-tab-btn active" data-tab="quickstart" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: var(--bg-card); color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem;">
+      <span>🚀 Quickstart</span>
+    </button>
+    <button type="button" class="portal-tab-btn" data-tab="rest" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
+      <span>🌐 REST API</span>
+    </button>
+    <button type="button" class="portal-tab-btn" data-tab="graphql" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
+      <span>⚡ GraphQL</span>
+    </button>
+    <button type="button" class="portal-tab-btn" data-tab="studio" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: #c084fc; display: flex; align-items: center; gap: 0.4rem;">
+      <span>🎮 API Studio</span>
+    </button>
+    <button type="button" class="portal-tab-btn" data-tab="sdks" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
+      <span>💻 SDKs & Code</span>
+    </button>
+    <button type="button" class="portal-tab-btn" data-tab="session" style="padding: 0.6rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
+      <span>📊 Session & Health</span>
+    </button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- TAB 1: QUICKSTART -->
+<!-- ========================================== -->
+<div id="portal-tab-quickstart" class="portal-tab-content active" style="margin-top: 1.5rem;">
+  <div class="endpoint-card">
+    <h2 style="margin: 0 0 1rem 0; font-size: 1.3rem; color: var(--text-primary);">🚀 3-Minute Quickstart Guide</h2>
+    
+    <div style="display: grid; gap: 1.5rem;">
+      <!-- Step 1 -->
+      <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div style="font-weight: 700; font-size: 1rem; color: var(--get-badge); margin-bottom: 0.5rem;">
+          Step 1: Fetch Baseline Mock Data (GET /posts)
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Playground API comes pre-loaded with realistic baseline mock data. Fetch data using standard <code>fetch</code> or <code>axios</code>:
+        </p>
+        <pre class="code-block"><code>fetch('https://playground-api-xi.vercel.app/posts?page=1&limit=3')
+  .then(res => res.json())
+  .then(data => console.log(data));</code></pre>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div style="font-weight: 700; font-size: 1.0rem; color: var(--post-badge); margin-bottom: 0.5rem;">
+          Step 2: Create a Sandboxed Record with State Persistence (POST /posts)
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Unlike standard mock APIs, Playground API saves your mutations in a per-session sandbox overlay. Include <code>credentials: 'include'</code> to persist state via cookie, or pass <code>X-Playground-Identity</code> header:
+        </p>
+        <pre class="code-block"><code>fetch('https://playground-api-xi.vercel.app/posts', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({
+    title: 'My Sandboxed Post',
+    body: 'Persists specifically for my identity session!',
+    userId: 1
+  })
+}).then(res => res.json()).then(data => console.log('Created:', data));</code></pre>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div style="font-weight: 700; font-size: 1.0rem; color: var(--patch-badge); margin-bottom: 0.5rem;">
+          Step 3: Simulate Network Latency & HTTP Error States
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Test UI loading spinners with <code>?_delay=1500</code> and error boundaries with <code>?_status=500</code>:
+        </p>
+        <pre class="code-block"><code>// Simulate 1.5s network delay
+fetch('https://playground-api-xi.vercel.app/posts?_delay=1500');
+
+// Force 500 Server Error
+fetch('https://playground-api-xi.vercel.app/posts?_status=500');</code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- TAB 2: REST API REFERENCE -->
+<!-- ========================================== -->
+<div id="portal-tab-rest" class="portal-tab-content" style="display: none; margin-top: 1.5rem;">
+  <div class="endpoint-card">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+      <h2 style="margin: 0; font-size: 1.3rem; color: var(--text-primary);">🌐 REST API Endpoints Directory</h2>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/docs/users" class="session-action-btn" style="text-decoration: none;">👤 Users Docs</a>
+        <a href="/docs/posts" class="session-action-btn" style="text-decoration: none;">📝 Posts Docs</a>
+        <a href="/docs/comments" class="session-action-btn" style="text-decoration: none;">💬 Comments Docs</a>
+        <a href="/docs/todos" class="session-action-btn" style="text-decoration: none;">✅ Todos Docs</a>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary);">
+            <th style="padding: 0.6rem;">Method</th>
+            <th style="padding: 0.6rem;">Endpoint</th>
+            <th style="padding: 0.6rem;">Description</th>
+            <th style="padding: 0.6rem;">Sandboxed?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem;"><span class="badge badge-get">GET</span></td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/users, /posts, /comments, /todos</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">List merged baseline + sandbox records</td>
+            <td style="padding: 0.7rem; color: #22c55e;">✅ Virtual Merge</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem;"><span class="badge badge-post">POST</span></td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/users, /posts, /comments, /todos</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">Create sandbox record (ID: local-&lt;uuid&gt;)</td>
+            <td style="padding: 0.7rem; color: #22c55e;">✅ Session Scope</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem;"><span class="badge badge-put">PUT</span> / <span class="badge badge-patch">PATCH</span></td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/:resource/:id</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">Update record in session overlay</td>
+            <td style="padding: 0.7rem; color: #22c55e;">✅ Session Scope</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.6rem;"><span class="badge badge-delete">DELETE</span></td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/:resource/:id</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">Remove record from session overlay</td>
+            <td style="padding: 0.7rem; color: #22c55e;">✅ Session Scope</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- TAB 3: GRAPHQL GATEWAY -->
+<!-- ========================================== -->
+<div id="portal-tab-graphql" class="portal-tab-content" style="display: none; margin-top: 1.5rem;">
+  <div class="endpoint-card">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.3rem; color: var(--text-primary);">⚡ GraphQL Sandbox Gateway</h2>
+        <p style="margin: 0.25rem 0 0 0; font-size: 0.88rem; color: var(--text-secondary);">
+          Query baseline data and execute mutations using GraphQL at <code>POST /graphql</code>.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/graphql" target="_blank" class="session-action-btn" style="background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); color: #fff; text-decoration: none;">🎮 Launch GraphiQL IDE ↗</a>
+        <a href="/downloads/schema.graphql" download class="session-action-btn" style="text-decoration: none;">⚡ Schema.graphql</a>
+      </div>
+    </div>
+
+    <pre class="code-block"><code># Example GraphQL Query
+query GetUserWithPosts {
+  user(id: "1") {
+    id
+    name
+    email
+    posts {
+      id
+      title
+    }
+  }
+}</code></pre>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- TAB 4: INTERACTIVE API STUDIO (Option 3 Embedded!) -->
+<!-- ========================================== -->
+<div id="portal-tab-studio" class="portal-tab-content" style="display: none; margin-top: 1.5rem;">
+  <div class="endpoint-card" style="padding: 1.25rem;">
+    <h2 style="margin: 0 0 1rem 0; font-size: 1.3rem; color: #c084fc; display: flex; align-items: center; gap: 0.5rem;">
+      <span>🎮 Interactive API Studio & Request Builder</span>
+    </h2>
+
+    <!-- Request Builder Header -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+      <select id="studio-method-select" class="form-control" style="width: 120px; font-weight: 700; background: var(--bg-sidebar); color: var(--get-badge); border: 1px solid var(--border-color); border-radius: 6px;">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="PATCH">PATCH</option>
+        <option value="DELETE">DELETE</option>
+      </select>
+      <input type="text" id="studio-url-input" class="form-control" value="/posts?page=1&limit=5" style="flex: 1; min-width: 250px; font-family: var(--font-mono); font-size: 0.9rem; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem 0.75rem;" />
+      <button type="button" id="studio-send-btn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #fff; padding: 0.5rem 1.25rem; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+        <span>▶ Send Request</span>
+      </button>
+    </div>
+
+    <!-- Simulation Toggles -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; background: var(--bg-sidebar); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); flex-wrap: wrap; align-items: center;">
+      <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">⚙️ Network Simulations:</span>
+      <label style="font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+        Delay:
+        <select id="studio-delay-select" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.2rem 0.4rem; font-size: 0.8rem;">
+          <option value="0">0 ms (Default)</option>
+          <option value="1000">1000 ms (Slow 3G)</option>
+          <option value="2500">2500 ms (High Latency)</option>
+        </select>
+      </label>
+      <label style="font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+        Status Error:
+        <select id="studio-status-select" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.2rem 0.4rem; font-size: 0.8rem;">
+          <option value="200">Normal (Default)</option>
+          <option value="400">400 Bad Request</option>
+          <option value="404">404 Not Found</option>
+          <option value="500">500 Server Error</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Request Body Input (Shown for POST/PUT/PATCH) -->
+    <div id="studio-body-container" style="margin-bottom: 1rem; display: none;">
+      <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-secondary);">JSON Request Body:</label>
+      <textarea id="studio-body-input" rows="4" style="width: 100%; font-family: var(--font-mono); font-size: 0.85rem; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; resize: vertical;"></textarea>
+    </div>
+
+    <!-- Live Response Inspector -->
+    <div id="studio-response-container" style="margin-top: 1rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Response Inspector Output:</span>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <span id="studio-res-status-badge" class="badge badge-get" style="font-size: 0.75rem;">Status: Waiting...</span>
+          <span id="studio-res-time-badge" style="font-size: 0.75rem; color: var(--text-secondary);">0 ms</span>
+        </div>
+      </div>
+      <pre id="studio-response-output" class="code-block" style="max-height: 350px; overflow-y: auto;"><code>Click "Send Request" to execute endpoint in real-time.</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- TAB 5: SDKs & CODE GENERATORS -->
+<!-- ========================================== -->
+<div id="portal-tab-sdks" class="portal-tab-content" style="display: none; margin-top: 1.5rem;">
+  <div class="endpoint-card">
+    <h2 style="margin: 0 0 1rem 0; font-size: 1.3rem; color: var(--text-primary);">💻 SDKs & Multi-Language Code Generators</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+      Every endpoint on Playground API provides ready-to-use snippets in 9 programming languages:
+    </p>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">cURL</span>
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">JavaScript (Fetch)</span>
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Axios</span>
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Python</span>
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Go</span>
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Swift</span>
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Kotlin</span>
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">Rust</span>
+      <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--primary-accent); padding: 0.3rem 0.6rem;">PHP</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- TAB 6: SESSION & HEALTH -->
+<!-- ========================================== -->
+<div id="portal-tab-session" class="portal-tab-content" style="display: none; margin-top: 1.5rem;">
+  <div class="endpoint-card">
+    <h2 style="margin: 0 0 1rem 0; font-size: 1.3rem; color: var(--text-primary);">📊 Session Quota & Operational Health</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+      <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.35rem;">Session Quota Cap</div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">Max 30 self-created sandbox records per resource per identity.</div>
+      </div>
+      <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.35rem;">Inactivity TTL</div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">Mutations persist for up to 10 days of inactivity before automatic cleanup.</div>
+      </div>
+      <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.35rem;">System Health</div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary);"><a href="/health" target="_blank" style="color: var(--primary-accent);">GET /health</a> returns real-time DB latency ms & active session counts.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Simple Portal Tab Switching Script
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabBtns = document.querySelectorAll('.portal-tab-btn');
+    const tabContents = document.querySelectorAll('.portal-tab-content');
+
+    function switchTab(targetTab) {
+      tabBtns.forEach(btn => {
+        if (btn.dataset.tab === targetTab) {
+          btn.classList.add('active');
+          btn.style.background = 'var(--bg-card)';
+          btn.style.color = 'var(--primary-accent)';
+          btn.style.borderColor = 'var(--border-color)';
+        } else {
+          btn.classList.remove('active');
+          btn.style.background = 'transparent';
+          btn.style.color = 'var(--text-secondary)';
+          btn.style.borderColor = 'transparent';
+        }
+      });
+
+      tabContents.forEach(content => {
+        if (content.id === `portal-tab-${targetTab}`) {
+          content.style.display = 'block';
+        } else {
+          content.style.display = 'none';
+        }
+      });
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchTab(btn.dataset.tab);
+      });
+    });
+
+    // Interactive API Studio Execution Handler
+    const sendBtn = document.getElementById('studio-send-btn');
+    const methodSelect = document.getElementById('studio-method-select');
+    const urlInput = document.getElementById('studio-url-input');
+    const delaySelect = document.getElementById('studio-delay-select');
+    const statusSelect = document.getElementById('studio-status-select');
+    const bodyInput = document.getElementById('studio-body-input');
+    const bodyContainer = document.getElementById('studio-body-container');
+    const resOutput = document.getElementById('studio-response-output');
+    const statusBadge = document.getElementById('studio-res-status-badge');
+    const timeBadge = document.getElementById('studio-res-time-badge');
+
+    if (methodSelect && bodyContainer) {
+      methodSelect.addEventListener('change', () => {
+        const val = methodSelect.value;
+        if (val === 'POST' || val === 'PUT' || val === 'PATCH') {
+          bodyContainer.style.display = 'block';
+          if (!bodyInput.value) {
+            bodyInput.value = JSON.stringify({ title: 'Sample Title', body: 'Sample Content', userId: 1 }, null, 2);
+          }
+        } else {
+          bodyContainer.style.display = 'none';
+        }
+      });
+    }
+
+    if (sendBtn) {
+      sendBtn.addEventListener('click', async () => {
+        const method = methodSelect.value;
+        let url = urlInput.value.trim();
+        if (!url.startsWith('http') && !url.startsWith('/')) {
+          url = '/' + url;
+        }
+
+        const delay = delaySelect.value;
+        const status = statusSelect.value;
+
+        // Append query params if selected
+        if (delay !== '0' && !url.includes('_delay=')) {
+          url += (url.includes('?') ? '&' : '?') + `_delay=${delay}`;
+        }
+        if (status !== '200' && !url.includes('_status=')) {
+          url += (url.includes('?') ? '&' : '?') + `_status=${status}`;
+        }
+
+        statusBadge.textContent = 'Status: Sending...';
+        statusBadge.style.color = '#eab308';
+        resOutput.innerHTML = '<code>Executing request...</code>';
+
+        const startTime = Date.now();
+        try {
+          const fetchOpts = {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          };
+          if ((method === 'POST' || method === 'PUT' || method === 'PATCH') && bodyInput.value) {
+            fetchOpts.body = bodyInput.value;
+          }
+
+          const res = await fetch(url, fetchOpts);
+          const duration = Date.now() - startTime;
+          timeBadge.textContent = `${duration} ms`;
+
+          statusBadge.textContent = `Status: ${res.status} ${res.statusText}`;
+          if (res.ok) {
+            statusBadge.style.color = '#22c55e';
+          } else {
+            statusBadge.style.color = '#ef4444';
+          }
+
+          const json = await res.json();
+          resOutput.innerHTML = `<code>${JSON.stringify(json, null, 2)}</code>`;
+        } catch (err) {
+          const duration = Date.now() - startTime;
+          timeBadge.textContent = `${duration} ms`;
+          statusBadge.textContent = 'Status: Error';
+          statusBadge.style.color = '#ef4444';
+          resOutput.innerHTML = `<code>Error: ${err.message}</code>`;
+        }
+      });
+    }
+  });
+</script>
