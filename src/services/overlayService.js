@@ -632,20 +632,21 @@ export const importSessionSnapshot = async (identityId, snapshotData, options = 
       });
     }
 
-    // Insert records
-    for (const r of recordsToImport) {
-      await tx.overlayRecords.create({
-        data: {
-          identity_id: identityId,
-          resource: r.resource.toLowerCase(),
-          target_id: r.targetId || r.target_id || null,
-          op: r.op,
-          data: r.data || {},
-          created_at: r.createdAt ? new Date(r.createdAt) : new Date()
-        }
-      });
-    }
-  });
+    // Bulk insert records
+    const dataToInsert = recordsToImport.map(r => ({
+      id: uuidv4(),
+      identity_id: identityId,
+      resource: r.resource.toLowerCase(),
+      target_id: r.targetId || r.target_id || null,
+      op: r.op,
+      data: r.data || {},
+      created_at: r.createdAt ? new Date(r.createdAt) : new Date()
+    }));
+
+    await tx.overlayRecords.createMany({
+      data: dataToInsert
+    });
+  }, { timeout: 20000 });
 
   return {
     message: 'Session sandbox snapshot imported successfully.',

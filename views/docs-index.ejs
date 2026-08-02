@@ -102,6 +102,42 @@
       </p>
     </div>
 
+    <div class="endpoint-card" style="margin: 0; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.03);">
+      <div style="font-weight: 700; font-size: 1.1rem; color: #34d399; margin-bottom: 0.5rem;">
+        💾 Session Sandbox Snapshots
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">
+        Export 1-click JSON snapshot backups (<code>GET /session/export</code>) of your session overlay or restore state anytime (<code>POST /session/import</code>).
+      </p>
+    </div>
+
+    <div class="endpoint-card" style="margin: 0; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.03);">
+      <div style="font-weight: 700; font-size: 1.1rem; color: #fbbf24; margin-bottom: 0.5rem;">
+        🛠️ Dynamic Custom Resources
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">
+        Create arbitrary REST collections on the fly (<code>/custom/:collection</code>) or seed 1-click domain templates (E-Commerce, CRM, SaaS, Healthcare).
+      </p>
+    </div>
+
+    <div class="endpoint-card" style="margin: 0; border-color: rgba(14, 165, 233, 0.4); background: rgba(14, 165, 233, 0.03);">
+      <div style="font-weight: 700; font-size: 1.1rem; color: #38bdf8; margin-bottom: 0.5rem;">
+        🖼️ Dynamic SVG Vector Avatars
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">
+        Generate vector SVG user avatars (<code>/public/avatars/:seed.svg</code>) and landscape thumbnails with mesh gradients and 24h caching.
+      </p>
+    </div>
+
+    <div class="endpoint-card" style="margin: 0; border-color: rgba(236, 72, 153, 0.4); background: rgba(236, 72, 153, 0.03);">
+      <div style="font-weight: 700; font-size: 1.1rem; color: #f472b6; margin-bottom: 0.5rem;">
+        🔐 Simulated JWT Authentication
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">
+        Test real auth flows with <code>POST /auth/login</code>, <code>POST /auth/register</code>, <code>POST /auth/refresh</code>, and Bearer token profiles (<code>/auth/me</code>).
+      </p>
+    </div>
+
     <div class="endpoint-card" style="margin: 0; cursor: pointer; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.03);" id="overview-explainer-trigger-card" onclick="document.getElementById('open-explainer-modal-btn') && document.getElementById('open-explainer-modal-btn').click()">
       <div style="font-weight: 700; font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 0.5rem;">
         💡 How Sandboxing Works
@@ -191,6 +227,30 @@
             <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ 100% Free & Open</td>
             <td style="padding: 0.7rem 0.6rem; color: #22c55e;">✅ Free</td>
             <td style="padding: 0.7rem 0.6rem; color: #22c55e;">✅ Free</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Session Snapshot Export & Import</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ 1-Click JSON Snapshot (`/session/export`)</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ None</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ None</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Dynamic Custom Resource Collections</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ `/custom/:collection` & 1-click domain templates</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Fixed schemas only</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Fixed schemas only</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Dynamic Vector SVG Avatars</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ Built-in vector SVG helper (`/public/avatars`)</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Static external URLs</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Static image links</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+            <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">Simulated JWT Authentication Suite</td>
+            <td style="padding: 0.7rem 0.6rem; color: #22c55e; font-weight: 700;">✅ `/auth/login`, `/auth/register`, `/auth/me`</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--delete-badge);">❌ Unsupported</td>
+            <td style="padding: 0.7rem 0.6rem; color: var(--post-badge);">⚠️ Basic mock login</td>
           </tr>
           <tr style="color: var(--text-secondary);">
             <td style="padding: 0.7rem 0.6rem; font-weight: 600; color: var(--text-primary);">System Health Endpoint</td>
@@ -366,6 +426,45 @@ fetch('http://localhost:3000/users?page=1&limit=10', {
         </summary>
         <div class="faq-answer">
           Yes! Playground API features a full-featured <strong>GraphQL Sandbox Gateway</strong> at <code>POST /graphql</code> powered by the exact same stateful per-session sandbox engine. You can query baseline data, fetch nested relational fields (e.g., <code>user { posts { comments } }</code>), execute mutations (<code>createPost</code>, <code>deleteUser</code>), and test Apollo/Relay clients. An interactive <strong>GraphiQL IDE</strong> is also available at <code>GET /graphql</code> or via the <a href="/docs/graphql">GraphQL Docs</a> page.
+        </div>
+      </details>
+      <!-- Item 10: Session Sandbox Snapshots -->
+      <details class="faq-item">
+        <summary>
+          <span>How do I export, backup, or restore my session sandbox data?</span>
+        </summary>
+        <div class="faq-answer">
+          You can export your complete session sandbox overlay (creates, updates, deletes) as a downloadable JSON snapshot file anytime using <code>GET /session/export</code> or the <strong>"📥 Export"</strong> button in the sidebar. To restore a snapshot back into your session or share mock datasets with teammates, send a <code>POST /session/import</code> request or click <strong>"📤 Import"</strong> in the docs sidebar.
+        </div>
+      </details>
+
+      <!-- Item 11: Dynamic Custom Resources -->
+      <details class="faq-item">
+        <summary>
+          <span>Can I create dynamic custom resource collections like products or orders?</span>
+        </summary>
+        <div class="faq-answer">
+          Yes! Playground API allows you to create arbitrary custom REST collections on the fly under <code>/custom/:collection</code> without any physical database schema changes. Send a <code>POST /custom/products</code> request with any JSON body, or use <code>POST /custom/seed?template=ecommerce</code> to populate pre-built domain templates (E-Commerce, CRM, SaaS, Healthcare) in 1 click.
+        </div>
+      </details>
+
+      <!-- Item 12: Dynamic Vector SVG Avatars -->
+      <details class="faq-item">
+        <summary>
+          <span>How do built-in dynamic SVG avatars and thumbnails work?</span>
+        </summary>
+        <div class="faq-answer">
+          Every user record automatically receives a dynamic vector avatar URL (<code>/public/avatars/:seed.svg</code>) and post records receive a landscape thumbnail URL (<code>/public/thumbnails/:seed.svg</code>). They generate lightweight vector SVGs on-the-fly with 12 curated mesh gradient palettes, initials extraction, custom dimension parameters (<code>?width=600&amp;height=400</code>), and 24-hour browser HTTP caching headers.
+        </div>
+      </details>
+
+      <!-- Item 13: Simulated JWT Auth -->
+      <details class="faq-item">
+        <summary>
+          <span>How does fake JWT authentication simulation work?</span>
+        </summary>
+        <div class="faq-answer">
+          Test real frontend login, registration, and protected route logic using <code>POST /auth/login</code>, <code>POST /auth/register</code>, and <code>POST /auth/refresh</code>. The server returns signed HMAC JWT access and refresh tokens linked to your session sandbox identity. Pass the token as <code>Authorization: Bearer &lt;token&gt;</code> to query or update your authenticated profile at <code>/auth/me</code>.
         </div>
       </details>
     </div>
