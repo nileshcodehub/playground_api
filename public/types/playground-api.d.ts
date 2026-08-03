@@ -27,6 +27,7 @@ export interface User {
   name: string;
   username: string;
   email: string;
+  avatar?: string;
   phone?: string;
   website?: string;
   address?: Address;
@@ -40,6 +41,7 @@ export interface Post {
   user_id?: number | string;
   title: string;
   body: string;
+  thumbnail?: string;
   _sandbox?: 'created' | 'updated';
 }
 
@@ -110,3 +112,84 @@ export type UpdateUserInput = Partial<CreateUserInput>;
 export type UpdatePostInput = Partial<CreatePostInput>;
 export type UpdateCommentInput = Partial<CreateCommentInput>;
 export type UpdateTodoInput = Partial<CreateTodoInput>;
+
+// Auth Simulation Types
+export interface AuthLoginInput {
+  username?: string;
+  email?: string;
+  password?: string;
+}
+
+export interface AuthRegisterInput {
+  name: string;
+  username: string;
+  email: string;
+  password?: string;
+  company?: Company;
+  address?: Address;
+  phone?: string;
+  website?: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: 'Bearer';
+  expires_in: number;
+  user: User;
+}
+
+export interface RefreshTokenResponse {
+  access_token: string;
+  token_type: 'Bearer';
+  expires_in: number;
+}
+
+export interface SnapshotRecord {
+  id?: string;
+  resource: string;
+  op: 'create' | 'update' | 'delete';
+  targetId?: number | string | null;
+  data?: Record<string, any>;
+  createdAt?: string;
+}
+
+export interface SnapshotPayload {
+  version: string;
+  exportedAt: string;
+  identityId: string;
+  targetResource: string;
+  stats: {
+    totalRecords: number;
+    creates: number;
+    updates: number;
+    deletes: number;
+  };
+  records: SnapshotRecord[];
+}
+
+export interface ImportResponse {
+  message: string;
+  importedRecords: number;
+  strategy: 'replace' | 'merge';
+  affectedResources: string[];
+}
+
+export interface CustomCollectionSummary {
+  name: string;
+  endpoint: string;
+  count: number;
+  lastUpdated: string;
+}
+
+export interface CustomCollectionsDirectoryResponse {
+  totalCollections: number;
+  collections: CustomCollectionSummary[];
+}
+
+export interface CustomSeedResult {
+  message: string;
+  template: 'ecommerce' | 'crm' | 'saas' | 'healthcare';
+  collections: string[];
+  totalSeeded: number;
+}

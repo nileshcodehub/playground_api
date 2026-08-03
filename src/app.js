@@ -12,11 +12,14 @@ import { simulationMiddleware } from './middleware/simulation.js';
 import { errorHandler, AppError } from './middleware/errorHandler.js';
 import { makeResourceRouter } from './routes/resourceRoutes.js';
 import { makeResourceController } from './controllers/resourceController.js';
+import avatarRoutes from './routes/avatarRoutes.js';
 import docsRouter from './routes/docsRoutes.js';
 import cronRouter from './routes/cronRoutes.js';
 import downloadRouter from './routes/downloadRoutes.js';
 import sessionRouter from './routes/sessionRoutes.js';
 import graphqlRouter from './routes/graphqlRoutes.js';
+import authRouter from './routes/authRoutes.js';
+import customRouter from './routes/customRoutes.js';
 import { getHealth } from './controllers/healthController.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,7 +54,8 @@ if (!config.isProduction) {
   app.use(morgan('dev'));
 }
 
-// Static file serving (bypasses DB identity check for speed)
+// Static file serving & Dynamic SVG Avatars / Thumbnails (bypasses DB identity check for speed)
+app.use('/public', avatarRoutes);
 app.use('/public', express.static(path.join(rootDir, 'public')));
 
 // Identity Cookie Middleware, Global Rate Limiter & Network Simulation
@@ -62,8 +66,10 @@ app.use(simulationMiddleware);
 // Health Check & System Metrics Endpoint
 app.get('/health', getHealth);
 
-// Session Sandbox Management, Cron & Collection Downloads Endpoints
+// Session Sandbox Management, Cron, Downloads & Auth Simulation Endpoints
 app.use('/session', sessionRouter);
+app.use('/auth', authRouter);
+app.use('/custom', customRouter);
 app.use('/api/cron', cronRouter);
 app.use('/downloads', downloadRouter);
 app.use('/graphql', graphqlRouter);

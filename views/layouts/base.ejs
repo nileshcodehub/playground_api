@@ -155,6 +155,12 @@
             </svg>
             <span>Reset</span>
           </button>
+          <a href="/session/export" id="export-sandbox-btn" download class="session-action-btn" style="text-decoration: none; justify-content: center;" title="Export session sandbox snapshot as JSON file">
+            <span>📥 Export</span>
+          </a>
+          <button type="button" id="open-import-modal-btn" class="session-action-btn" style="justify-content: center;" title="Import session sandbox snapshot from JSON file">
+            <span>📤 Import</span>
+          </button>
         </div>
         <div class="session-note">
           Mutations are session-isolated & HMAC signed. Global seed data remains pristine.
@@ -211,6 +217,26 @@
           <span>todos</span>
           <span class="nav-count">REST</span>
         </a>
+        <a href="/docs/auth"
+          class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'auth') ? 'active' : '' %>">
+          <span>auth</span>
+          <span class="nav-count" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">JWT</span>
+        </a>
+        <a href="/docs/media"
+          class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'media') ? 'active' : '' %>">
+          <span>media (avatars)</span>
+          <span class="nav-count" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">SVG</span>
+        </a>
+        <a href="/docs/session"
+          class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'session') ? 'active' : '' %>">
+          <span>session (snapshot)</span>
+          <span class="nav-count" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">JSON</span>
+        </a>
+        <a href="/docs/custom"
+          class="nav-item <%= (typeof currentNav !== 'undefined' && currentNav === 'custom') ? 'active' : '' %>">
+          <span>custom (dynamic)</span>
+          <span class="nav-count" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">REST</span>
+        </a>
       </nav>
 
       <!-- Export API Collections Card (Below Documentation Section) -->
@@ -232,6 +258,14 @@
               %>>💬 Comments Collection</option>
             <option value="todos" <%=(typeof currentNav !=='undefined' && currentNav==='todos' ) ? 'selected' : '' %>>✅
               Todos Collection</option>
+            <option value="auth" <%=(typeof currentNav !=='undefined' && currentNav==='auth' ) ? 'selected' : '' %>>🔐
+              Auth Collection</option>
+            <option value="media" <%=(typeof currentNav !=='undefined' && currentNav==='media' ) ? 'selected' : '' %>>🖼️
+              Media & Avatars Collection</option>
+            <option value="session" <%=(typeof currentNav !=='undefined' && currentNav==='session' ) ? 'selected' : '' %>>💾
+              Session Snapshot Collection</option>
+            <option value="custom" <%=(typeof currentNav !=='undefined' && currentNav==='custom' ) ? 'selected' : '' %>>🛠️
+              Custom Dynamic Collections</option>
           </select>
         </div>
         <div class="export-collections-grid"
@@ -313,6 +347,7 @@
             <li><a href="/docs/posts">/posts</a></li>
             <li><a href="/docs/comments">/comments</a></li>
             <li><a href="/docs/todos">/todos</a></li>
+            <li><a href="/docs/auth">/auth</a></li>
           </ul>
         </div>
 
@@ -381,6 +416,46 @@
           Done
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Import Snapshot Modal -->
+  <div id="import-snapshot-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; max-width: 500px; width: 90%; padding: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">📤 Import Session Snapshot</h3>
+        <button type="button" id="close-import-modal-btn" style="background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer;">✕</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+        Upload a previously saved <code>playground_sandbox_snapshot.json</code> file to restore your session sandbox records.
+      </p>
+
+      <form id="import-snapshot-form">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">Import Strategy:</label>
+          <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-primary);">
+            <label style="cursor: pointer;"><input type="radio" name="importStrategy" value="replace" checked /> Replace (Purge existing target overlay)</label>
+            <label style="cursor: pointer;"><input type="radio" name="importStrategy" value="merge" /> Merge (Append records)</label>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">Snapshot JSON File:</label>
+          <input type="file" id="snapshot-file-input" accept=".json,application/json" class="form-control" style="width: 100%; font-size: 0.82rem;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">Or Paste Raw JSON Snapshot Payload:</label>
+          <textarea id="snapshot-json-input" class="form-control" rows="4" placeholder='{"version": "1.0", "records": [...]}' style="width: 100%; font-family: var(--font-mono); font-size: 0.8rem; background: var(--bg-sidebar); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem;"></textarea>
+        </div>
+
+        <div id="import-status-msg" style="font-size: 0.82rem; margin-bottom: 1rem; display: none;"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+          <button type="button" id="cancel-import-modal-btn" class="session-action-btn">Cancel</button>
+          <button type="submit" id="submit-import-snapshot-btn" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; color: #fff; font-weight: 700; padding: 0.4rem 1rem;">Import Snapshot</button>
+        </div>
+      </form>
     </div>
   </div>
 

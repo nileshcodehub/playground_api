@@ -1,6 +1,6 @@
 import { getEndpointsForResource } from '../config/endpointsCatalog.js';
 
-const RESOURCES = ['users', 'posts', 'comments', 'todos'];
+const RESOURCES = ['users', 'posts', 'comments', 'todos', 'auth', 'media', 'session', 'custom'];
 
 /**
  * Helper to collect catalog endpoints across all or specific resources

@@ -72,7 +72,34 @@ export const getVirtualList = async (identityId, resource) => {
   return { virtualList: [...createdIds, ...globalIds], overlay };
 };
 
+export const enrichRecordWithMedia = (resource, record) => {
+  if (!record || typeof record !== 'object') return record;
+
+  if (resource === 'users') {
+    const seed = record.username || record.name || record.id || 'user';
+    return {
+      ...record,
+      avatar: record.avatar || `/public/avatars/${encodeURIComponent(seed)}.svg`
+    };
+  }
+
+  if (resource === 'posts') {
+    const seed = `post-${record.id}`;
+    return {
+      ...record,
+      thumbnail: record.thumbnail || `/public/thumbnails/${encodeURIComponent(seed)}.svg`
+    };
+  }
+
+  return record;
+};
+
 export const getAllMergedRecords = async (identityId, resource) => {
+  if (resource.startsWith('custom_')) {
+    const overlay = await loadOverlay(identityId, resource);
+    return overlay.created.map(record => enrichRecordWithMedia(resource, record));
+  }
+
   const modelName = GLOBAL_MODELS[resource];
   if (!modelName) {
     throw new AppError(`Unknown resource: ${resource}`, 400);
@@ -100,7 +127,8 @@ export const getAllMergedRecords = async (identityId, resource) => {
     });
 
   // Created items top (newest first), then global items preserving DB order
-  return [...created, ...activeGlobalRecords];
+  const allMerged = [...created, ...activeGlobalRecords];
+  return allMerged.map(record => enrichRecordWithMedia(resource, record));
 };
 
 export const getPaginatedResource = async (identityId, resource, { page = 1, limit = 10, filters = {}, _sort, _order = 'asc', q } = {}) => {
@@ -197,9 +225,10 @@ export const getPaginatedResource = async (identityId, resource, { page = 1, lim
 export const getSingleResource = async (identityId, resource, publicId) => {
   const { deletedIds, updatesById, created } = await loadOverlay(identityId, resource);
 
-  if (typeof publicId === 'string' && publicId.startsWith('local-')) {
-    const found = created.find(item => item.id === publicId);
-    return found || null;
+  if (resource.startsWith('custom_') || (typeof publicId === 'string' && publicId.startsWith('local-'))) {
+    const target = String(publicId).startsWith('local-') ? publicId : `local-${publicId}`;
+    const found = created.find(item => item.id === publicId || item.id === target);
+    return found ? enrichRecordWithMedia(resource, found) : null;
   }
 
   const intId = parseInt(publicId, 10);
@@ -217,14 +246,15 @@ export const getSingleResource = async (identityId, resource, publicId) => {
 
   if (updatesById.has(intId)) {
     const patch = updatesById.get(intId);
-    return {
+    const updated = {
       ...baseRecord,
       ...(typeof patch === 'object' && patch !== null ? patch : {}),
       _sandbox: 'updated'
     };
+    return enrichRecordWithMedia(resource, updated);
   }
 
-  return baseRecord;
+  return enrichRecordWithMedia(resource, baseRecord);
 };
 
 export const createOverlayRecord = async (identityId, resource, data) => {
@@ -245,19 +275,25 @@ export const createOverlayRecord = async (identityId, resource, data) => {
   }
 
   const newUuid = uuidv4();
+  const now = new Date().toISOString();
+  const rawData = typeof data === 'object' && data !== null ? data : {};
+  const enrichedData = resource.startsWith('custom_')
+    ? { id: `local-${newUuid}`, createdAt: now, updatedAt: now, ...rawData }
+    : rawData;
+
   const createdRecord = await prisma.overlayRecords.create({
     data: {
       id: newUuid,
       identity_id: identityId,
       resource: resource,
       op: 'create',
-      data: data || {}
+      data: enrichedData
     }
   });
 
   return {
     id: `local-${createdRecord.id}`,
-    ...(typeof data === 'object' && data !== null ? data : {}),
+    ...enrichedData,
     _sandbox: 'created'
   };
 };
@@ -405,6 +441,16 @@ export const resetSessionOverlay = async (identityId) => {
   return { count };
 };
 
+export const purgeSessionOverlay = async (identityId) => {
+  if (!identityId) {
+    throw new AppError('Identity session required to purge overlay', 401);
+  }
+  const result = await prisma.overlayRecords.deleteMany({
+    where: { identity_id: identityId }
+  });
+  return { count: result.count };
+};
+
 export const cleanupInactiveIdentities = async (daysThreshold = 10) => {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - daysThreshold);
@@ -490,6 +536,207 @@ export const getSessionStats = async (identityId) => {
       totalRecords: records.length,
       byResource
     }
+  };
+};
+
+export const exportSessionSnapshot = async (identityId, targetResource = 'all') => {
+  if (!identityId) {
+    throw new AppError('Identity session required for exporting snapshot', 401);
+  }
+
+  const whereClause = { identity_id: identityId };
+  if (targetResource && targetResource !== 'all') {
+    whereClause.resource = targetResource.toLowerCase();
+  }
+
+  const records = await prisma.overlayRecords.findMany({
+    where: whereClause,
+    orderBy: { created_at: 'asc' }
+  });
+
+  const formattedRecords = records.map(r => ({
+    id: r.id,
+    resource: r.resource,
+    op: r.op,
+    targetId: r.target_id,
+    data: r.data,
+    createdAt: r.created_at
+  }));
+
+  const stats = {
+    totalRecords: records.length,
+    creates: records.filter(r => r.op === 'create').length,
+    updates: records.filter(r => r.op === 'update').length,
+    deletes: records.filter(r => r.op === 'delete').length
+  };
+
+  return {
+    version: '1.0',
+    exportedAt: new Date().toISOString(),
+    identityId,
+    targetResource,
+    stats,
+    records: formattedRecords
+  };
+};
+
+export const importSessionSnapshot = async (identityId, snapshotData, options = {}) => {
+  if (!identityId) {
+    throw new AppError('Identity session required for importing snapshot', 401);
+  }
+
+  if (!snapshotData || typeof snapshotData !== 'object') {
+    throw new AppError('Invalid snapshot payload. Expected JSON object.', 400);
+  }
+
+  const records = Array.isArray(snapshotData.records) ? snapshotData.records : [];
+  if (records.length === 0 && !Array.isArray(snapshotData)) {
+    throw new AppError('Snapshot contains no valid overlay records.', 400);
+  }
+
+  const recordsToImport = Array.isArray(snapshotData) ? snapshotData : records;
+  const targetResource = options.targetResource ? options.targetResource.toLowerCase() : null;
+  const strategy = options.strategy === 'merge' ? 'merge' : 'replace';
+
+  // Resource mismatch check
+  if (targetResource && targetResource !== 'all') {
+    const mismatched = recordsToImport.find(r => r.resource && r.resource.toLowerCase() !== targetResource);
+    if (mismatched) {
+      throw new AppError(`Resource mismatch. Snapshot contains '${mismatched.resource}' records, but target destination is '${targetResource}'.`, 400);
+    }
+  }
+
+  // Schema validation
+  for (let i = 0; i < recordsToImport.length; i++) {
+    const rec = recordsToImport[i];
+    if (!rec.resource || !rec.op) {
+      throw new AppError(`Record #${i + 1} is missing required 'resource' or 'op' fields.`, 400);
+    }
+    if (!['create', 'update', 'delete'].includes(rec.op)) {
+      throw new AppError(`Record #${i + 1} has invalid operation type '${rec.op}'. Expected create, update, or delete.`, 400);
+    }
+  }
+
+  // Determine affected resources
+  const affectedResources = Array.from(new Set(recordsToImport.map(r => r.resource.toLowerCase())));
+
+  // Execute import transaction
+  await prisma.$transaction(async (tx) => {
+    // If strategy is 'replace', purge existing overlay for affected resources
+    if (strategy === 'replace') {
+      await tx.overlayRecords.deleteMany({
+        where: {
+          identity_id: identityId,
+          resource: { in: affectedResources }
+        }
+      });
+    }
+
+    // Bulk insert records
+    const dataToInsert = recordsToImport.map(r => ({
+      id: uuidv4(),
+      identity_id: identityId,
+      resource: r.resource.toLowerCase(),
+      target_id: r.targetId || r.target_id || null,
+      op: r.op,
+      data: r.data || {},
+      created_at: r.createdAt ? new Date(r.createdAt) : new Date()
+    }));
+
+    await tx.overlayRecords.createMany({
+      data: dataToInsert
+    });
+  }, { timeout: 20000 });
+
+  return {
+    message: 'Session sandbox snapshot imported successfully.',
+    importedRecords: recordsToImport.length,
+    strategy,
+    affectedResources
+  };
+};
+
+export const getCustomCollections = async (identityId) => {
+  if (!identityId) return { totalCollections: 0, collections: [] };
+
+  const records = await prisma.overlayRecords.findMany({
+    where: {
+      identity_id: identityId,
+      resource: { startsWith: 'custom_' },
+      op: 'create'
+    },
+    orderBy: { created_at: 'desc' }
+  });
+
+  const collectionsMap = new Map();
+  for (const r of records) {
+    const cleanName = r.resource.replace(/^custom_/, '');
+    if (!collectionsMap.has(cleanName)) {
+      collectionsMap.set(cleanName, {
+        name: cleanName,
+        endpoint: `/custom/${cleanName}`,
+        count: 0,
+        lastUpdated: r.created_at
+      });
+    }
+    collectionsMap.get(cleanName).count += 1;
+  }
+
+  const collections = Array.from(collectionsMap.values());
+  return {
+    totalCollections: collections.length,
+    collections
+  };
+};
+
+const TEMPLATE_PRESETS = {
+  ecommerce: [
+    { resource: 'custom_products', data: { name: 'MacBook Pro M3 16"', price: 2499, category: 'Laptops', stock: 15 } },
+    { resource: 'custom_products', data: { name: 'Sony WH-1000XM5 Headphones', price: 399, category: 'Audio', stock: 30 } },
+    { resource: 'custom_products', data: { name: 'Herman Miller Ergonomic Chair', price: 1250, category: 'Furniture', stock: 8 } },
+    { resource: 'custom_orders', data: { orderNumber: 'ORD-9910', customerName: 'Leanne Graham', total: 2898.00, status: 'Shipped' } },
+    { resource: 'custom_orders', data: { orderNumber: 'ORD-9911', customerName: 'Ervin Howell', total: 399.00, status: 'Processing' } }
+  ],
+  crm: [
+    { resource: 'custom_leads', data: { company: 'Acme Corporation', contactPerson: 'John Smith', dealValue: 50000, stage: 'Qualified' } },
+    { resource: 'custom_leads', data: { company: 'Globex Industries', contactPerson: 'Sarah Jenkins', dealValue: 120000, stage: 'Proposal Sent' } },
+    { resource: 'custom_contacts', data: { name: 'John Smith', email: 'john@acme.corp', phone: '+1-555-0192', title: 'VP of Technology' } },
+    { resource: 'custom_contacts', data: { name: 'Sarah Jenkins', email: 'sjenkins@globex.com', phone: '+1-555-0843', title: 'Procurement Director' } }
+  ],
+  saas: [
+    { resource: 'custom_invoices', data: { invoiceNumber: 'INV-2026-001', clientName: 'Initech LLC', amount: 3500.00, dueDate: '2026-08-15', status: 'Paid' } },
+    { resource: 'custom_invoices', data: { invoiceNumber: 'INV-2026-002', clientName: 'Umbrella Corp', amount: 8900.00, dueDate: '2026-08-30', status: 'Pending' } },
+    { resource: 'custom_subscriptions', data: { planName: 'Enterprise Pro Tier', billingCycle: 'Annual', priceMonthly: 499, seats: 25 } },
+    { resource: 'custom_subscriptions', data: { planName: 'Developer Starter Tier', billingCycle: 'Monthly', priceMonthly: 29, seats: 2 } }
+  ],
+  healthcare: [
+    { resource: 'custom_patients', data: { name: 'Alice Johnson', dob: '1988-04-12', bloodType: 'O+', primaryDoctor: 'Dr. Smith' } },
+    { resource: 'custom_patients', data: { name: 'Bob Miller', dob: '1975-11-23', bloodType: 'A-', primaryDoctor: 'Dr. Taylor' } },
+    { resource: 'custom_appointments', data: { patientName: 'Alice Johnson', doctorName: 'Dr. Smith', date: '2026-08-10T10:00:00Z', department: 'Cardiology' } },
+    { resource: 'custom_appointments', data: { patientName: 'Bob Miller', doctorName: 'Dr. Taylor', date: '2026-08-12T14:30:00Z', department: 'Orthopedics' } }
+  ]
+};
+
+export const seedCustomTemplate = async (identityId, templateName = 'ecommerce') => {
+  if (!identityId) {
+    throw new AppError('Identity required for seeding template', 401);
+  }
+
+  const key = String(templateName).toLowerCase();
+  const presets = TEMPLATE_PRESETS[key] || TEMPLATE_PRESETS.ecommerce;
+
+  const seeded = [];
+  for (const item of presets) {
+    const res = await createOverlayRecord(identityId, item.resource, item.data);
+    seeded.push(res);
+  }
+
+  const uniqueCollections = Array.from(new Set(presets.map(p => p.resource.replace(/^custom_/, ''))));
+  return {
+    message: `Seeded ${seeded.length} records across custom collections: ${uniqueCollections.join(', ')}.`,
+    template: key,
+    collections: uniqueCollections,
+    totalSeeded: seeded.length
   };
 };
 

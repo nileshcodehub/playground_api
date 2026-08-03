@@ -439,5 +439,276 @@ window.ALL_ENDPOINTS_CATALOG = [
     ],
     bodyExample: null,
     responseExample: "204 No Content"
+  },
+  // AUTH
+  {
+    resource: 'auth',
+    method: 'POST',
+    path: '/auth/login',
+    summary: 'Authenticate user with username/email & password to receive signed JWT access and refresh tokens.',
+    params: [
+      { name: 'username', in: 'body', type: 'string', description: 'Username (e.g. Bret or custom registered username).' },
+      { name: 'password', in: 'body', type: 'string', description: 'Password string.' }
+    ],
+    bodyExample: JSON.stringify({ username: "Bret", password: "password123" }, null, 2),
+    responseExample: JSON.stringify({
+      access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      token_type: "Bearer",
+      expires_in: 900,
+      user: {
+        id: 1,
+        name: "Leanne Graham",
+        username: "bret",
+        email: "sincere@april.biz"
+      }
+    }, null, 2)
+  },
+  {
+    resource: 'auth',
+    method: 'POST',
+    path: '/auth/register',
+    summary: 'Register a new session user and immediately receive signed JWT access and refresh tokens.',
+    params: [
+      { name: 'name', in: 'body', type: 'string', description: 'Full name of the user.' },
+      { name: 'username', in: 'body', type: 'string', description: 'Unique username.' },
+      { name: 'email', in: 'body', type: 'string', description: 'User email address.' }
+    ],
+    bodyExample: JSON.stringify({ name: "Alice Smith", username: "alice", email: "alice@example.com", password: "password123" }, null, 2),
+    responseExample: JSON.stringify({
+      access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      token_type: "Bearer",
+      expires_in: 900,
+      user: {
+        id: "local-d4e5f6a7-8901-bcde-f123-456789012345",
+        name: "Alice Smith",
+        username: "alice",
+        email: "alice@example.com",
+        _sandbox: "created"
+      }
+    }, null, 2)
+  },
+  {
+    resource: 'auth',
+    method: 'POST',
+    path: '/auth/refresh',
+    summary: 'Exchange a valid refresh token for a fresh 15-minute JWT access token.',
+    params: [
+      { name: 'refreshToken', in: 'body', type: 'string', description: 'Valid refresh token string.' }
+    ],
+    bodyExample: JSON.stringify({ refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6..." }, null, 2),
+    responseExample: JSON.stringify({
+      access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+      token_type: "Bearer",
+      expires_in: 900
+    }, null, 2)
+  },
+  {
+    resource: 'auth',
+    method: 'GET',
+    path: '/auth/me',
+    summary: 'Retrieve current authenticated user profile using Authorization: Bearer <access_token>.',
+    params: [
+      { name: 'Authorization', in: 'header', type: 'string', description: 'Bearer <access_token>' }
+    ],
+    bodyExample: null,
+    responseExample: JSON.stringify({
+      id: 1,
+      name: "Leanne Graham",
+      username: "bret",
+      email: "sincere@april.biz"
+    }, null, 2)
+  },
+  {
+    resource: 'auth',
+    method: 'PATCH',
+    path: '/auth/me',
+    summary: 'Update current authenticated user profile in the session sandbox using Authorization: Bearer <access_token>.',
+    params: [
+      { name: 'Authorization', in: 'header', type: 'string', description: 'Bearer <access_token>' }
+    ],
+    bodyExample: JSON.stringify({ name: "Bret - Updated Profile" }, null, 2),
+    responseExample: JSON.stringify({
+      id: 1,
+      name: "Bret - Updated Profile",
+      username: "bret",
+      email: "sincere@april.biz",
+      _sandbox: "updated"
+    }, null, 2)
+  },
+  // MEDIA (AVATARS & THUMBNAILS)
+  {
+    resource: 'media',
+    method: 'GET',
+    path: '/public/avatars/:seed.svg',
+    summary: 'Generate deterministic vector SVG avatar for a user seed string or ID with custom size and squircle/circle background.',
+    params: [
+      { name: 'seed', in: 'path', type: 'string', description: 'Seed string (e.g. bret, alice, user-1) for gradient hashing and initials extraction.' },
+      { name: 'size', in: 'query', type: 'integer', description: 'Avatar dimension in pixels (default 128).' },
+      { name: 'rounded', in: 'query', type: 'boolean', description: 'Circular vs squircle rendering (default true).' }
+    ],
+    bodyExample: null,
+    responseExample: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="64" fill="#059669" />
+  <text x="50%" y="54%" font-family="Inter, sans-serif" font-size="54" font-weight="700" fill="#ffffff" text-anchor="middle">BR</text>
+</svg>`
+  },
+  {
+    resource: 'media',
+    method: 'GET',
+    path: '/public/thumbnails/:seed.svg',
+    summary: 'Generate 600x400 landscape vector SVG placeholder image with mesh gradient background, custom text, and dimension badge.',
+    params: [
+      { name: 'seed', in: 'path', type: 'string', description: 'Seed string (e.g. post-1, react-tutorial) for background color hashing.' },
+      { name: 'width', in: 'query', type: 'integer', description: 'Thumbnail width in pixels (default 600).' },
+      { name: 'height', in: 'query', type: 'integer', description: 'Thumbnail height in pixels (default 400).' },
+      { name: 'text', in: 'query', type: 'string', description: 'Custom label text override.' }
+    ],
+    bodyExample: null,
+    responseExample: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <rect width="600" height="400" fill="#4f46e5" />
+  <text x="50%" y="46%" font-family="Inter, sans-serif" font-size="33" font-weight="700" fill="#ffffff" text-anchor="middle">Post #1</text>
+</svg>`
+  },
+  // SESSION (SNAPSHOT EXPORT & IMPORT)
+  {
+    resource: 'session',
+    method: 'GET',
+    path: '/session/export',
+    summary: 'Serializes all session sandbox overlay records (creates, updates, deletes) into a downloadable JSON snapshot file for backups or team sharing.',
+    params: [
+      { name: 'resource', in: 'query', type: 'string', description: 'Resource filter ("all", "users", "posts", "comments", "todos"). Default: "all".' }
+    ],
+    bodyExample: null,
+    responseExample: JSON.stringify({
+      version: "1.0",
+      exportedAt: "2026-08-02T23:00:00.000Z",
+      identityId: "550e8400-e29b-41d4-a716-446655440000",
+      targetResource: "all",
+      stats: { totalRecords: 2, creates: 1, updates: 1, deletes: 0 },
+      records: [
+        { resource: "users", op: "create", targetId: null, data: { name: "Custom User" }, createdAt: "2026-08-02T22:00:00.000Z" }
+      ]
+    }, null, 2)
+  },
+  {
+    resource: 'session',
+    method: 'POST',
+    path: '/session/import',
+    summary: 'Restores a previously exported JSON snapshot file or payload into your session sandbox overlay with strategy replacement or merge.',
+    params: [
+      { name: 'strategy', in: 'query', type: 'string', description: 'Import strategy ("replace" or "merge"). Default: "replace".' },
+      { name: 'resource', in: 'query', type: 'string', description: 'Target resource restriction. Default: auto-detect.' }
+    ],
+    bodyExample: JSON.stringify({
+      version: "1.0",
+      records: [
+        { resource: "users", op: "create", data: { name: "Restored User", email: "restored@sandbox.dev" } }
+      ]
+    }, null, 2),
+    responseExample: JSON.stringify({
+      message: "Session sandbox snapshot imported successfully.",
+      importedRecords: 1,
+      strategy: "replace",
+      affectedResources: ["users"]
+    }, null, 2)
+  },
+  {
+    resource: 'session',
+    method: 'DELETE',
+    path: '/session/reset',
+    summary: 'Purges all created, updated, and deleted overlay mutations for your session identity, resetting your view to clean baseline global data.',
+    params: [],
+    bodyExample: null,
+    responseExample: JSON.stringify({
+      message: "Session sandbox overlay purged successfully.",
+      purgedRecords: 3
+    }, null, 2)
+  },
+  // CUSTOM (DYNAMIC RESOURCES ENGINE)
+  {
+    resource: 'custom',
+    method: 'GET',
+    path: '/custom',
+    summary: 'Returns a summary of all active dynamic custom resource collections in your session sandbox with record counts.',
+    params: [],
+    bodyExample: null,
+    responseExample: JSON.stringify({
+      totalCollections: 2,
+      collections: [
+        { name: "products", endpoint: "/custom/products", count: 3, lastUpdated: "2026-08-02T23:30:00.000Z" },
+        { name: "orders", endpoint: "/custom/orders", count: 2, lastUpdated: "2026-08-02T23:30:00.000Z" }
+      ]
+    }, null, 2)
+  },
+  {
+    resource: 'custom',
+    method: 'POST',
+    path: '/custom/seed',
+    summary: 'Instantly populates pre-built domain collections into your session sandbox with one request.',
+    params: [
+      { name: 'template', in: 'query', type: 'string', description: 'Domain template ("ecommerce", "crm", "saas", "healthcare"). Default: "ecommerce".' }
+    ],
+    bodyExample: JSON.stringify({ template: "ecommerce" }, null, 2),
+    responseExample: JSON.stringify({
+      message: "Seeded 5 records across custom collections: products, orders.",
+      template: "ecommerce",
+      collections: ["products", "orders"],
+      totalSeeded: 5
+    }, null, 2)
+  },
+  {
+    resource: 'custom',
+    method: 'GET',
+    path: '/custom/:collection',
+    summary: 'Retrieves a paginated list of items from any dynamic custom collection. Supports page, limit, full-text search (?q=), and sorting (?_sort=).',
+    params: [
+      { name: 'collection', in: 'path', type: 'string', description: 'Custom collection name (e.g. products, orders, notes, leads).' },
+      { name: 'page', in: 'query', type: 'integer', description: 'Page number (default 1).' },
+      { name: 'limit', in: 'query', type: 'integer', description: 'Records per page (default 10).' },
+      { name: 'q', in: 'query', type: 'string', description: 'Case-insensitive full-text search term.' },
+      { name: '_sort', in: 'query', type: 'string', description: 'Field name to sort by.' }
+    ],
+    bodyExample: null,
+    responseExample: JSON.stringify({
+      data: [
+        { id: "local-a1b2c3d4", name: 'MacBook Pro M3', price: 2499, category: 'Laptops', createdAt: "2026-08-02T23:30:00.000Z", _sandbox: "created" }
+      ],
+      pagination: { page: 1, limit: 10, total: 1, totalPages: 1, hasNextPage: false, hasPrevPage: false }
+    }, null, 2)
+  },
+  {
+    resource: 'custom',
+    method: 'POST',
+    path: '/custom/:collection',
+    summary: 'Creates a new custom record in any arbitrary collection with automatic ID, createdAt, and updatedAt metadata attachment.',
+    params: [
+      { name: 'collection', in: 'path', type: 'string', description: 'Custom collection name (e.g. products, orders).' }
+    ],
+    bodyExample: JSON.stringify({ name: "Custom Product Item", price: 99.99, inStock: true }, null, 2),
+    responseExample: JSON.stringify({
+      id: "local-f9e8d7c6-5432-10ab",
+      name: "Custom Product Item",
+      price: 99.99,
+      inStock: true,
+      createdAt: "2026-08-02T23:30:00.000Z",
+      updatedAt: "2026-08-02T23:30:00.000Z",
+      _sandbox: "created"
+    }, null, 2)
+  },
+  {
+    resource: 'custom',
+    method: 'DELETE',
+    path: '/custom/:collection/:id',
+    summary: 'Removes a custom record from your session sandbox.',
+    params: [
+      { name: 'collection', in: 'path', type: 'string', description: 'Custom collection name.' },
+      { name: 'id', in: 'path', type: 'string', description: 'Record ID (e.g. local-uuid).' }
+    ],
+    bodyExample: null,
+    responseExample: JSON.stringify({
+      message: "Record 'local-f9e8d7c6' removed from custom collection 'products'"
+    }, null, 2)
   }
 ];

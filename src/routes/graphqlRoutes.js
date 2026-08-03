@@ -82,7 +82,8 @@ async function handleGraphQLRequest(req, res, body) {
       variableValues: variables,
       operationName,
       contextValue: {
-        identityId: req.identityId
+        identityId: req.identityId,
+        req
       }
     });
 

@@ -10,6 +10,7 @@ import {
 } from 'graphql';
 
 import * as overlayService from '../services/overlayService.js';
+import { signAccessToken, signRefreshToken, verifyToken } from '../utils/jwtUtils.js';
 
 // Address & Geo Types for User
 const GeoType = new GraphQLObjectType({
@@ -46,6 +47,17 @@ let PostType;
 let CommentType;
 let TodoType;
 
+const AuthPayloadType = new GraphQLObjectType({
+  name: 'AuthPayload',
+  fields: () => ({
+    access_token: { type: GraphQLString },
+    refresh_token: { type: GraphQLString },
+    token_type: { type: GraphQLString },
+    expires_in: { type: GraphQLInt },
+    user: { type: UserType }
+  })
+});
+
 UserType = new GraphQLObjectType({
   name: 'User',
   fields: () => ({
@@ -53,6 +65,7 @@ UserType = new GraphQLObjectType({
     name: { type: GraphQLString },
     username: { type: GraphQLString },
     email: { type: GraphQLString },
+    avatar: { type: GraphQLString },
     phone: { type: GraphQLString },
     website: { type: GraphQLString },
     address: { type: AddressType },
@@ -94,6 +107,7 @@ PostType = new GraphQLObjectType({
     },
     title: { type: GraphQLString },
     body: { type: GraphQLString },
+    thumbnail: { type: GraphQLString },
     user: {
       type: UserType,
       resolve: async (post, _args, context) => {
@@ -191,6 +205,19 @@ const RootQuery = new GraphQLObjectType({
         return await overlayService.getSingleResource(context.identityId, 'users', id);
       }
     },
+    me: {
+      type: UserType,
+      resolve: async (_, _args, context) => {
+        let userId = context.req?.userJwt?.userId;
+        if (!userId && context.req?.headers?.authorization?.startsWith('Bearer ')) {
+          const token = context.req.headers.authorization.split(' ')[1];
+          const decoded = verifyToken(token);
+          if (decoded) userId = decoded.userId;
+        }
+        if (!userId) return null;
+        return await overlayService.getSingleResource(context.identityId, 'users', userId);
+      }
+    },
 
     posts: {
       type: new GraphQLList(PostType),
@@ -285,6 +312,56 @@ const RootQuery = new GraphQLObjectType({
 const RootMutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
+    login: {
+      type: AuthPayloadType,
+      args: {
+        username: { type: GraphQLString },
+        email: { type: GraphQLString },
+        password: { type: GraphQLString }
+      },
+      resolve: async (_, { username, email }, context) => {
+        const users = await overlayService.getAllMergedRecords(context.identityId, 'users');
+        let user = null;
+        if (username) user = users.find(u => u.username && u.username.toLowerCase() === String(username).toLowerCase());
+        if (!user && email) user = users.find(u => u.email && u.email.toLowerCase() === String(email).toLowerCase());
+        if (!user) user = users.find(u => String(u.id) === '1') || users[0];
+        const payload = { userId: user.id, identityId: context.identityId, username: user.username || 'user' };
+        return {
+          access_token: signAccessToken(payload, '15m'),
+          refresh_token: signRefreshToken(payload, '7d'),
+          token_type: 'Bearer',
+          expires_in: 900,
+          user
+        };
+      }
+    },
+    register: {
+      type: AuthPayloadType,
+      args: {
+        name: { type: new GraphQLNonNull(GraphQLString) },
+        username: { type: new GraphQLNonNull(GraphQLString) },
+        email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: GraphQLString }
+      },
+      resolve: async (_, { name, username, email }, context) => {
+        const userData = {
+          name,
+          username,
+          email,
+          company: { name: 'Playground Sandbox Inc.', catchPhrase: 'Developer First API' },
+          address: { street: '123 Tech Lane', city: 'Dev City', zipcode: '90210' }
+        };
+        const newUser = await overlayService.createOverlayRecord(context.identityId, 'users', userData);
+        const payload = { userId: newUser.id, identityId: context.identityId, username: newUser.username };
+        return {
+          access_token: signAccessToken(payload, '15m'),
+          refresh_token: signRefreshToken(payload, '7d'),
+          token_type: 'Bearer',
+          expires_in: 900,
+          user: newUser
+        };
+      }
+    },
     createUser: {
       type: UserType,
       args: {

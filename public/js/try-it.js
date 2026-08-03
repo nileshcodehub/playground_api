@@ -1120,4 +1120,133 @@ document.addEventListener('DOMContentLoaded', () => {
       closeExplainer();
     }
   });
+
+  // Import Snapshot Modal Wiring
+  const openImportModalBtn = document.getElementById('open-import-modal-btn');
+  const closeImportModalBtn = document.getElementById('close-import-modal-btn');
+  const cancelImportModalBtn = document.getElementById('cancel-import-modal-btn');
+  const importModal = document.getElementById('import-snapshot-modal');
+  const importForm = document.getElementById('import-snapshot-form');
+  const importStatusMsg = document.getElementById('import-status-msg');
+
+  if (openImportModalBtn && importModal) {
+    const openModal = () => {
+      importModal.style.display = 'flex';
+      if (importStatusMsg) importStatusMsg.style.display = 'none';
+    };
+    const closeModal = () => {
+      importModal.style.display = 'none';
+    };
+
+    openImportModalBtn.addEventListener('click', openModal);
+    if (closeImportModalBtn) closeImportModalBtn.addEventListener('click', closeModal);
+    if (cancelImportModalBtn) cancelImportModalBtn.addEventListener('click', closeModal);
+
+    if (importForm) {
+      importForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('snapshot-file-input');
+        const jsonTextarea = document.getElementById('snapshot-json-input');
+        const strategyInput = document.querySelector('input[name="importStrategy"]:checked');
+        const strategy = strategyInput ? strategyInput.value : 'replace';
+
+        let payload = null;
+
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+          try {
+            const text = await fileInput.files[0].text();
+            payload = JSON.parse(text);
+          } catch (err) {
+            if (importStatusMsg) {
+              importStatusMsg.style.display = 'block';
+              importStatusMsg.style.color = '#ef4444';
+              importStatusMsg.textContent = '❌ Failed to parse selected JSON file.';
+            }
+            return;
+          }
+        } else if (jsonTextarea && jsonTextarea.value.trim()) {
+          try {
+            payload = JSON.parse(jsonTextarea.value.trim());
+          } catch (err) {
+            if (importStatusMsg) {
+              importStatusMsg.style.display = 'block';
+              importStatusMsg.style.color = '#ef4444';
+              importStatusMsg.textContent = '❌ Invalid JSON text payload.';
+            }
+            return;
+          }
+        }
+
+        if (!payload) {
+          if (importStatusMsg) {
+            importStatusMsg.style.display = 'block';
+            importStatusMsg.style.color = '#f59e0b';
+            importStatusMsg.textContent = '⚠️ Please select a JSON snapshot file or paste JSON payload.';
+          }
+          return;
+        }
+
+        try {
+          if (importStatusMsg) {
+            importStatusMsg.style.display = 'block';
+            importStatusMsg.style.color = '#38bdf8';
+            importStatusMsg.textContent = '⏳ Importing snapshot...';
+          }
+
+          const res = await fetch(`/session/import?strategy=${strategy}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await res.json();
+          if (res.ok) {
+            importStatusMsg.style.color = '#10b981';
+            importStatusMsg.textContent = `✅ ${result.message} (${result.importedRecords} records restored). Refreshing page...`;
+            setTimeout(() => {
+              window.location.reload();
+            }, 1200);
+          } else {
+            importStatusMsg.style.color = '#ef4444';
+            importStatusMsg.textContent = `❌ Import Failed: ${result.message || result.error || 'Server error'}`;
+          }
+        } catch (err) {
+          if (importStatusMsg) {
+            importStatusMsg.style.display = 'block';
+            importStatusMsg.style.color = '#ef4444';
+            importStatusMsg.textContent = `❌ Network Error: ${err.message}`;
+          }
+        }
+      });
+    }
+  }
+
+  // 1-Click Custom Collection Template Seed Buttons
+  const seedBtns = document.querySelectorAll('.seed-template-btn');
+  seedBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const template = btn.getAttribute('data-template');
+      const originalText = btn.textContent;
+      try {
+        btn.textContent = '⏳ Seeding template...';
+        btn.disabled = true;
+        const res = await fetch(`/custom/seed?template=${template}`, { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+          btn.textContent = `✅ ${data.message}`;
+          setTimeout(() => {
+            window.location.reload();
+          }, 1200);
+        } else {
+          alert(`❌ Failed to seed template: ${data.error || data.message}`);
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert(`❌ Network error: ${err.message}`);
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    });
+  });
 });

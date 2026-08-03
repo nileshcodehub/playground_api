@@ -82,4 +82,16 @@ describe('18 — Multi-Format API Collection & Schema Downloads', () => {
     assert.ok(json.paths['/posts']);
     assert.equal(json.paths['/users'], undefined);
   });
+
+  test('GET /downloads/openapi.json?resource=auth returns OpenAPI spec filtered for auth endpoints', async () => {
+    const res = await fetch(`${baseUrl}/downloads/openapi.json?resource=auth`);
+    assert.equal(res.status, 200);
+    assert.ok(res.headers.get('content-disposition').includes('playground-api-auth.openapi.json'));
+
+    const json = await res.json();
+    assert.equal(json.info.title, 'Playground API — Auth');
+    assert.ok(json.paths['/auth/login']);
+    assert.ok(json.paths['/auth/register']);
+    assert.ok(json.paths['/auth/me']);
+  });
 });

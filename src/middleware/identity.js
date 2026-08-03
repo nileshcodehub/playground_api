@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import config from '../config/env.js';
 import prisma from '../db/prismaClient.js';
 import { createSignedToken, verifySignedToken } from '../utils/sessionToken.js';
+import { verifyToken } from '../utils/jwtUtils.js';
 
 // In-memory identity verification cache (5-minute TTL) to eliminate cloud DB latency on repeat requests
 const verifiedIdentitiesCache = new Map();
@@ -38,8 +39,18 @@ export const identityMiddleware = async (req, res, next) => {
 
     req.ipHash = ipHash;
 
-    // Check X-Playground-Identity header or pg_identity cookie
-    const rawToken = req.headers['x-playground-identity'] || (req.cookies ? req.cookies.pg_identity : null);
+    // Check Authorization header (Bearer token), X-Playground-Identity header, or pg_identity cookie
+    let authHeaderToken = null;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      const jwtStr = req.headers.authorization.split(' ')[1];
+      const decoded = verifyToken(jwtStr);
+      if (decoded && decoded.identityId) {
+        authHeaderToken = decoded.identityId;
+        req.userJwt = decoded; // Store decoded token payload on request
+      }
+    }
+
+    const rawToken = authHeaderToken || req.headers['x-playground-identity'] || (req.cookies ? req.cookies.pg_identity : null);
     let identityId = null;
     let validIdentity = false;
     const now = Date.now();

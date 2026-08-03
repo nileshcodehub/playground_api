@@ -121,6 +121,10 @@ fetch('https://playground-api-xi.vercel.app/posts?_status=500');</code></pre>
         <a href="/docs/posts" class="session-action-btn" style="text-decoration: none;">📝 Posts Docs</a>
         <a href="/docs/comments" class="session-action-btn" style="text-decoration: none;">💬 Comments Docs</a>
         <a href="/docs/todos" class="session-action-btn" style="text-decoration: none;">✅ Todos Docs</a>
+        <a href="/docs/auth" class="session-action-btn" style="text-decoration: none;">🔐 Auth Docs</a>
+        <a href="/docs/media" class="session-action-btn" style="text-decoration: none;">🖼️ Media Docs</a>
+        <a href="/docs/session" class="session-action-btn" style="text-decoration: none;">💾 Session Docs</a>
+        <a href="/docs/custom" class="session-action-btn" style="text-decoration: none;">🛠️ Custom Docs</a>
       </div>
     </div>
 
@@ -128,7 +132,7 @@ fetch('https://playground-api-xi.vercel.app/posts?_status=500');</code></pre>
       <table style="width: 100%; min-width: 500px; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
         <thead>
           <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary);">
-            <th style="padding: 0.6rem;">Method</th>
+            <th style="padding: 0.6rem; min-width: 150px;">Method</th>
             <th style="padding: 0.6rem;">Endpoint</th>
             <th style="padding: 0.6rem;">Description</th>
             <th style="padding: 0.6rem;">Sandboxed?</th>
@@ -148,19 +152,90 @@ fetch('https://playground-api-xi.vercel.app/posts?_status=500');</code></pre>
             <td style="padding: 0.7rem; color: #22c55e;">✅ Session Scope</td>
           </tr>
           <tr style="border-bottom: 1px solid var(--border-color);">
-            <td style="padding: 0.6rem;"><span class="badge badge-put">PUT</span> / <span class="badge badge-patch">PATCH</span></td>
+            <td style="padding: 0.6rem;">
+              <div style="display: flex; align-items: center; gap: 0.25rem;">
+                <span class="badge badge-put">PUT</span>
+                <span style="opacity: 0.5;">/</span>
+                <span class="badge badge-patch">PATCH</span>
+              </div>
+            </td>
             <td style="padding: 0.6rem; font-family: var(--font-mono);">/:resource/:id</td>
             <td style="padding: 0.6rem; color: var(--text-secondary);">Update record in session overlay</td>
             <td style="padding: 0.7rem; color: #22c55e;">✅ Session Scope</td>
           </tr>
-          <tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
             <td style="padding: 0.6rem;"><span class="badge badge-delete">DELETE</span></td>
             <td style="padding: 0.6rem; font-family: var(--font-mono);">/:resource/:id</td>
             <td style="padding: 0.6rem; color: var(--text-secondary);">Remove record from session overlay</td>
             <td style="padding: 0.7rem; color: #22c55e;">✅ Session Scope</td>
           </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem;"><span class="badge badge-post">POST</span></td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/auth/login, /auth/register, /auth/refresh</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">JWT login, user registration & token refresh</td>
+            <td style="padding: 0.7rem; color: #22c55e;">✅ JWT & Session</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem;">
+              <div style="display: flex; align-items: center; gap: 0.25rem;">
+                <span class="badge badge-get">GET</span>
+                <span style="opacity: 0.5;">/</span>
+                <span class="badge badge-patch">PATCH</span>
+              </div>
+            </td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/auth/me</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">Read & update authenticated profile via Bearer token</td>
+            <td style="padding: 0.7rem; color: #22c55e;">✅ Bearer Token</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem;"><span class="badge badge-get">GET</span></td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/public/avatars/:seed.svg, /public/thumbnails/:seed.svg</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">Dynamic SVG vector avatar & landscape thumbnail image helpers</td>
+            <td style="padding: 0.7rem; color: #38bdf8;">⚡ 24h Edge Cache</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.6rem;">
+              <div style="display: flex; align-items: center; gap: 0.25rem; flex-wrap: wrap;">
+                <span class="badge badge-get">GET</span>
+                <span class="badge badge-post">POST</span>
+                <span class="badge badge-delete">DELETE</span>
+              </div>
+            </td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/session/export, /session/import, /session/reset</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">Export sandbox JSON snapshot, restore/import state, or purge session</td>
+            <td style="padding: 0.7rem; color: #a855f7;">💾 Backup & Restore</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.6rem;">
+              <div style="display: flex; align-items: center; gap: 0.25rem; flex-wrap: wrap;">
+                <span class="badge badge-get">GET</span>
+                <span class="badge badge-post">POST</span>
+                <span class="badge badge-delete">DELETE</span>
+              </div>
+            </td>
+            <td style="padding: 0.6rem; font-family: var(--font-mono);">/custom/:collection, /custom/seed</td>
+            <td style="padding: 0.6rem; color: var(--text-secondary);">Create custom REST collections on the fly or seed domain templates</td>
+            <td style="padding: 0.7rem; color: #f59e0b;">🛠️ Dynamic Collections</td>
+          </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Custom Resource Studio Card -->
+  <div class="endpoint-card" style="margin-top: 1.5rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(217, 119, 6, 0.02) 100%); border: 1px solid rgba(245, 158, 11, 0.2);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <h3 style="margin: 0; font-size: 1.1rem; color: #f59e0b;">🛠️ 1-Click Custom Collection Domain Generator</h3>
+      <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">Zero SQL Migrations</span>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.5rem 0 1rem 0;">
+      Instantly seed realistic custom collections (products, orders, leads, invoices, patients) directly into your session sandbox overlay.
+    </p>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <button type="button" class="btn btn-secondary seed-template-btn" data-template="ecommerce" style="font-size: 0.8rem;">🛒 E-Commerce (products & orders)</button>
+      <button type="button" class="btn btn-secondary seed-template-btn" data-template="crm" style="font-size: 0.8rem;">💼 CRM (leads & contacts)</button>
+      <button type="button" class="btn btn-secondary seed-template-btn" data-template="saas" style="font-size: 0.8rem;">💳 SaaS (invoices & subscriptions)</button>
+      <button type="button" class="btn btn-secondary seed-template-btn" data-template="healthcare" style="font-size: 0.8rem;">🏥 Healthcare (patients & appointments)</button>
     </div>
   </div>
 </div>
