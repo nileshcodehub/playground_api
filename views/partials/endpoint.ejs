@@ -7,10 +7,9 @@
   -b "pg_identity=your_cookie_uuid" ` : `curl -X ${method} '${origin}${path}' \\\n -H 'Content-Type: application/json'
   \\\n -b "pg_identity=your_cookie_uuid" \\\n -d '${formattedBodyForCurl}' `; const fetchCmd=method==='GET' ||
   method==='DELETE' ? `fetch('${origin}${path}', {\n method: '${method}' ,\n credentials: 'include' \n})\n .then(res=>
-  res.json())\n .then(data => console.log(data));`
-  : `fetch('${origin}${path}', {\n method: '${method}',\n headers: { 'Content-Type': 'application/json' },\n
-  credentials: 'include',\n body: JSON.stringify(${sampleBodyStr || '{}'})\n})\n .then(res => res.json())\n .then(data
-  => console.log(data));`;
+  res.json())\n .then(data => console.log(data));` : `fetch('${origin}${path}', {\n method: '${method}',\n headers: {
+  'Content-Type': 'application/json' },\n credentials: 'include',\n body: JSON.stringify(${sampleBodyStr || '{}'})\n})\n
+  .then(res => res.json())\n .then(data => console.log(data));`;
 
   const axiosCmd = method === 'GET'
   ? `import axios from 'axios';\n\naxios.get('${origin}${path}', {\n withCredentials: true\n}).then(response =>
