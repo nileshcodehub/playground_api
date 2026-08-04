@@ -1,4 +1,5 @@
-import { exportSessionSnapshot, importSessionSnapshot, purgeSessionOverlay } from '../services/overlayService.js';
+import { exportSessionSnapshot, importSessionSnapshot, purgeSessionOverlay, getSessionStats } from '../services/overlayService.js';
+import { AppError } from '../middleware/errorHandler.js';
 
 /**
  * GET /session/export
@@ -55,3 +56,22 @@ export const resetSession = async (req, res, next) => {
     next(err);
   }
 };
+
+/**
+ * GET /session/stats
+ * Retrieve active session identity stats, quotas, and record breakdown
+ */
+export const getSessionStatsController = async (req, res, next) => {
+  try {
+    const identityId = req.identityId;
+    if (!identityId) {
+      throw new AppError('Identity required for session statistics', 401);
+    }
+
+    const stats = await getSessionStats(identityId);
+    res.status(200).json(stats);
+  } catch (error) {
+    next(error);
+  }
+};
+
