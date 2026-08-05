@@ -32,7 +32,6 @@ export const identityMiddleware = async (req, res, next) => {
     }
 
     // Compute salted SHA-256 hash of IP
-    console.log(" ipHash : ", config.ipHashSalt)
     const ipHash = crypto
       .createHash('sha256')
       .update(clientIp + config.ipHashSalt)
