@@ -1,0 +1,617 @@
+import config from './env';
+
+export interface QueryParamDef {
+  name: string;
+  type: string;
+  required?: boolean;
+  defaultVal?: string;
+  description: string;
+}
+
+export interface EndpointDef {
+  id: string;
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  path: string;
+  title: string;
+  description: string;
+  queryParams?: QueryParamDef[];
+  requestBody?: Record<string, unknown>;
+  responseExample: Record<string, unknown> | Array<unknown> | string;
+}
+
+export interface ResourceCatalogDef {
+  id: string;
+  name: string;
+  singular: string;
+  description: string;
+  itemCount: number | string;
+  baseUrl: string;
+  icon: string;
+  endpoints: EndpointDef[];
+  prevPage?: { title: string; href: string };
+  nextPage?: { title: string; href: string };
+}
+
+const baseUrl = config.apiUrl;
+
+export const apiCatalog: ResourceCatalogDef[] = [
+  {
+    id: 'users',
+    name: 'Users',
+    singular: 'User',
+    description: 'User profile records with names, usernames, emails, address details, and avatar seeds.',
+    itemCount: 10,
+    baseUrl: `${baseUrl}/users`,
+    icon: 'ph:users-bold',
+    prevPage: { title: 'Session Sandbox Architecture', href: '/docs/sandbox' },
+    nextPage: { title: 'Posts Collection', href: '/docs/posts' },
+    endpoints: [
+      {
+        id: 'get-users',
+        method: 'GET',
+        path: '/users',
+        title: 'List All Users',
+        description: 'Retrieve a paginated list of users. Results merge shared global user records with session sandbox overlays (newly created users appear at the top).',
+        queryParams: [
+          { name: 'page', type: 'integer', required: false, defaultVal: '1', description: 'Page number (1-indexed).' },
+          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Number of records per page (default 10, max 30).' },
+          { name: 'q', type: 'string', required: false, defaultVal: '-', description: 'Full-text search query term across name, username, email.' },
+          { name: '_sort', type: 'string', required: false, defaultVal: 'id', description: 'Field name to sort results by (name, username, email).' },
+          { name: '_order', type: 'string', required: false, defaultVal: 'asc', description: 'Sort direction: asc or desc.' },
+        ],
+        responseExample: {
+          data: [
+            {
+              id: 'local-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+              name: 'Jane Doe',
+              username: 'janedoe',
+              email: 'jane.doe@example.com',
+              _sandbox: 'created',
+            },
+            {
+              id: 1,
+              name: 'Leanne Graham',
+              username: 'Bret',
+              email: 'Sincere@april.biz',
+              phone: '+1-770-555-0123',
+              website: 'hildegard.org',
+            },
+          ],
+          pagination: { page: 1, limit: 10, total: 11, totalPages: 2, hasNextPage: true, hasPrevPage: false },
+        },
+      },
+      {
+        id: 'get-user-by-id',
+        method: 'GET',
+        path: '/users/:id',
+        title: 'Get Single User',
+        description: 'Retrieve a single user by ID. Supports plain integer IDs for global records (e.g. 1) and string IDs formatted as local-<uuid> for sandbox records.',
+        queryParams: [
+          { name: 'id', type: 'string | integer', required: true, defaultVal: '1', description: 'User ID (global integer or local-<uuid>).' },
+        ],
+        responseExample: {
+          id: 1,
+          name: 'Leanne Graham',
+          username: 'Bret',
+          email: 'Sincere@april.biz',
+          phone: '+1-770-555-0123',
+          website: 'hildegard.org',
+          address: { street: 'Kulas Light', city: 'Gwenborough', zipcode: '92998-3874' },
+          company: { name: 'Romaguera-Crona', catchPhrase: 'Multi-layered client-server neural-net' },
+        },
+      },
+      {
+        id: 'create-user',
+        method: 'POST',
+        path: '/users',
+        title: 'Create New User',
+        description: 'Create a new session sandbox user record. Returns a local-<uuid> formatted ID with _sandbox: "created". Capped at 30 custom created records per session.',
+        requestBody: {
+          name: 'Jane Doe',
+          username: 'janedoe',
+          email: 'jane.doe@example.com',
+          phone: '+1-555-01999',
+          website: 'https://janedoe.dev',
+        },
+        responseExample: {
+          id: 'local-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          name: 'Jane Doe',
+          username: 'janedoe',
+          email: 'jane.doe@example.com',
+          _sandbox: 'created',
+        },
+      },
+      {
+        id: 'update-user',
+        method: 'PUT',
+        path: '/users/:id',
+        title: 'Replace User (PUT)',
+        description: 'Replace an existing user record in the session overlay. Global baseline records remain untouched for all other developers.',
+        requestBody: {
+          name: 'Leanne Graham (Updated)',
+          username: 'Bret',
+          email: 'bret.updated@april.biz',
+          website: 'https://updated-user.dev',
+        },
+        responseExample: {
+          id: 1,
+          name: 'Leanne Graham (Updated)',
+          username: 'Bret',
+          email: 'bret.updated@april.biz',
+          website: 'https://updated-user.dev',
+          _sandbox: 'updated',
+        },
+      },
+      {
+        id: 'patch-user',
+        method: 'PATCH',
+        path: '/users/:id',
+        title: 'Partial User Update (PATCH)',
+        description: 'Partially update specific profile fields of a user record in your session overlay.',
+        requestBody: {
+          name: 'Leanne Graham (Patched)',
+          website: 'https://patched-user.dev',
+        },
+        responseExample: {
+          id: 1,
+          name: 'Leanne Graham (Patched)',
+          username: 'Bret',
+          email: 'Sincere@april.biz',
+          website: 'https://patched-user.dev',
+          _sandbox: 'updated',
+        },
+      },
+      {
+        id: 'delete-user',
+        method: 'DELETE',
+        path: '/users/:id',
+        title: 'Delete User',
+        description: 'Remove a user record from your session view. The underlying global baseline record is unaffected for other users.',
+        responseExample: '204 No Content',
+      },
+    ],
+  },
+  {
+    id: 'posts',
+    name: 'Posts',
+    singular: 'Post',
+    description: 'Blog post articles containing title, body, user association, created dates, and full-text search indexing.',
+    itemCount: 100,
+    baseUrl: `${baseUrl}/posts`,
+    icon: 'ph:newspaper-bold',
+    prevPage: { title: 'Users Collection', href: '/docs/users' },
+    nextPage: { title: 'Comments Collection', href: '/docs/comments' },
+    endpoints: [
+      {
+        id: 'get-posts',
+        method: 'GET',
+        path: '/posts',
+        title: 'List All Posts',
+        description: 'Retrieve a paginated list of posts. Results merge shared global posts with session sandbox overlays (newly created posts appear at the top).',
+        queryParams: [
+          { name: 'page', type: 'integer', required: false, defaultVal: '1', description: 'Page number (1-indexed).' },
+          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Number of records per page (default 10, max 30).' },
+          { name: 'user_id', type: 'integer', required: false, defaultVal: '-', description: 'Filter posts authored by user ID (e.g. user_id=1).' },
+          { name: 'q', type: 'string', required: false, defaultVal: '-', description: 'Full-text search query term across title and body.' },
+          { name: '_sort', type: 'string', required: false, defaultVal: 'id', description: 'Field name to sort results by (title, id, created_at).' },
+          { name: '_order', type: 'string', required: false, defaultVal: 'asc', description: 'Sort direction: asc or desc.' },
+        ],
+        responseExample: {
+          data: [
+            {
+              id: 'local-b2c3d4e5-f6a7-8901-bcde-f12345678901',
+              user_id: 1,
+              title: 'Getting Started with Playground API',
+              body: 'Playground API provides instant sandboxed mock endpoints...',
+              _sandbox: 'created',
+            },
+            {
+              id: 1,
+              user_id: 1,
+              title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+              body: 'quia et suscipit suscipit recusandae consequuntur expedita et cum...',
+            },
+          ],
+          pagination: { page: 1, limit: 10, total: 101, totalPages: 11, hasNextPage: true, hasPrevPage: false },
+        },
+      },
+      {
+        id: 'get-post-by-id',
+        method: 'GET',
+        path: '/posts/:id',
+        title: 'Get Single Post',
+        description: 'Retrieve details of a specific post by integer ID or local sandbox string ID.',
+        queryParams: [
+          { name: 'id', type: 'string | integer', required: true, defaultVal: '1', description: 'Post ID (global integer or local-<uuid>).' },
+        ],
+        responseExample: {
+          id: 1,
+          user_id: 1,
+          title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+          body: 'quia et suscipit suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto',
+        },
+      },
+      {
+        id: 'create-post',
+        method: 'POST',
+        path: '/posts',
+        title: 'Create New Post',
+        description: 'Create a new session sandbox post record. Returns a local-<uuid> formatted ID with _sandbox: "created".',
+        requestBody: {
+          user_id: 1,
+          title: 'My Custom Prototype Article',
+          body: 'Testing frontend mutation overlay without touching global seed data.',
+        },
+        responseExample: {
+          id: 'local-b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          user_id: 1,
+          title: 'My Custom Prototype Article',
+          body: 'Testing frontend mutation overlay without touching global seed data.',
+          _sandbox: 'created',
+        },
+      },
+      {
+        id: 'update-post',
+        method: 'PUT',
+        path: '/posts/:id',
+        title: 'Replace Post (PUT)',
+        description: 'Completely replace a post row inside your identity sandbox overlay.',
+        requestBody: {
+          user_id: 1,
+          title: 'Updated Article Title',
+          body: 'Replaced body content.',
+        },
+        responseExample: {
+          id: 1,
+          user_id: 1,
+          title: 'Updated Article Title',
+          body: 'Replaced body content.',
+          _sandbox: 'updated',
+        },
+      },
+      {
+        id: 'patch-post',
+        method: 'PATCH',
+        path: '/posts/:id',
+        title: 'Partial Post Update (PATCH)',
+        description: 'Partially update selected fields of a post.',
+        requestBody: {
+          title: 'Patched Article Title Only',
+        },
+        responseExample: {
+          id: 1,
+          user_id: 1,
+          title: 'Patched Article Title Only',
+          body: 'quia et suscipit suscipit recusandae...',
+          _sandbox: 'updated',
+        },
+      },
+      {
+        id: 'delete-post',
+        method: 'DELETE',
+        path: '/posts/:id',
+        title: 'Delete Post',
+        description: 'Remove a post from your session overlay view.',
+        responseExample: '204 No Content',
+      },
+    ],
+  },
+  {
+    id: 'comments',
+    name: 'Comments',
+    singular: 'Comment',
+    description: 'Feedback comments linked relationally to blog posts.',
+    itemCount: 500,
+    baseUrl: `${baseUrl}/comments`,
+    icon: 'ph:chat-circle-text-bold',
+    prevPage: { title: 'Posts Collection', href: '/docs/posts' },
+    nextPage: { title: 'Todos Collection', href: '/docs/todos' },
+    endpoints: [
+      {
+        id: 'get-comments',
+        method: 'GET',
+        path: '/comments',
+        title: 'List All Comments',
+        description: 'Retrieve a paginated list of comments across posts.',
+        queryParams: [
+          { name: 'post_id', type: 'integer', required: false, defaultVal: '-', description: 'Filter comments linked to post ID.' },
+          { name: 'page', type: 'integer', required: false, defaultVal: '1', description: 'Page number.' },
+          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Items per page (max 30).' },
+          { name: 'q', type: 'string', required: false, defaultVal: '-', description: 'Search term across name, email, body.' },
+        ],
+        responseExample: {
+          data: [
+            {
+              id: 1,
+              post_id: 1,
+              name: 'id labore ex et quam laborum',
+              email: 'Eliseo@gardner.biz',
+              body: 'laudantium enim quasi est quidem magnam voluptate ipsam eos',
+            },
+          ],
+          pagination: { page: 1, limit: 10, total: 500, totalPages: 50, hasNextPage: true, hasPrevPage: false },
+        },
+      },
+      {
+        id: 'create-comment',
+        method: 'POST',
+        path: '/comments',
+        title: 'Create Comment',
+        description: 'Add a new comment overlay linked to a post.',
+        requestBody: {
+          post_id: 1,
+          name: 'Awesome API Prototyping Tool',
+          email: 'developer@playground.dev',
+          body: 'Saved time building my Next.js client app!',
+        },
+        responseExample: {
+          id: 'local-9b1deb4d-3b7d-4bad',
+          post_id: 1,
+          name: 'Awesome API Prototyping Tool',
+          email: 'developer@playground.dev',
+          body: 'Saved time building my Next.js client app!',
+          _sandbox: 'created',
+        },
+      },
+      {
+        id: 'delete-comment',
+        method: 'DELETE',
+        path: '/comments/:id',
+        title: 'Delete Comment',
+        description: 'Remove a comment from your session overlay view.',
+        responseExample: '204 No Content',
+      },
+    ],
+  },
+  {
+    id: 'todos',
+    name: 'Todos',
+    singular: 'Todo',
+    description: 'Task item records with completion status.',
+    itemCount: 200,
+    baseUrl: `${baseUrl}/todos`,
+    icon: 'ph:check-square-offset-bold',
+    prevPage: { title: 'Comments Collection', href: '/docs/comments' },
+    nextPage: { title: 'Authentication (JWT)', href: '/docs/auth' },
+    endpoints: [
+      {
+        id: 'get-todos',
+        method: 'GET',
+        path: '/todos',
+        title: 'List All Todos',
+        description: 'Retrieve a paginated list of task todos.',
+        queryParams: [
+          { name: 'user_id', type: 'integer', required: false, defaultVal: '-', description: 'Filter by user ID.' },
+          { name: 'completed', type: 'boolean', required: false, defaultVal: '-', description: 'Filter by completion state (true/false).' },
+          { name: 'page', type: 'integer', required: false, defaultVal: '1', description: 'Page number.' },
+          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Items per page.' },
+        ],
+        responseExample: {
+          data: [
+            {
+              id: 1,
+              user_id: 1,
+              title: 'delectus aut autem',
+              completed: false,
+            },
+          ],
+          pagination: { page: 1, limit: 10, total: 200, totalPages: 20, hasNextPage: true, hasPrevPage: false },
+        },
+      },
+      {
+        id: 'create-todo',
+        method: 'POST',
+        path: '/todos',
+        title: 'Create Todo Task',
+        description: 'Create a new todo item in your session sandbox overlay.',
+        requestBody: {
+          user_id: 1,
+          title: 'Build Next.js Frontend App',
+          completed: false,
+        },
+        responseExample: {
+          id: 'local-7a6b5c4d-3e2f',
+          user_id: 1,
+          title: 'Build Next.js Frontend App',
+          completed: false,
+          _sandbox: 'created',
+        },
+      },
+    ],
+  },
+  {
+    id: 'auth',
+    name: 'Authentication',
+    singular: 'Auth',
+    description: 'Fake JWT authentication login, user registration, token refresh, and profile inspection.',
+    itemCount: 2,
+    baseUrl: `${baseUrl}/auth`,
+    icon: 'ph:lock-key-bold',
+    prevPage: { title: 'Todos Collection', href: '/docs/todos' },
+    nextPage: { title: 'Custom Collections', href: '/docs/custom' },
+    endpoints: [
+      {
+        id: 'auth-login',
+        method: 'POST',
+        path: '/auth/login',
+        title: 'Fake JWT Login',
+        description: 'Authenticate user with username/email & password to receive signed JWT access and refresh tokens.',
+        requestBody: {
+          username: 'Bret',
+          password: 'password123',
+        },
+        responseExample: {
+          access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEs...',
+          refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEs...',
+          token_type: 'Bearer',
+          expires_in: 900,
+          user: {
+            id: 1,
+            name: 'Leanne Graham',
+            username: 'Bret',
+            email: 'Sincere@april.biz',
+          },
+        },
+      },
+      {
+        id: 'auth-register',
+        method: 'POST',
+        path: '/auth/register',
+        title: 'Register Mock User',
+        description: 'Register a new session user and immediately receive signed JWT tokens.',
+        requestBody: {
+          name: 'Alice Smith',
+          username: 'alice',
+          email: 'alice@example.com',
+          password: 'password123',
+        },
+        responseExample: {
+          access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+          refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+          token_type: 'Bearer',
+          expires_in: 900,
+          user: {
+            id: 'local-9b1deb4d',
+            name: 'Alice Smith',
+            username: 'alice',
+            email: 'alice@example.com',
+          },
+        },
+      },
+      {
+        id: 'auth-me',
+        method: 'GET',
+        path: '/auth/me',
+        title: 'Get Authenticated Profile',
+        description: 'Retrieve current authenticated user profile using Authorization: Bearer <access_token>.',
+        responseExample: {
+          id: 1,
+          name: 'Leanne Graham',
+          username: 'Bret',
+          email: 'Sincere@april.biz',
+        },
+      },
+    ],
+  },
+  {
+    id: 'custom',
+    name: 'Custom Collections',
+    singular: 'Custom',
+    description: 'Dynamic custom resource collections (e.g. /custom/products, /custom/orders) created on the fly.',
+    itemCount: 'Dynamic',
+    baseUrl: `${baseUrl}/custom`,
+    icon: 'ph:circles-three-plus-bold',
+    prevPage: { title: 'Authentication (JWT)', href: '/docs/auth' },
+    nextPage: { title: 'Media & Avatars', href: '/docs/avatars' },
+    endpoints: [
+      {
+        id: 'get-custom-collections',
+        method: 'GET',
+        path: '/custom',
+        title: 'List Active Custom Collections',
+        description: 'Returns a summary of all active dynamic custom resource collections in your session sandbox with record counts.',
+        responseExample: {
+          totalCollections: 2,
+          collections: [
+            { name: 'products', endpoint: '/custom/products', count: 3, lastUpdated: '2026-08-02T23:30:00.000Z' },
+            { name: 'orders', endpoint: '/custom/orders', count: 2, lastUpdated: '2026-08-02T23:30:00.000Z' },
+          ],
+        },
+      },
+      {
+        id: 'post-custom-item',
+        method: 'POST',
+        path: '/custom/:collection',
+        title: 'Create Custom Collection Record',
+        description: 'Creates a new custom record in any arbitrary collection with automatic ID, createdAt, and updatedAt metadata attachment.',
+        queryParams: [
+          { name: 'collection', type: 'string', required: true, defaultVal: 'products', description: 'Custom collection name (e.g. products, orders).' },
+        ],
+        requestBody: {
+          name: 'MacBook Pro M3',
+          price: 2499,
+          category: 'Laptops',
+        },
+        responseExample: {
+          id: 'local-f9e8d7c6-5432-10ab',
+          name: 'MacBook Pro M3',
+          price: 2499,
+          category: 'Laptops',
+          createdAt: '2026-08-07T00:00:00.000Z',
+          _sandbox: 'created',
+        },
+      },
+    ],
+  },
+  {
+    id: 'media',
+    name: 'Media & Avatars',
+    singular: 'Media',
+    description: 'Dynamic SVG avatar vectors and landscape image thumbnail generators.',
+    itemCount: 'Dynamic',
+    baseUrl: `${baseUrl}/avatars`,
+    icon: 'ph:user-circle-gear-bold',
+    prevPage: { title: 'Custom Collections', href: '/docs/custom' },
+    nextPage: { title: 'Session Sandbox', href: '/docs/sandbox' },
+    endpoints: [
+      {
+        id: 'get-avatar',
+        method: 'GET',
+        path: '/avatars/:seed.svg',
+        title: 'Generate Dynamic SVG Avatar',
+        description: 'Generates a crisp, colorful vector SVG avatar based on a seed string (username, email, or ID) with deterministic gradient background and initials.',
+        queryParams: [
+          { name: 'seed', type: 'string', required: true, defaultVal: 'Bret', description: 'Seed string used for color hashing and initials.' },
+          { name: 'size', type: 'integer', required: false, defaultVal: '128', description: 'Avatar size in pixels.' },
+        ],
+        responseExample: '<svg viewBox="0 0 128 128"><rect width="128" height="128" rx="64" fill="#059669"/><text x="50%" y="54%" font-size="54" fill="#fff" text-anchor="middle">BR</text></svg>',
+      },
+      {
+        id: 'get-thumbnail',
+        method: 'GET',
+        path: '/thumbnails/:seed.svg',
+        title: 'Generate Dynamic SVG Landscape Thumbnail',
+        description: 'Generates a 600x400 landscape vector SVG placeholder image with mesh gradient background, custom text, and dimension badge.',
+        queryParams: [
+          { name: 'seed', type: 'string', required: true, defaultVal: 'post-1', description: 'Seed string for mesh gradient color hashing.' },
+        ],
+        responseExample: '<svg viewBox="0 0 600 400"><rect width="600" height="400" fill="#4f46e5"/><text x="50%" y="46%" font-size="33" fill="#fff" text-anchor="middle">Post #1</text></svg>',
+      },
+    ],
+  },
+  {
+    id: 'session',
+    name: 'Session Sandbox',
+    singular: 'Session',
+    description: 'Export, import, and reset operations for identity session overlays.',
+    itemCount: 'Session',
+    baseUrl: `${baseUrl}/session`,
+    icon: 'ph:shield-check-bold',
+    prevPage: { title: 'Media & Avatars', href: '/docs/avatars' },
+    endpoints: [
+      {
+        id: 'export-session',
+        method: 'GET',
+        path: '/session/export',
+        title: 'Export Session Sandbox Snapshot JSON',
+        description: 'Serializes all session sandbox overlay records (creates, updates, deletes) into a downloadable JSON snapshot file for backups or team sharing.',
+        responseExample: {
+          version: '1.0',
+          identityId: '550e8400-e29b-41d4-a716-446655440000',
+          stats: { totalRecords: 2, creates: 1, updates: 1, deletes: 0 },
+        },
+      },
+      {
+        id: 'reset-session',
+        method: 'DELETE',
+        path: '/session/reset',
+        title: 'Purge Session Sandbox Overlay',
+        description: 'Purges all created, updated, and deleted overlay mutations for your session identity, resetting your view to clean baseline global data.',
+        responseExample: {
+          message: 'Session sandbox overlay purged successfully.',
+          purgedRecords: 3,
+        },
+      },
+    ],
+  },
+];

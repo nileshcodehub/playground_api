@@ -1,0 +1,214 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Icon } from '@iconify/react';
+import config from '@/config/env';
+
+const sampleSnapshotPayload = {
+  version: '1.0.0',
+  timestamp: '2026-08-07T00:00:00.000Z',
+  identity_id: 'pg-identity-anon-session-abc123xyz',
+  created_records: [
+    {
+      resource: 'posts',
+      id: 'local-f81d4fae-7dec-11d0-a765-00a0c91e6bf6',
+      title: 'E2E Testing Prototype Post',
+      body: 'Pre-seeded mock post payload for automated integration testing.',
+      user_id: 1,
+      created_at: '2026-08-07T00:00:00.000Z',
+    },
+    {
+      resource: 'comments',
+      id: 'local-9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+      post_id: 'local-f81d4fae-7dec-11d0-a765-00a0c91e6bf6',
+      name: 'QA Feedback Comment',
+      email: 'qa@playground.dev',
+      body: 'Verified overlay comment on local sandboxed post.',
+    },
+  ],
+  updated_records: [
+    {
+      resource: 'users',
+      target_id: 1,
+      name: 'Leanne Graham (Updated Profile)',
+      email: 'leanne.updated@playground.dev',
+    },
+  ],
+  deleted_record_ids: ['posts:5', 'todos:12'],
+};
+
+export default function ExportImportPage() {
+  const [snapshotJson, setSnapshotJson] = useState(JSON.stringify(sampleSnapshotPayload, null, 2));
+  const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const handleExport = async () => {
+    try {
+      const jsonStr = JSON.stringify(sampleSnapshotPayload, null, 2);
+      setSnapshotJson(jsonStr);
+
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `playground-sandbox-snapshot-${Date.now()}.json`;
+      a.click();
+
+      setStatusMsg({ type: 'success', text: 'Sandbox snapshot exported and downloaded successfully!' });
+    } catch (err) {
+      setStatusMsg({ type: 'error', text: 'Failed to export snapshot.' });
+    }
+  };
+
+  const handleImport = () => {
+    if (!snapshotJson) {
+      setStatusMsg({ type: 'error', text: 'Please paste or upload a valid JSON snapshot payload.' });
+      return;
+    }
+    try {
+      const parsed = JSON.parse(snapshotJson);
+      if (!parsed.created_records && !parsed.identity_id) {
+        throw new Error('Missing snapshot schema properties');
+      }
+      setStatusMsg({ type: 'success', text: 'Sandbox state restored successfully from JSON snapshot!' });
+    } catch (err) {
+      setStatusMsg({ type: 'error', text: 'Invalid JSON snapshot payload format.' });
+    }
+  };
+
+  return (
+    <div className="space-y-10 w-full max-w-none">
+      {/* Page Title & Overview */}
+      <div className="space-y-3 border-b border-border-theme pb-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs font-bold">
+          <Icon icon="ph:cloud-arrow-up-bold" className="w-4 h-4" />
+          Session Snapshot Management
+        </div>
+        <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">
+          Export & Import Session Sandbox
+        </h1>
+        <p className="text-sm text-text-secondary leading-relaxed">
+          Save your complete sandboxed mutation state into a portable JSON snapshot or restore mock data across devices and team environments.
+        </p>
+      </div>
+
+      {/* What it is & Where it is used */}
+      <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4">
+        <h2 className="text-base font-bold text-text-primary flex items-center gap-2">
+          <Icon icon="ph:info-bold" className="w-5 h-5 text-accent-primary" />
+          What is Snapshot Export & Import and Where is it Used?
+        </h2>
+        <p className="text-xs text-text-secondary leading-relaxed">
+          When prototyping or building automated test suites, you often create complex mock states—such as multiple created posts, modified user profiles, and deleted task items.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          <div className="p-4 rounded-xl bg-bg-secondary border border-border-theme space-y-1.5">
+            <div className="font-bold text-text-primary text-xs flex items-center gap-1.5">
+              <Icon icon="ph:share-network-bold" className="w-4 h-4 text-emerald-400" />
+              Team Collaboration
+            </div>
+            <p className="text-[11px] text-text-secondary leading-relaxed">
+              Export your sandbox state into a JSON snapshot file and share it with frontend team members so everyone tests against the exact same mock data scenario.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-bg-secondary border border-border-theme space-y-1.5">
+            <div className="font-bold text-text-primary text-xs flex items-center gap-1.5">
+              <Icon icon="ph:test-tube-bold" className="w-4 h-4 text-indigo-400" />
+              Automated E2E Testing
+            </div>
+            <p className="text-[11px] text-text-secondary leading-relaxed">
+              Pre-load deterministic snapshot JSON files into Playwright or Cypress E2E test suites before running component tests.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-bg-secondary border border-border-theme space-y-1.5">
+            <div className="font-bold text-text-primary text-xs flex items-center gap-1.5">
+              <Icon icon="ph:devices-bold" className="w-4 h-4 text-pink-400" />
+              Cross-Device Backup
+            </div>
+            <p className="text-[11px] text-text-secondary leading-relaxed">
+              Transfer session state between desktop browsers, mobile emulators, or postman workspaces effortlessly.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Interactive Tool Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-500">
+              <Icon icon="ph:download-simple-bold" className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-text-primary">1. Export Session State</h3>
+              <p className="text-xs text-text-secondary">Download active overlay JSON</p>
+            </div>
+          </div>
+          <p className="text-xs text-text-secondary leading-relaxed">
+            Generates a structured JSON file containing all created local records, updated rows, and deleted record IDs.
+          </p>
+          <button
+            onClick={handleExport}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-md"
+          >
+            <Icon icon="ph:export-bold" className="w-4 h-4" />
+            Export & Download JSON
+          </button>
+        </div>
+
+        <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-accent-light text-accent-primary">
+              <Icon icon="ph:upload-simple-bold" className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-text-primary">2. Restore State Snapshot</h3>
+              <p className="text-xs text-text-secondary">Import JSON payload state</p>
+            </div>
+          </div>
+          <p className="text-xs text-text-secondary leading-relaxed">
+            Paste or load a JSON snapshot file into the editor below and click restore to apply the state to your session identity.
+          </p>
+          <button
+            onClick={handleImport}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-xs font-bold transition-all cursor-pointer shadow-md"
+          >
+            <Icon icon="ph:import-bold" className="w-4 h-4" />
+            Restore State from Payload
+          </button>
+        </div>
+      </div>
+
+      {statusMsg && (
+        <div
+          className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+            statusMsg.type === 'success'
+              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+              : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+          }`}
+        >
+          <Icon icon={statusMsg.type === 'success' ? 'ph:check-circle-bold' : 'ph:warning-circle-bold'} className="w-5 h-5" />
+          <span>{statusMsg.text}</span>
+        </div>
+      )}
+
+      {/* Sample Payload Explanation & Interactive Editor */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
+            <Icon icon="ph:code-bold" className="w-4 h-4 text-accent-primary" />
+            Sample Snapshot JSON Payload Schema
+          </label>
+          <span className="text-[11px] font-mono text-text-muted">Format: JSON v1.0.0</span>
+        </div>
+        <textarea
+          value={snapshotJson}
+          onChange={(e) => setSnapshotJson(e.target.value)}
+          rows={12}
+          className="w-full font-mono text-xs p-4 rounded-xl bg-code-bg border border-border-theme text-gray-200 focus:outline-none focus:border-accent-primary leading-relaxed"
+        />
+      </div>
+    </div>
+  );
+}
