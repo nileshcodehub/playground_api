@@ -7,7 +7,8 @@ import config from '@/config/env';
 
 export function HeroSection() {
   const [copied, setCopied] = useState(false);
-  const sampleCurl = `curl -X GET ${config.apiUrl}/posts?_limit=5`;
+  const sampleCurl = `curl -X GET ${config.publicApiUrl || config.apiUrl}/posts?_limit=5`;
+
 
   const handleCopy = () => {
     navigator.clipboard.writeText(sampleCurl);

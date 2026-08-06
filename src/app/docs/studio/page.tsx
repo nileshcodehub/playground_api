@@ -188,7 +188,8 @@ export default function StudioPage() {
           </select>
 
           <div className="flex-1 w-full flex items-center bg-code-bg border border-border-theme rounded-xl overflow-hidden px-3">
-            <span className="font-mono text-xs text-text-muted shrink-0">{config.apiUrl}</span>
+            <span className="font-mono text-xs text-text-muted shrink-0">{config.publicApiUrl || config.apiUrl}</span>
+
             <input
               type="text"
               value={endpointPath}

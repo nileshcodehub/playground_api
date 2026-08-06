@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "crons": [
+  "rewrites": [
     {
-      "path": "/api/cron/cleanup",
-      "schedule": "0 0 * * *"
+      "source": "/api/:path*",
+      "destination": "https://playground-api-backend.vercel.app/api/:path*"
     }
   ]
 }
+
