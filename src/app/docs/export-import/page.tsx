@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import config from '@/config/env';
 
-const sampleSnapshotPayload = {
+const fallbackSnapshotPayload = {
   version: '1.0.0',
-  timestamp: '2026-08-07T00:00:00.000Z',
+  timestamp: new Date().toISOString(),
   identity_id: 'pg-identity-anon-session-abc123xyz',
   created_records: [
     {
@@ -15,35 +15,57 @@ const sampleSnapshotPayload = {
       title: 'E2E Testing Prototype Post',
       body: 'Pre-seeded mock post payload for automated integration testing.',
       user_id: 1,
-      created_at: '2026-08-07T00:00:00.000Z',
-    },
-    {
-      resource: 'comments',
-      id: 'local-9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
-      post_id: 'local-f81d4fae-7dec-11d0-a765-00a0c91e6bf6',
-      name: 'QA Feedback Comment',
-      email: 'qa@playground.dev',
-      body: 'Verified overlay comment on local sandboxed post.',
+      created_at: new Date().toISOString(),
     },
   ],
-  updated_records: [
-    {
-      resource: 'users',
-      target_id: 1,
-      name: 'Leanne Graham (Updated Profile)',
-      email: 'leanne.updated@playground.dev',
-    },
-  ],
-  deleted_record_ids: ['posts:5', 'todos:12'],
+  updated_records: [],
+  deleted_record_ids: [],
 };
 
 export default function ExportImportPage() {
-  const [snapshotJson, setSnapshotJson] = useState(JSON.stringify(sampleSnapshotPayload, null, 2));
+  const [snapshotJson, setSnapshotJson] = useState(JSON.stringify(fallbackSnapshotPayload, null, 2));
+  const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  useEffect(() => {
+    // Attempt to fetch current live session export on load
+    const match = document.cookie.match(/pg_identity=([^;]+)/);
+    const cookieToken = match ? match[1] : '';
+    const headers: Record<string, string> = {};
+    if (cookieToken) headers['X-Playground-Identity'] = cookieToken;
+
+    fetch(`${config.apiUrl}/session/export`, { headers, credentials: 'include' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) {
+          setSnapshotJson(JSON.stringify(data, null, 2));
+        }
+      })
+      .catch((err) => {
+        console.warn('[ExportImportPage] Live session export fetch warning:', err);
+      });
+  }, []);
+
   const handleExport = async () => {
+    setLoading(true);
+    setStatusMsg(null);
     try {
-      const jsonStr = JSON.stringify(sampleSnapshotPayload, null, 2);
+      const match = document.cookie.match(/pg_identity=([^;]+)/);
+      const cookieToken = match ? match[1] : '';
+      const headers: Record<string, string> = {};
+      if (cookieToken) headers['X-Playground-Identity'] = cookieToken;
+
+      const res = await fetch(`${config.apiUrl}/session/export`, {
+        headers,
+        credentials: 'include',
+      });
+
+      let snapshotData = fallbackSnapshotPayload;
+      if (res.ok) {
+        snapshotData = await res.json();
+      }
+
+      const jsonStr = JSON.stringify(snapshotData, null, 2);
       setSnapshotJson(jsonStr);
 
       const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -52,26 +74,58 @@ export default function ExportImportPage() {
       a.href = url;
       a.download = `playground-sandbox-snapshot-${Date.now()}.json`;
       a.click();
+      URL.revokeObjectURL(url);
 
-      setStatusMsg({ type: 'success', text: 'Sandbox snapshot exported and downloaded successfully!' });
+      setStatusMsg({ type: 'success', text: 'Live sandbox session snapshot exported and downloaded successfully!' });
     } catch (err) {
-      setStatusMsg({ type: 'error', text: 'Failed to export snapshot.' });
+      setStatusMsg({ type: 'error', text: 'Failed to export session snapshot.' });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     if (!snapshotJson) {
       setStatusMsg({ type: 'error', text: 'Please paste or upload a valid JSON snapshot payload.' });
       return;
     }
+
+    setLoading(true);
+    setStatusMsg(null);
+
     try {
       const parsed = JSON.parse(snapshotJson);
-      if (!parsed.created_records && !parsed.identity_id) {
-        throw new Error('Missing snapshot schema properties');
+      const match = document.cookie.match(/pg_identity=([^;]+)/);
+      const cookieToken = match ? match[1] : '';
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (cookieToken) headers['X-Playground-Identity'] = cookieToken;
+
+      const res = await fetch(`${config.apiUrl}/session/import`, {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify(parsed),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        setStatusMsg({
+          type: 'success',
+          text: result.message || 'Sandbox state restored successfully from JSON snapshot!',
+        });
+      } else {
+        const errData = await res.json().catch(() => null);
+        setStatusMsg({
+          type: 'error',
+          text: errData?.error || 'Failed to import snapshot to session sandbox.',
+        });
       }
-      setStatusMsg({ type: 'success', text: 'Sandbox state restored successfully from JSON snapshot!' });
     } catch (err) {
       setStatusMsg({ type: 'error', text: 'Invalid JSON snapshot payload format.' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -150,10 +204,11 @@ export default function ExportImportPage() {
           </p>
           <button
             onClick={handleExport}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-md"
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
           >
-            <Icon icon="ph:export-bold" className="w-4 h-4" />
-            Export & Download JSON
+            <Icon icon={loading ? 'ph:spinner-bold' : 'ph:export-bold'} className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <span>{loading ? 'Exporting...' : 'Export & Download JSON'}</span>
           </button>
         </div>
 
@@ -172,10 +227,11 @@ export default function ExportImportPage() {
           </p>
           <button
             onClick={handleImport}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-xs font-bold transition-all cursor-pointer shadow-md"
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
           >
-            <Icon icon="ph:import-bold" className="w-4 h-4" />
-            Restore State from Payload
+            <Icon icon={loading ? 'ph:spinner-bold' : 'ph:import-bold'} className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <span>{loading ? 'Restoring...' : 'Restore State from Payload'}</span>
           </button>
         </div>
       </div>
@@ -198,7 +254,7 @@ export default function ExportImportPage() {
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
             <Icon icon="ph:code-bold" className="w-4 h-4 text-accent-primary" />
-            Sample Snapshot JSON Payload Schema
+            Snapshot JSON Payload Schema
           </label>
           <span className="text-[11px] font-mono text-text-muted">Format: JSON v1.0.0</span>
         </div>
@@ -212,3 +268,4 @@ export default function ExportImportPage() {
     </div>
   );
 }
+

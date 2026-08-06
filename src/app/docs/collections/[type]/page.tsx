@@ -40,7 +40,7 @@ const collectionMeta: Record<
     overview:
       'Postman is a powerful API client that simplifies the process of testing, documenting, and sharing APIs. It provides an intuitive interface for sending requests, viewing responses, and automating workflows through collections.',
     icon: 'simple-icons:postman',
-    downloadUrl: `${config.apiUrl}/postman.json`,
+    downloadUrl: `${config.apiUrl}/downloads/postman.json`,
     format: 'JSON (Postman v2.1)',
     benefits: [
       'Explore our full REST & GraphQL API capabilities instantly.',
@@ -68,7 +68,7 @@ pg_identity: <your_signed_session_token>`,
     overview:
       'OpenAPI 3.0 is the industry-standard specification language for HTTP REST APIs. It allows developers to generate interactive Swagger UI documentation, client SDKs, and mock servers automatically.',
     icon: 'simple-icons:openapi',
-    downloadUrl: `${config.apiUrl}/openapi.json`,
+    downloadUrl: `${config.apiUrl}/downloads/openapi.json`,
     format: 'JSON (OpenAPI 3.0)',
     benefits: [
       'View interactive endpoint schemas and parameters in Swagger UI or Redoc.',
@@ -83,7 +83,7 @@ pg_identity: <your_signed_session_token>`,
       'Use openapi-generator-cli to generate client code for your project.',
     ],
     codeSnippet: `npx @openapitools/openapi-generator-cli generate \\
-  -i ${config.apiUrl}/openapi.json \\
+  -i ${config.apiUrl}/downloads/openapi.json \\
   -g typescript-axios \\
   -o ./src/api-client`,
     prevPage: { title: 'GraphQL Gateway', href: '/docs/graphql' },
@@ -96,7 +96,7 @@ pg_identity: <your_signed_session_token>`,
     overview:
       'Bruno is an open-source, offline-first API client designed as a modern Git-friendly alternative to Postman. It stores collection files directly in your repository format.',
     icon: 'ph:brackets-curly-bold',
-    downloadUrl: `${config.apiUrl}/bruno.json`,
+    downloadUrl: `${config.apiUrl}/downloads/bruno.json`,
     format: 'JSON (Bruno Spec)',
     benefits: [
       'Offline-first execution without cloud sync requirements.',
@@ -109,7 +109,7 @@ pg_identity: <your_signed_session_token>`,
       'Click "Open Collection" and select the downloaded JSON file.',
       'Start testing Playground API endpoints offline!',
     ],
-    codeSnippet: `bru import --source ${config.apiUrl}/bruno.json`,
+    codeSnippet: `bru import --source ${config.apiUrl}/downloads/bruno.json`,
     prevPage: { title: 'Postman Collection', href: '/docs/collections/postman' },
     nextPage: { title: 'Insomnia Collection', href: '/docs/collections/insomnia' },
   },
@@ -120,7 +120,7 @@ pg_identity: <your_signed_session_token>`,
     overview:
       'Insomnia is a popular open-source API design and testing platform. Import our workspace definition to test endpoints with environment variable switching.',
     icon: 'simple-icons:insomnia',
-    downloadUrl: `${config.apiUrl}/insomnia.json`,
+    downloadUrl: `${config.apiUrl}/downloads/insomnia.json`,
     format: 'JSON (Insomnia v4)',
     benefits: [
       'Clean modern interface for REST and GraphQL testing.',

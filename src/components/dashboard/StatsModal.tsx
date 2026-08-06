@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Icon } from '@iconify/react';
 import config from '@/config/env';
 import { SandboxExplanationCard } from './SandboxExplanationCard';
@@ -10,36 +10,102 @@ interface StatsModalProps {
   onClose: () => void;
 }
 
+interface SessionStats {
+  identity: {
+    id: string;
+    createdAt?: string;
+    lastSeenAt?: string;
+    inactivityTtlDays?: number;
+  };
+  summary: {
+    totalOverlays: number;
+    creates: number;
+    updates: number;
+    deletes: number;
+  };
+  byResource: Record<
+    string,
+    {
+      created: number;
+      updated: number;
+      deleted: number;
+      total: number;
+      quotaUsed: string;
+    }
+  >;
+}
+
 export function StatsModal({ isOpen, onClose }: StatsModalProps) {
   const [copiedUuid, setCopiedUuid] = useState(false);
   const [copiedToken, setCopiedToken] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [uuid, setUuid] = useState('df9ee9b9-52a7-4e7c-a325-de21989d0a85');
-  const [fullToken, setFullToken] = useState('df9ee9b9-52a7-4e7c-a325-de21989d0a85.8a7b6c5d4e3f');
-  const [createdDate, setCreatedDate] = useState('Jul 28, 2026');
-  const [lastActive, setLastActive] = useState('12:21 AM');
+  const [uuid, setUuid] = useState('');
+  const [fullToken, setFullToken] = useState('');
+  const [createdDate, setCreatedDate] = useState('N/A');
+  const [lastActive, setLastActive] = useState('N/A');
   const [resetMsg, setResetMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    const match = document.cookie.match(/pg_identity=([^;]+)/);
-    if (match && match[1]) {
-      const parts = match[1].split('.');
-      setUuid(parts[0]);
-      setFullToken(match[1]);
+  const [stats, setStats] = useState<SessionStats | null>(null);
+
+  const fetchStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Check cookie for token fallback
+      const match = document.cookie.match(/pg_identity=([^;]+)/);
+      const cookieToken = match ? match[1] : '';
+
+      const headers: Record<string, string> = {};
+      if (cookieToken) {
+        headers['X-Playground-Identity'] = cookieToken;
+      }
+
+      const res = await fetch(`${config.apiUrl}/session/stats`, {
+        headers,
+        credentials: 'include',
+      });
+
+      if (res.ok) {
+        const data: SessionStats = await res.json();
+        setStats(data);
+        if (data.identity?.id) {
+          setUuid(data.identity.id);
+          setFullToken(cookieToken || data.identity.id);
+
+          if (data.identity.createdAt) {
+            setCreatedDate(new Date(data.identity.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+          }
+          if (data.identity.lastSeenAt) {
+            setLastActive(new Date(data.identity.lastSeenAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[StatsModal] Failed to fetch live session stats:', err);
+    } finally {
+      setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchStats();
+    }
+  }, [isOpen, fetchStats]);
 
   if (!isOpen) return null;
 
   const handleCopyUuid = () => {
+    if (!uuid) return;
     navigator.clipboard.writeText(uuid);
     setCopiedUuid(true);
     setTimeout(() => setCopiedUuid(false), 2000);
   };
 
   const handleCopyToken = () => {
-    navigator.clipboard.writeText(fullToken);
+    if (!fullToken && !uuid) return;
+    navigator.clipboard.writeText(fullToken || uuid);
     setCopiedToken(true);
     setTimeout(() => setCopiedToken(false), 2000);
   };
@@ -48,14 +114,53 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
     setResetting(true);
     setResetMsg(null);
     try {
-      await fetch(`${config.apiUrl}/session/reset`, { method: 'DELETE' });
-      setResetMsg('Sandbox session overlay successfully purged.');
+      const match = document.cookie.match(/pg_identity=([^;]+)/);
+      const cookieToken = match ? match[1] : '';
+      const headers: Record<string, string> = {};
+      if (cookieToken) {
+        headers['X-Playground-Identity'] = cookieToken;
+      }
+
+      const res = await fetch(`${config.apiUrl}/session/reset`, {
+        method: 'DELETE',
+        headers,
+        credentials: 'include',
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setResetMsg(data.message || 'Sandbox session overlay successfully purged.');
+      } else {
+        setResetMsg('Session purged.');
+      }
+      await fetchStats();
     } catch {
       setResetMsg('Session purged.');
     } finally {
       setResetting(false);
     }
   };
+
+  const resourceList = stats?.byResource
+    ? Object.entries(stats.byResource).map(([name, data]) => {
+        const createdCount = data.created || 0;
+        const maxQuota = 30;
+        const pct = Math.min(Math.round((createdCount / maxQuota) * 100), 100);
+        return {
+          name: `/${name.charAt(0).toUpperCase() + name.slice(1)}`,
+          created: data.quotaUsed || `${createdCount} / ${maxQuota}`,
+          updated: data.updated || 0,
+          deleted: data.deleted || 0,
+          pct,
+        };
+      })
+    : [
+        { name: '/Users', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
+        { name: '/Posts', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
+        { name: '/Comments', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
+        { name: '/Todos', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
+        { name: '/Custom', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
+      ];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200">
@@ -89,11 +194,14 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <span className="text-lg font-bold text-emerald-400 break-all select-all">{uuid}</span>
+            <span className="text-lg font-bold text-emerald-400 break-all select-all">
+              {uuid || (loading ? 'Loading...' : 'Anonymous Session')}
+            </span>
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={handleCopyUuid}
-                className="px-2.5 py-1 rounded-lg bg-bg-tertiary hover:bg-border-theme text-text-primary text-[11px] font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                disabled={!uuid}
+                className="px-2.5 py-1 rounded-lg bg-bg-tertiary hover:bg-border-theme text-text-primary text-[11px] font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50"
                 title="Copy Identity UUID"
               >
                 <Icon icon={copiedUuid ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5" />
@@ -101,7 +209,8 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
               </button>
               <button
                 onClick={handleCopyToken}
-                className="px-2.5 py-1 rounded-lg bg-accent-light hover:bg-accent-primary hover:text-white text-accent-primary text-[11px] font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                disabled={!uuid && !fullToken}
+                className="px-2.5 py-1 rounded-lg bg-accent-light hover:bg-accent-primary hover:text-white text-accent-primary text-[11px] font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50"
                 title="Copy Full Signed Token (<uuid>.<signature>)"
               >
                 <Icon icon={copiedToken ? 'ph:check-bold' : 'ph:key-bold'} className="w-3.5 h-3.5" />
@@ -123,19 +232,19 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
         {/* 2. 4 Summary Metric Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
           <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme space-y-1">
-            <div className="text-2xl font-black text-emerald-400">0</div>
+            <div className="text-2xl font-black text-emerald-400">{stats?.summary?.totalOverlays ?? 0}</div>
             <div className="text-[11px] font-medium text-text-secondary">Total Sandbox Records</div>
           </div>
           <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme space-y-1">
-            <div className="text-2xl font-black text-emerald-400">0</div>
+            <div className="text-2xl font-black text-emerald-400">{stats?.summary?.creates ?? 0}</div>
             <div className="text-[11px] font-medium text-text-secondary">Records Created</div>
           </div>
           <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme space-y-1">
-            <div className="text-2xl font-black text-amber-400">0</div>
+            <div className="text-2xl font-black text-amber-400">{stats?.summary?.updates ?? 0}</div>
             <div className="text-[11px] font-medium text-text-secondary">Records Updated</div>
           </div>
           <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme space-y-1">
-            <div className="text-2xl font-black text-rose-400">0</div>
+            <div className="text-2xl font-black text-rose-400">{stats?.summary?.deletes ?? 0}</div>
             <div className="text-[11px] font-medium text-text-secondary">Records Deleted</div>
           </div>
         </div>
@@ -155,13 +264,7 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-theme font-medium text-text-primary">
-                {[
-                  { name: '/Users', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
-                  { name: '/Posts', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
-                  { name: '/Comments', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
-                  { name: '/Todos', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
-                  { name: '/Custom', created: '0 / 30', updated: 0, deleted: 0, pct: 0 },
-                ].map((row) => (
+                {resourceList.map((row) => (
                   <tr key={row.name}>
                     <td className="p-3 font-bold">{row.name}</td>
                     <td className="p-3 font-mono text-text-secondary">{row.created}</td>
@@ -216,3 +319,4 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
     </div>
   );
 }
+

@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, use } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Icon } from '@iconify/react';
-import { apiCatalog } from '@/config/api-catalog';
+import { apiCatalog, EndpointDef } from '@/config/api-catalog';
 import { EndpointCard } from '@/components/docs/EndpointCard';
+import config from '@/config/env';
 
 interface ResourcePageProps {
   params: Promise<{ resource: string }>;
@@ -16,19 +17,49 @@ export default function ResourcePage({ params }: ResourcePageProps) {
   const res = apiCatalog.find((r) => r.id === resource);
 
   const [activeMethodFilter, setActiveMethodFilter] = useState<'ALL' | 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'>('ALL');
+  const [endpoints, setEndpoints] = useState<EndpointDef[]>(res?.endpoints || []);
+
+  useEffect(() => {
+    if (!res) return;
+    setEndpoints(res.endpoints);
+
+    // Fetch live sample data from backend to update GET response examples
+    if (['users', 'posts', 'comments', 'todos'].includes(resource)) {
+      fetch(`${config.apiUrl}/${resource}?limit=2`, { credentials: 'include' })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((liveData) => {
+          if (liveData) {
+            setEndpoints((prev) =>
+              prev.map((ep) => {
+                if (ep.method === 'GET' && ep.path === `/${resource}`) {
+                  return { ...ep, responseExample: liveData };
+                }
+                if (ep.method === 'GET' && ep.path === `/${resource}/:id` && liveData.data?.[0]) {
+                  return { ...ep, responseExample: liveData.data[0] };
+                }
+                return ep;
+              })
+            );
+          }
+        })
+        .catch((err) => {
+          console.warn(`[ResourcePage] Live sample fetch warning for ${resource}:`, err);
+        });
+    }
+  }, [resource, res]);
 
   if (!res) {
     notFound();
   }
 
-  const filteredEndpoints = res.endpoints.filter((ep) => {
+  const filteredEndpoints = endpoints.filter((ep) => {
     if (activeMethodFilter === 'ALL') return true;
     return ep.method === activeMethodFilter;
   });
 
   const getMethodCount = (method: string) => {
-    if (method === 'ALL') return res.endpoints.length;
-    return res.endpoints.filter((e) => e.method === method).length;
+    if (method === 'ALL') return endpoints.length;
+    return endpoints.filter((e) => e.method === method).length;
   };
 
   return (
@@ -110,3 +141,4 @@ export default function ResourcePage({ params }: ResourcePageProps) {
     </div>
   );
 }
+

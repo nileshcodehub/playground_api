@@ -7,26 +7,47 @@ import config from '@/config/env';
 export default function SandboxPage() {
   const [copiedUuid, setCopiedUuid] = useState(false);
   const [copiedToken, setCopiedToken] = useState(false);
-  const [uuid, setUuid] = useState('df9ee9b9-52a7-4e7c-a325-de21989d0a85');
-  const [signedToken, setSignedToken] = useState('df9ee9b9-52a7-4e7c-a325-de21989d0a85.8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d');
+  const [uuid, setUuid] = useState('');
+  const [signedToken, setSignedToken] = useState('');
 
   useEffect(() => {
+    const updateToken = (raw: string) => {
+      setSignedToken(raw);
+      setUuid(raw.split('.')[0]);
+    };
+
     const match = document.cookie.match(/pg_identity=([^;]+)/);
     if (match && match[1]) {
-      const parts = match[1].split('.');
-      setUuid(parts[0]);
-      setSignedToken(match[1]);
+      updateToken(match[1]);
+    } else {
+      fetch(`${config.apiUrl}/session/stats`, { credentials: 'include' })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.identity?.id) {
+            const reMatch = document.cookie.match(/pg_identity=([^;]+)/);
+            if (reMatch && reMatch[1]) {
+              updateToken(reMatch[1]);
+            } else {
+              updateToken(data.identity.id);
+            }
+          }
+        })
+        .catch((err) => {
+          console.warn('[SandboxPage] Failed to fetch live session token:', err);
+        });
     }
   }, []);
 
   const handleCopyUuid = () => {
+    if (!uuid) return;
     navigator.clipboard.writeText(uuid);
     setCopiedUuid(true);
     setTimeout(() => setCopiedUuid(false), 2000);
   };
 
   const handleCopyToken = () => {
-    navigator.clipboard.writeText(signedToken);
+    if (!signedToken && !uuid) return;
+    navigator.clipboard.writeText(signedToken || uuid);
     setCopiedToken(true);
     setTimeout(() => setCopiedToken(false), 2000);
   };
@@ -60,20 +81,24 @@ export default function SandboxPage() {
 
         <div className="p-4 rounded-xl bg-bg-secondary border border-border-theme space-y-2">
           <div className="text-[11px] text-text-muted">Format: &lt;UUID&gt;.&lt;HMAC_SIGNATURE&gt;</div>
-          <div className="text-sm font-bold text-emerald-400 break-all select-all">{signedToken}</div>
+          <div className="text-sm font-bold text-emerald-400 break-all select-all">
+            {signedToken || uuid || 'Active Session Token'}
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={handleCopyUuid}
-            className="px-4 py-2 rounded-xl bg-bg-tertiary hover:bg-border-theme text-text-primary text-xs font-sans font-semibold transition-colors cursor-pointer flex items-center gap-2"
+            disabled={!uuid}
+            className="px-4 py-2 rounded-xl bg-bg-tertiary hover:bg-border-theme text-text-primary text-xs font-sans font-semibold transition-colors cursor-pointer flex items-center gap-2 disabled:opacity-50"
           >
             <Icon icon={copiedUuid ? 'ph:check-bold' : 'ph:copy-bold'} className="w-4 h-4 text-emerald-400" />
             <span>{copiedUuid ? 'UUID Copied!' : 'Copy UUID Only'}</span>
           </button>
           <button
             onClick={handleCopyToken}
-            className="px-4 py-2 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-xs font-sans font-semibold transition-colors cursor-pointer flex items-center gap-2 shadow-md"
+            disabled={!signedToken && !uuid}
+            className="px-4 py-2 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-xs font-sans font-semibold transition-colors cursor-pointer flex items-center gap-2 shadow-md disabled:opacity-50"
           >
             <Icon icon={copiedToken ? 'ph:check-bold' : 'ph:key-bold'} className="w-4 h-4" />
             <span>{copiedToken ? 'Signed Token Copied!' : 'Copy Signed Token (<uuid>.<sig>)'}</span>
@@ -92,7 +117,7 @@ export default function SandboxPage() {
             The backend sets the <code className="font-mono text-accent-primary">pg_identity</code> HTTP cookie automatically. For cross-origin E2E test suites (Playwright, Cypress) or mobile applications where cookies are restricted, pass the header explicitly:
           </p>
           <div className="p-3.5 rounded-xl bg-code-bg font-mono text-xs text-emerald-400 border border-border-theme select-all">
-            X-Playground-Identity: {signedToken}
+            X-Playground-Identity: {signedToken || uuid || '<your_signed_token>'}
           </div>
         </div>
 
@@ -122,3 +147,4 @@ export default function SandboxPage() {
     </div>
   );
 }
+

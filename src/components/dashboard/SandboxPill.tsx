@@ -2,29 +2,52 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
+import config from '@/config/env';
 
 export function SandboxPill() {
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [fullToken, setFullToken] = useState('df9ee9b9-52a7-4e7c-a325-de21989d0a85.8a7b6c5d4e3f');
-  const [displayId, setDisplayId] = useState('df9ee9b9-52a7...');
+  const [fullToken, setFullToken] = useState('');
+  const [displayId, setDisplayId] = useState('Active');
 
   useEffect(() => {
     setMounted(true);
-    // Check cookie or header fallback identity
-    const match = document.cookie.match(/pg_identity=([^;]+)/);
-    if (match && match[1]) {
-      const raw = match[1];
+    const updateIdentity = (raw: string) => {
       setFullToken(raw);
       if (raw.length > 16) {
         setDisplayId(raw.slice(0, 8) + '...' + raw.slice(-4));
       } else {
         setDisplayId(raw);
       }
+    };
+
+    // 1. Check cookie
+    const match = document.cookie.match(/pg_identity=([^;]+)/);
+    if (match && match[1]) {
+      updateIdentity(match[1]);
+    } else {
+      // 2. Fetch backend root/stats to initialize/retrieve identity cookie
+      fetch(`${config.apiUrl}/session/stats`, { credentials: 'include' })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.identity?.id) {
+            const reMatch = document.cookie.match(/pg_identity=([^;]+)/);
+            if (reMatch && reMatch[1]) {
+              updateIdentity(reMatch[1]);
+            } else {
+              updateIdentity(data.identity.id);
+            }
+          }
+        })
+        .catch(() => {
+          // Fallback to active state if backend request fails
+          setDisplayId('Active');
+        });
     }
   }, []);
 
   const handleCopy = () => {
+    if (!fullToken) return;
     navigator.clipboard.writeText(fullToken);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -40,16 +63,19 @@ export function SandboxPill() {
         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
       </span>
       <span className="font-medium text-text-primary hidden sm:inline">Sandbox Active:</span>
-      <span className="text-accent-primary font-semibold" title={fullToken} suppressHydrationWarning>
-        {mounted ? displayId : 'df9ee9b9-52a7...'}
+      <span className="text-accent-primary font-semibold" title={fullToken || displayId} suppressHydrationWarning>
+        {mounted ? displayId : 'Active'}
       </span>
-      <button
-        onClick={handleCopy}
-        title="Copy Signed Identity Token"
-        className="text-text-muted hover:text-text-primary transition-colors cursor-pointer ml-1"
-      >
-        <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5" />
-      </button>
+      {fullToken && (
+        <button
+          onClick={handleCopy}
+          title="Copy Signed Identity Token"
+          className="text-text-muted hover:text-text-primary transition-colors cursor-pointer ml-1"
+        >
+          <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5" />
+        </button>
+      )}
     </div>
   );
 }
+
