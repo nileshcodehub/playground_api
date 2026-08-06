@@ -3,7 +3,17 @@
  * Rule: NEVER access process.env directly outside this file.
  */
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || (
+  process.env.NODE_ENV === 'production'
+    ? 'https://playground-api-xi.vercel.app'
+    : 'http://localhost:3000'
+);
+
+// Ensure HTTPS scheme in production for canonical links & SEO
+const siteUrl = process.env.NODE_ENV === 'production' && rawSiteUrl.startsWith('http://')
+  ? rawSiteUrl.replace('http://', 'https://')
+  : rawSiteUrl;
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 const envConfig = {
@@ -18,5 +28,6 @@ const envConfig = {
 };
 
 export default envConfig;
+
 
 

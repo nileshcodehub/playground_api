@@ -9,10 +9,14 @@ import { getWebApiSchema } from '@/lib/json-ld';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+  alternates: {
+    canonical: siteConfig.url,
+  },
   title: {
     default: siteConfig.title,
     template: `%s | ${siteConfig.name}`,
   },
+
   description: siteConfig.description,
   keywords: [
     'mock api',
