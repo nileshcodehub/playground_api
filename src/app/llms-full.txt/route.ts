@@ -3,13 +3,15 @@ import config from '@/config/env';
 import { apiCatalog } from '@/config/api-catalog';
 
 export async function GET() {
+  const publicApi = config.publicApiUrl || config.apiUrl;
   let fullText = `# Playground API — Full AI Technical Reference Specification
 
-Base API Endpoint: ${config.apiUrl}
+Base API Endpoint: ${publicApi}
 Documentation Site: ${config.siteUrl}
 Version: ${config.apiVersion}
 
 `;
+
 
   apiCatalog.forEach((resource) => {
     fullText += `## Resource: ${resource.name}\n`;

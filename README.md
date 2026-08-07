@@ -1,106 +1,172 @@
-# 🚀 Playground API
+# 🚀 Playground API — Frontend & Interactive Developer Portal
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18%2B-green.svg)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-v5.x-blue.svg)](https://expressjs.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-v15.1-black.svg)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-v19-blue.svg)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4.0-38bdf8.svg)](https://tailwindcss.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-v5.7-blue.svg)](https://www.typescriptlang.org/)
+[![Express 5](https://img.shields.io/badge/Express-v5.0-blue.svg)](https://expressjs.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-v5.x-informational.svg)](https://www.prisma.io/)
+[![Neon PostgreSQL](https://img.shields.io/badge/Neon-PostgreSQL-00e599.svg)](https://neon.tech/)
 [![Deployed on Vercel](https://img.shields.io/badge/Vercel-Deployed-black.svg)](https://playground-api-xi.vercel.app/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 
-A state-of-the-art, **stateful JSONPlaceholder-style mock REST API** built with **Node.js (ESM)**, **Express 5**, **Prisma ORM**, **Neon PostgreSQL**, and **EJS**.
+A state-of-the-art, **stateful mock REST & GraphQL API developer portal** built with **Next.js 15 (App Router)**, **React 19**, **Tailwind CSS v4**, and **TypeScript**.
 
-Playground API provides pre-seeded, production-grade global baseline datasets (`users`, `posts`, `comments`, `todos`) while allowing developers, frontend engineers, and QA test suites to execute `POST`, `PUT`, `PATCH`, and `DELETE` mutations in an isolated, **zero-login per-visitor session sandbox**.
+Playground API solves the biggest flaw of standard mock APIs (like JSONPlaceholder): **mutations actually persist in an isolated, zero-login per-visitor sandbox overlay**. When you execute `POST`, `PUT`, `PATCH`, or `DELETE`, your changes remain visible across page reloads and API calls without altering shared global baseline data or affecting other users.
 
-Shared global baseline data is **never permanently mutated**; instead, per-session mutations are virtualized over the global database using HMAC-SHA256 signed session tokens delivered via HTTP-only cookies (`pg_identity`) or the `X-Playground-Identity` header.
-
-🔗 **Live Deployment & Interactive Developer Docs**: [https://playground-api-xi.vercel.app/](https://playground-api-xi.vercel.app/)
+🔗 **Live Portal Application**: [https://playground-api-xi.vercel.app/](https://playground-api-xi.vercel.app/)  
+📖 **Interactive Documentation**: [https://playground-api-xi.vercel.app/docs](https://playground-api-xi.vercel.app/docs)  
+🧰 **Interactive API Studio**: [https://playground-api-xi.vercel.app/docs/studio](https://playground-api-xi.vercel.app/docs/studio)  
+🪐 **GraphQL Explorer**: [https://playground-api-xi.vercel.app/docs/graphql](https://playground-api-xi.vercel.app/docs/graphql)  
+🤖 **AI Agent Documentation**: [https://playground-api-xi.vercel.app/llms.txt](https://playground-api-xi.vercel.app/llms.txt)
 
 ---
 
-## ✨ Architectural Features & Capabilities
+## ⚡ Playground API vs Traditional Mock APIs
 
-- 🔒 **Zero-Login Session Sandboxing**: Every visitor gets an isolated stateful sandbox overlay automatically. Creates (`local-<uuid>`), updates, and deletes apply strictly to their session identity without requiring user sign-in or altering shared global data.
-- 🔑 **Option B HMAC Signed Session Tokens**: Identities are protected with HMAC-SHA256 token signatures. Works seamlessly via HTTP cookies (`pg_identity`) or cross-origin request headers (`X-Playground-Identity`).
+| Feature | Traditional Mock APIs (JSONPlaceholder, ReqRes) | 🚀 Playground API |
+| :--- | :--- | :--- |
+| **Mutation Persistence** | ❌ None (Fake response with ID 101, disappears immediately) | ✅ **Stateful Session Sandbox** (Mutations persist per visitor) |
+| **User Sign-In Required?** | ❌ N/A | ✅ **Zero Login Required** (Auto HMAC signed identity tokens) |
+| **API Protocols** | REST only | ✅ **REST v1 + Full GraphQL Gateway** |
+| **Network Latency Testing** | ❌ Fixed static response speed | ✅ **Simulate Delay (`?_delay=1500`) & Error Statuses (`?_status=500`)** |
+| **Authentication Testing** | ❌ Hardcoded tokens | ✅ **Fake JWT Login, Register & Bearer Profile (`/auth/*`)** |
+| **Full-Text Search & Sorting** | ❌ Basic or limited | ✅ **Universal Substring Search (`?q=`) & Multi-Field Sorting (`?_sort=`)** |
+| **Schema Exporters** | ❌ None | ✅ **One-Click OpenAPI 3.0, Postman, Bruno, Insomnia & TypeScript SDK (.d.ts)** |
+| **State Portability** | ❌ None | ✅ **Snapshot Export & Import JSON** |
+
+---
+
+## ✨ Features & Platform Capabilities
+
+### 🎨 Frontend Portal Features (`playground_api_fe`)
+- ⚡ **Next.js 15 App Router Architecture**: Built with modern server and client components, static site generation (SSG), dynamic routes, and zero layout shift.
+- 🔀 **Transparent API Proxy Rewrites**: 
+  - All frontend API calls to `/api/*` transparently proxy to the backend server (`playground-api-backend.vercel.app`).
+  - Same-origin execution eliminates CORS errors and hides backend domain details.
+- 🎨 **Obsidian Dark & Light Theme System**: Tailored HSL color system, glassmorphic cards, custom thin scrollbars, and full mobile-responsive sidebar navigation.
+- 🧰 **Interactive API Studio**: Test `GET`, `POST`, `PUT`, `PATCH`, and `DELETE` requests in real-time with dynamic query params, body editors, header simulation controls, and raw JSON response inspectors.
+- 🪐 **GraphQL Explorer & GraphiQL IDE**: Full interactive IDE to write, test, and validate GraphQL queries and mutations over sandboxed data.
+- 📊 **Session Sandbox Quota & Activity Modal**: Real-time status pill and activity modal displaying active sandbox mutations, resource quotas (max 30 created items per collection), and 10-day inactivity countdown TTL.
+- 💾 **State Snapshot Export & Import**: Export your active session overlay state as a JSON file and restore it anytime to resume testing.
+- 📦 **One-Click Schema Downloads**: Download OpenAPI 3.0 Specs, Postman Collections, Bruno Collections, Insomnia Collections, and TypeScript SDK definitions (`.d.ts`).
+- 🛡️ **Comprehensive Security Headers**: Pre-configured in `vercel.json` and `next.config.mjs` with strict Content-Security-Policy (CSP), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, and `Permissions-Policy`.
+- 🤖 **AI-Native & LLM Ready**: Includes `/llms.txt` and `/llms-full.txt` endpoints formatted for AI assistants (ChatGPT, Claude, Perplexity).
+
+### ⚙️ Backend Engine Capabilities (`playground_api_be`)
+- 🔒 **HMAC-SHA256 Signed Session Tokens**: Identities are protected with HMAC signatures delivered via `pg_identity` HTTP-only cookies or `X-Playground-Identity` request headers.
 - ⚡ **Virtual Merging & Smart Pagination Engine**:
-  - `GET` operations build virtual lists: newly created records appear at the **top**, updates apply **in-place**, and deleted records are filtered out without ID renumbering.
-  - Slices merged virtual ID lists prior to database record retrieval for optimal performance.
-- 🔍 **Universal Full-Text Search (`?q=<term>`)**: Case-insensitive substring searching across all resource fields and nested objects in merged lists.
-- 🔀 **Dynamic Sorting (`?_sort=<field>&_order=asc|desc`)**: Flexible multi-field sorting across merged baseline and sandbox records.
-- 🔗 **Relational Sub-Resources & Filtering**:
-  - Supports query parameter filtering: `GET /posts?user_id=1`, `GET /todos?user_id=1&completed=true`.
-  - Supports nested relational routes: `GET /users/1/posts`, `GET /users/1/todos`, `GET /posts/1/comments`.
-- ⏱️ **Network Delay & Error Simulation**:
-  - Simulate latency: `X-Simulate-Delay: 1500` or `GET /posts?_delay=1500` (0–20,000ms).
-  - Simulate HTTP errors: `X-Simulate-Status: 500` or `GET /posts?_status=404` (400–599 status codes).
-- 📊 **Session Quota & Activity Dashboard Modal**: Interactive modal displaying real-time identity metrics, sandbox mutation counts, quota caps (max 30 created records per resource), and 10-day inactivity countdown TTL.
-- 📦 **One-Click Multi-Format Schema Downloads**: Export OpenAPI 3.0 Specs, Postman Collections, Bruno Collections, and Insomnia Collections for all or individual resource collections.
-- 🎨 **Responsive Developer Portal**: Dark Obsidian & Light Mode documentation built with EJS, Vanilla CSS grid/flex layout, horizontal snippet tab bar (cURL, Node fetch, Axios, Python, Go, Swift, Kotlin, Rust, PHP), and a mobile sidebar quick actions card.
-- 🏥 **Health Check & Operational Metrics**: Real-time status at `GET /health` monitoring database connectivity, query latency ms, active session identities count, server uptime, and memory usage.
+  - `GET` requests construct virtual lists: new creations appear at the **top**, updates apply **in-place**, and deletes are filtered out without ID renumbering.
+- 🔗 **Relational Sub-Resources & Query Filtering**: Filter resources via `?user_id=1` or nested routes like `GET /users/1/posts` and `GET /posts/1/comments`.
+- ⏱️ **Network Delay & Error Simulation**: Test frontend loading indicators (`X-Simulate-Delay: 1500`) and error boundaries (`X-Simulate-Status: 500`).
+- 🎨 **Custom Collections & Media Helpers**: Create dynamic endpoints on the fly (`POST /custom/products`) and generate seed-based placeholder images (`GET /avatars/:seed.svg`).
+- 🏥 **Health Check & Metrics**: Monitor server uptime, active session count, database latency, and memory usage at `GET /health`.
 
 ---
 
-## 📡 API Endpoint Reference
+## 📡 Complete API Endpoint Reference
 
-All list endpoints support pagination (`?page=1&limit=10`), full-text search (`?q=term`), sorting (`?_sort=title&_order=desc`), and filtering (`?user_id=1`).
+All REST list endpoints support pagination (`?page=1&limit=10`), full-text search (`?q=javascript`), sorting (`?_sort=title&_order=desc`), and filtering (`?user_id=1`).
 
-### 📦 Core Resource Endpoints
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/users` | List users (merged global baseline + session sandbox overlay) |
-| `GET` | `/users/:id` | Get user by ID (integer for global, string `local-<uuid>` for sandbox) |
-| `POST` | `/users` | Create sandbox user record (max 30 created records per session) |
-| `PUT` | `/users/:id` | Replace user record in session overlay |
-| `PATCH` | `/users/:id` | Update specific user fields in session overlay |
-| `DELETE` | `/users/:id` | Remove user record from session overlay |
-| `GET` | `/posts` | List posts (supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) |
-| `GET` | `/comments` | List comments (supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) |
-| `GET` | `/todos` | List todos (supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) |
-
-### 🔗 Relational Sub-Resource Routes
+### 📦 Core REST Resources (`/api/v1`)
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/users/:userId/posts` | List posts belonging to specific user |
-| `GET` | `/users/:userId/todos` | List todos belonging to specific user |
-| `GET` | `/posts/:postId/comments` | List comments belonging to specific post |
+| `GET` | `/api/v1/users` | List users (merged baseline global seed + visitor session overlay) |
+| `GET` | `/api/v1/users/:id` | Get user by ID (integer for baseline, string `local-<uuid>` for sandbox) |
+| `POST` | `/api/v1/users` | Create sandbox user record (max 30 created records per session) |
+| `PUT` | `/api/v1/users/:id` | Replace user record in session overlay |
+| `PATCH` | `/api/v1/users/:id` | Update specific user fields in session overlay |
+| `DELETE` | `/api/v1/users/:id` | Remove user record from session overlay |
+| `GET` | `/api/v1/posts` | List posts (supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) |
+| `GET` | `/api/v1/comments` | List comments (supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) |
+| `GET` | `/api/v1/todos` | List todos (supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) |
 
-### 🛡️ Session Sandbox & Utility Endpoints
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/session/stats` | Retrieve session quota usage, total records, and 10-day inactivity purge TTL |
-| `DELETE` | `/session/reset` | Purge all session sandbox mutations and restore pristine global baseline |
-| `POST` | `/session/reset` | Programmatically reset session sandbox |
-
-### 📦 Collection Schema Downloads
+### 🔗 Relational Routes
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/downloads/openapi.json` | Download OpenAPI 3.0 Specification (`?resource=posts`) |
-| `GET` | `/downloads/postman.json` | Download Postman Collection v2.1 (`?resource=posts`) |
-| `GET` | `/downloads/bruno.json` | Download Bruno API Collection (`?resource=posts`) |
-| `GET` | `/downloads/insomnia.json` | Download Insomnia Collection (`?resource=posts`) |
+| `GET` | `/api/v1/users/:userId/posts` | List posts belonging to specific user |
+| `GET` | `/api/v1/users/:userId/todos` | List todos belonging to specific user |
+| `GET` | `/api/v1/posts/:postId/comments` | List comments belonging to specific post |
 
-### 📑 Hosted Documentation & Operational Routes
+### 🔑 Authentication Simulation (`/api/v1/auth`)
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/` or `/docs` | Hosted Documentation landing page |
-| `GET` | `/docs/:resource` | Detailed resource docs page (`users`, `posts`, `comments`, `todos`) |
-| `GET` | `/health` | Health check & system operational metrics JSON |
+| `POST` | `/api/v1/auth/login` | Login with credentials returning JWT access token & user profile |
+| `POST` | `/api/v1/auth/register` | Register new user profile |
+| `POST` | `/api/v1/auth/refresh` | Refresh JWT access token |
+| `GET` | `/api/v1/auth/me` | Get current user profile using `Authorization: Bearer <token>` |
+
+### 🪐 GraphQL & Custom Resources
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/v1/graphql` | GraphQL Gateway supporting queries and mutations |
+| `GET` | `/api/v1/custom/:resource` | Fetch dynamic custom collection items (e.g. `/custom/products`) |
+| `POST` | `/api/v1/custom/:resource` | Create dynamic custom resource item |
+| `GET` | `/avatars/:seed.svg` | Dynamic SVG avatar image generator |
+
+### 🛡️ Session Sandbox & Downloads
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/session/stats` | Retrieve active session metrics, quota usage, and 10-day purge TTL |
+| `DELETE` | `/api/v1/session/reset` | Reset session sandbox and restore pristine global baseline |
+| `GET` | `/api/v1/session/export` | Download active sandbox overlay snapshot JSON |
+| `POST` | `/api/v1/session/import` | Restore sandbox state from uploaded snapshot JSON |
+| `GET` | `/api/v1/downloads/openapi.json` | Download OpenAPI 3.0 Specification |
+| `GET` | `/api/v1/downloads/postman.json` | Download Postman Collection v2.1 |
+| `GET` | `/api/v1/downloads/bruno.json` | Download Bruno API Collection |
+| `GET` | `/api/v1/downloads/insomnia.json` | Download Insomnia Collection |
+| `GET` | `/api/v1/downloads/playground-api.d.ts` | Download TypeScript SDK definitions |
+
+---
+
+## 💻 Quick Code Examples
+
+### JavaScript / TypeScript (`fetch`)
+```typescript
+// Fetch posts with search and pagination
+const response = await fetch('https://playground-api-xi.vercel.app/api/v1/posts?_limit=5&q=javascript');
+const posts = await response.json();
+console.log(posts);
+
+// Create a new post in your session sandbox
+const createRes = await fetch('https://playground-api-xi.vercel.app/api/v1/posts', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    title: 'My Custom Sandbox Post',
+    body: 'This post is saved in my isolated visitor sandbox overlay.',
+    userId: 1,
+  }),
+});
+const newPost = await createRes.json();
+console.log('Created Sandbox Post:', newPost);
+```
+
+### cURL
+```bash
+# Test network latency (1.5s delay) and create post
+curl -X POST "https://playground-api-xi.vercel.app/api/v1/posts?_delay=1500" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Testing Latency", "body": "Simulating slow network connection", "userId": 1}'
+```
 
 ---
 
 ## ⚙️ Environment Configuration
 
-Centralized variable loading and validation is handled strictly in [`src/config/env.js`](src/config/env.js). Per project guidelines, direct usage of `process.env` outside `env.js` is prohibited.
+Frontend configuration is centralized in [`src/config/env.ts`](src/config/env.ts).
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
-| `PORT` | Listening HTTP server port | `3000` |
-| `DATABASE_URL` | PostgreSQL connection string (Prisma / Neon DB) | `postgresql://postgres:postgres@localhost:5432/playground_api?schema=public` |
-| `IP_HASH_SALT` | Secret salt string for SHA-256 IP hashing | `default_playground_salt_key` |
-| `TRUST_PROXY` | Set `true` when deployed behind a reverse proxy (Nginx / Vercel) | `false` |
+| `PORT` | Local Next.js dev server port | `3000` |
+| `NEXT_PUBLIC_API_URL` | Relative or absolute API endpoint path | `/api/v1` |
+| `NEXT_PUBLIC_SITE_URL` | Public canonical site URL | `https://playground-api-xi.vercel.app` |
+| `BACKEND_URL` | Local proxy backend target for `next dev` | `http://localhost:3001` |
 | `NODE_ENV` | Application environment (`development` / `production`) | `development` |
 
 ---
@@ -111,143 +177,67 @@ Centralized variable loading and validation is handled strictly in [`src/config/
 
 ```bash
 git clone https://github.com/nileshcodehub/playground_api.git
-cd playground_api
+cd playground_api_fe
 npm install
 ```
 
 ### 2. Configure Environment
 
-Copy `.env.example` to `.env` and set your local PostgreSQL or Neon database URL:
+Copy `.env.example` to `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-### 3. Migration & Prisma Client Generation
+### 3. Launch Local Development Server
 
-Generate Prisma Client and push database schema:
-
-```bash
-npx prisma generate
-npx prisma db push
-```
-
-### 4. Seed Baseline Datasets
-
-Populate the database with initial baseline mock data (25 users, 100 posts, 300 comments, 125 todos):
-
-```bash
-npm run seed
-```
-
-### 5. Launch Local Development Server
+Start the backend server in `playground_api_be` on port 3001, then launch Next.js:
 
 ```bash
 npm run dev
 ```
 
-The API server will listen locally at `http://localhost:3000` and hosted documentation at `http://localhost:3000/docs`.
+The app will start at `http://localhost:3000`. Next.js rewrites will proxy `/api/*` to `http://localhost:3001/api/*`.
 
----
-
-## 🧪 Automated Testing
-
-The project includes an automated test suite executed via Node's native runner (`node:test`):
+### 4. Build & Production Verification
 
 ```bash
-npm test
+npm run build
+npm run start
 ```
-
-**Test Suites (10 suites, 45 tests):**
-- `tests/app.test.js` — General routing and 404 error handling
-- `tests/resources.test.js` — REST CRUD operations & local ID assignment
-- `tests/session.test.js` — Option B HMAC signed session tokens & reset API
-- `tests/relational.test.js` — Relational sub-resources & query filtering
-- `tests/search.test.js` — Universal full-text search (`?q=`)
-- `tests/sort.test.js` — Dynamic sorting (`?_sort=&_order=`)
-- `tests/simulation.test.js` — Artificial delay & HTTP status error simulation
-- `tests/dashboard.test.js` — Session quota stats API
-- `tests/downloads.test.js` — OpenAPI, Postman, Bruno, Insomnia download specs
-- `tests/rateLimit.test.js` — Rate limiting headers and enforcement
 
 ---
 
 ## 📁 Project Structure
 
 ```
-playground_api/
-├── .agents/                    # AI Agent skills, guidelines & task trackers
-│   └── AGENTS.md               # Project-wide mandatory coding guidelines
-├── api/
-│   └── index.js                # Vercel serverless entry point & DB connection bootstrapper
-├── prisma/
-│   └── schema.prisma           # Prisma schema (Identities, OverlayRecords, Globals)
-├── public/
-│   ├── css/
-│   │   └── docs.css            # Developer portal design system & responsive layout
-│   ├── js/
-│   │   ├── endpoints-catalog.js# Client-side endpoint schema definitions
-│   │   └── try-it.js           # Live Try-It tester, modal controllers & theme engine
-│   ├── favicon.svg             # Brand favicon
-│   ├── robots.txt              # SEO robots indexing configuration
-│   └── sitemap.xml             # Search engine XML sitemap
+playground_api_fe/
+├── public/                     # Static assets (favicons, icons, manifest)
 ├── src/
+│   ├── app/                    # Next.js App Router pages & layouts
+│   │   ├── docs/               # Documentation pages ([resource], studio, stats, sandbox, etc.)
+│   │   ├── layout.tsx          # Root layout with metadata & providers
+│   │   ├── page.tsx            # Home landing page
+│   │   ├── llms.txt/           # AI Agent overview endpoint
+│   │   └── llms-full.txt/      # Full AI reference specification endpoint
+│   ├── components/
+│   │   ├── dashboard/          # SandboxPill, StatsModal components
+│   │   ├── docs/               # EndpointCard, TryItRunner, CodeGenerators
+│   │   ├── landing/            # HeroSection, ResourceGrid, QuickstartTabs
+│   │   ├── layout/             # Header, Footer, Sidebar, Navigation
+│   │   └── theme/              # ThemeProvider & theme toggle controls
 │   ├── config/
-│   │   ├── endpointsCatalog.js # Server-side endpoint catalog definitions
-│   │   └── env.js              # Centralized environment variable loader
-│   ├── controllers/
-│   │   ├── healthController.js # Operational metrics & health check controller
-│   │   └── resourceController.js # Generic REST CRUD controller factory
-│   ├── db/
-│   │   ├── initDb.js           # Runtime DB bootstrapper
-│   │   ├── migrateAndSeed.js   # Vercel deployment DB sync helper
-│   │   ├── prismaClient.js     # Prisma client singleton
-│   │   ├── seed.js             # Seed database runner script
-│   │   └── seedData.js         # Global baseline mock datasets
-│   ├── jobs/
-│   │   └── cleanupInactiveIdentities.js # 10-day inactive identity purge task
-│   ├── middleware/
-│   │   ├── errorHandler.js     # Centralized error handling middleware
-│   │   ├── identity.js         # Cookie & header HMAC session identity middleware
-│   │   ├── rateLimit.js        # Global & mutation rate limiters
-│   │   └── simulation.js       # Network delay & error simulation middleware
-│   ├── routes/
-│   │   ├── cronRoutes.js       # Vercel cron cleanup endpoint (/api/cron/cleanup)
-│   │   ├── docsRoutes.js       # Documentation portal & resource views router
-│   │   ├── downloadRoutes.js   # Multi-format schema collection downloads router
-│   │   ├── resourceRoutes.js   # Generic Express resource router factory
-│   │   └── sessionRoutes.js   # Session sandbox management & stats router
-│   ├── services/
-│   │   └── overlayService.js   # Virtual list merging, filtering & pagination engine
-│   ├── utils/
-│   │   ├── sanitize.js         # Input sanitization helpers
-│   │   └── sessionToken.js     # HMAC-SHA256 session token signer & verifier
-│   └── app.js                  # Express middleware & route assembly
-├── tests/
-│   ├── app.test.js             # General app & 404 tests
-│   ├── dashboard.test.js       # Session quota stats tests
-│   ├── downloads.test.js       # Schema download collection tests
-│   ├── rateLimit.test.js       # Rate limiting tests
-│   ├── relational.test.js      # Relational sub-resource tests
-│   ├── resources.test.js       # REST CRUD & overlay tests
-│   ├── search.test.js          # Full-text search tests
-│   ├── session.test.js          # HMAC session & reset tests
-│   ├── simulation.test.js       # Network simulation tests
-│   └── sort.test.js            # Dynamic sorting tests
-├── views/
-│   ├── layouts/
-│   │   └── base.ejs            # EJS master layout template
-│   ├── partials/
-│   │   ├── endpoint.ejs        # Endpoint card component with multi-language snippets
-│   │   ├── explainer-modal.ejs # Sandboxing architecture explainer modal
-│   │   ├── head.ejs            # Document head partial
-│   │   └── sidebar.ejs         # Documentation navigation sidebar
-│   ├── docs-index.ejs          # Hosted documentation landing view
-│   └── [resource].ejs          # Resource docs pages (users, posts, comments, todos)
-├── vercel.json                 # Vercel serverless deployment config
-├── package.json                # NPM dependencies & test scripts
-├── README.md                   # Project documentation
-└── server.js                   # Standalone Node.js server entry point
+│   │   ├── api-catalog.ts      # Endpoint schemas & documentation catalog
+│   │   ├── env.ts              # Environment variable loader
+│   │   └── site.ts             # Site metadata & navigation structure
+│   ├── lib/                    # JSON-LD & utility helpers
+│   ├── styles/                 # Global CSS & Tailwind styling
+│   └── utils/                  # Collection export generators
+├── .env.example                # Environment template
+├── next.config.mjs             # Next.js configuration & local dev rewrites
+├── postcss.config.mjs          # PostCSS Tailwind plugin config
+├── tsconfig.json               # TypeScript compiler config
+└── vercel.json                 # Vercel deployment rewrites & security headers
 ```
 
 ---
@@ -255,3 +245,5 @@ playground_api/
 ## 📄 License
 
 [ISC](LICENSE) © Nilesh Kumar
+
+

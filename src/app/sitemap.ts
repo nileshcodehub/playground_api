@@ -24,7 +24,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/docs/collections/bruno',
     '/docs/collections/insomnia',
     '/docs/collections/typescript',
+    '/llms.txt',
+    '/llms-full.txt',
   ];
+
 
   return routes.map((route) => ({
     url: `${siteConfig.url}${route}`,

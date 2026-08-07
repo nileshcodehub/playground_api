@@ -11,6 +11,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   alternates: {
     canonical: siteConfig.url,
+    types: {
+      'text/plain': [
+        { url: '/llms.txt', title: 'LLM Documentation' },
+        { url: '/llms-full.txt', title: 'Full LLM Reference' },
+      ],
+    },
   },
   title: {
     default: siteConfig.title,
@@ -27,6 +33,9 @@ export const metadata: Metadata = {
     'graphql mock gateway',
     'sandbox api',
     'frontend mock api',
+    'developer tools',
+    'api testing',
+    'stateful mock api',
   ],
   authors: [{ name: 'Nilesh Kumar' }],
   creator: 'Nilesh Kumar',
@@ -46,6 +55,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   icons: {
     icon: '/favicon.svg',
@@ -62,6 +78,10 @@ export default function RootLayout({
 
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <head>
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Documentation" />
+        <link rel="alternate" type="text/plain" href="/llms-full.txt" title="Full LLM Reference Specification" />
+      </head>
       <body
         suppressHydrationWarning
         className="flex flex-col min-h-screen antialiased selection:bg-accent-primary selection:text-white"
@@ -80,3 +100,4 @@ export default function RootLayout({
     </html>
   );
 }
+

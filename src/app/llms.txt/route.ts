@@ -2,10 +2,14 @@ import { NextResponse } from 'next/server';
 import config from '@/config/env';
 
 export async function GET() {
+  const publicApi = config.publicApiUrl || config.apiUrl;
   const content = `# Playground API — AI Model Documentation & Overview
 
 > Free, Instant, Sandboxed Mock REST & GraphQL API Service for Web & Mobile Development.
-> Base API URL: ${config.apiUrl}
+> Base API URL: ${publicApi}
+> OpenAPI Spec: ${publicApi}/downloads/openapi.json
+> Postman Collection: ${publicApi}/downloads/postman.json
+> TypeScript SDK: ${publicApi}/downloads/playground-api.d.ts
 
 ## Project Overview
 Playground API is a modern JSONPlaceholder & Platzi Fake API replacement engineered with identity-isolated mutation overlays over global seed datasets. Frontend applications can perform real POST, PUT, PATCH, and DELETE operations without requiring database setup or backend code.
@@ -19,28 +23,29 @@ Playground API is a modern JSONPlaceholder & Platzi Fake API replacement enginee
 6. **Network Simulation Headers**: Support for \`X-Simulate-Delay: 1000\` and \`X-Simulate-Status: 500\` middleware testing.
 
 ## Core API Endpoints Reference
-- GET ${config.apiUrl}/posts (List posts, supports ?page=1&limit=10&q=search&_sort=title&_order=desc)
-- GET ${config.apiUrl}/posts/:id (Get post by ID or local sandbox ID)
-- POST ${config.apiUrl}/posts (Create new post overlay)
-- PUT ${config.apiUrl}/posts/:id (Replace post overlay)
-- PATCH ${config.apiUrl}/posts/:id (Partial post overlay update)
-- DELETE ${config.apiUrl}/posts/:id (Delete post overlay)
-- GET ${config.apiUrl}/users (List users)
-- GET ${config.apiUrl}/users/:id/posts (Relational user posts)
-- POST ${config.apiUrl}/auth/login (Fake JWT login)
-- GET ${config.apiUrl}/auth/me (Get profile via Bearer token)
-- POST ${config.apiUrl}/graphql (GraphQL query & mutation gateway)
+- GET ${publicApi}/posts (List posts, supports ?page=1&limit=10&q=search&_sort=title&_order=desc)
+- GET ${publicApi}/posts/:id (Get post by ID or local sandbox ID)
+- POST ${publicApi}/posts (Create new post overlay)
+- PUT ${publicApi}/posts/:id (Replace post overlay)
+- PATCH ${publicApi}/posts/:id (Partial post overlay update)
+- DELETE ${publicApi}/posts/:id (Delete post overlay)
+- GET ${publicApi}/users (List users)
+- GET ${publicApi}/users/:id/posts (Relational user posts)
+- POST ${publicApi}/auth/login (Fake JWT login)
+- GET ${publicApi}/auth/me (Get profile via Bearer token)
+- POST ${publicApi}/graphql (GraphQL query & mutation gateway)
 
 ## How to Integrate in Real-World Projects
 \`\`\`javascript
 // Fetch posts using standard JavaScript fetch
-const response = await fetch('${config.apiUrl}/posts?_limit=5');
+const response = await fetch('${publicApi}/posts?_limit=5');
 const posts = await response.json();
 console.log('Fetched posts:', posts);
 \`\`\`
 
 Full specification available at: ${config.siteUrl}/llms-full.txt
 `;
+
 
   return new NextResponse(content, {
     headers: {
