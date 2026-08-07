@@ -13,7 +13,7 @@ interface ResourcePageProps {
 }
 
 export default function ResourcePage({ params }: ResourcePageProps) {
-  const resolvedParams = use(params);
+  const resolvedParams = params && typeof (params as any).then === 'function' ? use(params) : (params as any);
   const resource = resolvedParams?.resource;
   const res = apiCatalog.find((r) => r.id === resource);
 
@@ -46,6 +46,40 @@ export default function ResourcePage({ params }: ResourcePageProps) {
         .catch((err) => {
           console.warn(`[ResourcePage] Live sample fetch warning for ${resource}:`, err);
         });
+
+      if (resource === 'users') {
+        fetch(`${config.apiUrl}/users/1/posts?limit=2`, { credentials: 'include' })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((postsData) => {
+            if (postsData) {
+              setEndpoints((prev) =>
+                prev.map((ep) => (ep.path === '/users/:userId/posts' ? { ...ep, responseExample: postsData } : ep))
+              );
+            }
+          });
+
+        fetch(`${config.apiUrl}/users/1/todos?limit=2`, { credentials: 'include' })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((todosData) => {
+            if (todosData) {
+              setEndpoints((prev) =>
+                prev.map((ep) => (ep.path === '/users/:userId/todos' ? { ...ep, responseExample: todosData } : ep))
+              );
+            }
+          });
+      }
+
+      if (resource === 'posts') {
+        fetch(`${config.apiUrl}/posts/1/comments?limit=2`, { credentials: 'include' })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((commentsData) => {
+            if (commentsData) {
+              setEndpoints((prev) =>
+                prev.map((ep) => (ep.path === '/posts/:postId/comments' ? { ...ep, responseExample: commentsData } : ep))
+              );
+            }
+          });
+      }
     }
   }, [resource, res]);
 

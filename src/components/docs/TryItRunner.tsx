@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { EndpointDef, QueryParamDef } from '@/config/api-catalog';
 import { CodeBlock } from '@/components/ui/CodeBlock';
+import { useLiveCounts } from '@/context/CountsContext';
 import config from '@/config/env';
 
 interface TryItRunnerProps {
@@ -19,6 +20,7 @@ const DEFAULT_GET_QUERY_PARAMS: QueryParamDef[] = [
 ];
 
 export function TryItRunner({ endpoint }: TryItRunnerProps) {
+  const { refreshCounts } = useLiveCounts();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -169,6 +171,10 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
         data,
         isSvg,
       });
+
+      if (res.ok && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(endpoint.method)) {
+        refreshCounts();
+      }
     } catch (err) {
       const timeMs = Math.round(performance.now() - startTime);
       setResponse({

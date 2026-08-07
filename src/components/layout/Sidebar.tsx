@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { siteConfig } from '@/config/site';
+import { useLiveCounts } from '@/context/CountsContext';
 
 interface SidebarProps {
   onSelect?: () => void;
@@ -13,6 +14,8 @@ interface SidebarProps {
 
 export function Sidebar({ onSelect, className = '' }: SidebarProps) {
   const pathname = usePathname();
+  const { counts } = useLiveCounts();
+
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     'About & Overview': true,
     'Identity & Sandbox': true,
@@ -23,6 +26,17 @@ export function Sidebar({ onSelect, className = '' }: SidebarProps) {
 
   const toggleGroup = (title: string) => {
     setOpenGroups((prev) => ({ ...prev, [title]: !prev[title] }));
+  };
+
+  const getDynamicBadge = (href: string, fallbackBadge?: string) => {
+    if (href === '/docs/posts') return `${counts.posts} items`;
+    if (href === '/docs/comments') return `${counts.comments} items`;
+    if (href === '/docs/users') return `${counts.users} items`;
+    if (href === '/docs/todos') return `${counts.todos} items`;
+    if (href === '/docs/custom' && typeof counts.custom === 'number' && counts.custom > 0) {
+      return `${counts.custom} items`;
+    }
+    return fallbackBadge;
   };
 
   return (
@@ -55,6 +69,7 @@ export function Sidebar({ onSelect, className = '' }: SidebarProps) {
                 <ul className="pl-2 space-y-1 border-l border-border-theme ml-3">
                   {group.items.map((item: { title: string; href: string; icon: string; badge?: string }) => {
                     const isActive = pathname === item.href;
+                    const badgeText = getDynamicBadge(item.href, item.badge);
 
                     return (
                       <li key={item.href}>
@@ -71,9 +86,9 @@ export function Sidebar({ onSelect, className = '' }: SidebarProps) {
                             <Icon icon={item.icon} className="w-4 h-4 shrink-0 text-text-muted" />
                             <span className="truncate">{item.title}</span>
                           </span>
-                          {item.badge && (
+                          {badgeText && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-bg-tertiary text-text-muted border border-border-theme font-mono">
-                              {item.badge}
+                              {badgeText}
                             </span>
                           )}
                         </Link>

@@ -51,9 +51,9 @@ export const siteConfig = {
       icon: 'ph:tree-structure-bold',
       items: [
         { title: 'Posts Collection', href: '/docs/posts', badge: '100 items', icon: 'ph:newspaper-bold' },
-        { title: 'Comments Collection', href: '/docs/comments', badge: '500 items', icon: 'ph:chat-circle-text-bold' },
-        { title: 'Users Collection', href: '/docs/users', badge: '10 items', icon: 'ph:users-bold' },
-        { title: 'Todos Collection', href: '/docs/todos', badge: '200 items', icon: 'ph:check-square-offset-bold' },
+        { title: 'Comments Collection', href: '/docs/comments', badge: '300 items', icon: 'ph:chat-circle-text-bold' },
+        { title: 'Users Collection', href: '/docs/users', badge: '25 items', icon: 'ph:users-bold' },
+        { title: 'Todos Collection', href: '/docs/todos', badge: '125 items', icon: 'ph:check-square-offset-bold' },
         { title: 'Authentication (JWT)', href: '/docs/auth', badge: 'Auth', icon: 'ph:lock-key-bold' },
         { title: 'Custom Collections', href: '/docs/custom', badge: 'Dynamic', icon: 'ph:circles-three-plus-bold' },
         { title: 'Media & Avatars', href: '/docs/avatars', badge: 'SVG', icon: 'ph:user-circle-gear-bold' },

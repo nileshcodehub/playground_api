@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import '@/styles/globals.css';
 import Script from 'next/script';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import { CountsProvider } from '@/context/CountsContext';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { siteConfig } from '@/config/site';
@@ -92,9 +93,11 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <ThemeProvider>
-          <Header />
-          <main className="flex-1 w-full">{children}</main>
-          <Footer />
+          <CountsProvider>
+            <Header />
+            <main className="flex-1 w-full">{children}</main>
+            <Footer />
+          </CountsProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,10 +1,15 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
 import { siteConfig } from '@/config/site';
 import { LogoIcon } from '@/components/ui/LogoIcon';
+import { useLiveCounts } from '@/context/CountsContext';
 
 export function Footer() {
+  const { counts } = useLiveCounts();
+
   return (
     <footer className="w-full border-t border-border-theme bg-bg-secondary transition-colors py-12 mt-auto">
       <div className="w-full px-4 sm:px-6 lg:px-8 space-y-10">
@@ -56,25 +61,25 @@ export function Footer() {
               <li>
                 <Link href="/docs/posts" className="hover:text-accent-primary transition-colors flex items-center justify-between">
                   <span>/api/v1/posts</span>
-                  <span className="text-[10px] font-mono text-text-muted">100 items</span>
+                  <span className="text-[10px] font-mono text-text-muted">{counts.posts} items</span>
                 </Link>
               </li>
               <li>
                 <Link href="/docs/comments" className="hover:text-accent-primary transition-colors flex items-center justify-between">
                   <span>/api/v1/comments</span>
-                  <span className="text-[10px] font-mono text-text-muted">500 items</span>
+                  <span className="text-[10px] font-mono text-text-muted">{counts.comments} items</span>
                 </Link>
               </li>
               <li>
                 <Link href="/docs/users" className="hover:text-accent-primary transition-colors flex items-center justify-between">
                   <span>/api/v1/users</span>
-                  <span className="text-[10px] font-mono text-text-muted">10 items</span>
+                  <span className="text-[10px] font-mono text-text-muted">{counts.users} items</span>
                 </Link>
               </li>
               <li>
                 <Link href="/docs/todos" className="hover:text-accent-primary transition-colors flex items-center justify-between">
                   <span>/api/v1/todos</span>
-                  <span className="text-[10px] font-mono text-text-muted">200 items</span>
+                  <span className="text-[10px] font-mono text-text-muted">{counts.todos} items</span>
                 </Link>
               </li>
               <li>
@@ -86,7 +91,9 @@ export function Footer() {
               <li>
                 <Link href="/docs/custom" className="hover:text-accent-primary transition-colors flex items-center justify-between">
                   <span>/api/v1/custom</span>
-                  <span className="text-[10px] font-mono text-amber-400 font-semibold">Dynamic</span>
+                  <span className="text-[10px] font-mono text-amber-400 font-semibold">
+                    {typeof counts.custom === 'number' && counts.custom > 0 ? `${counts.custom} items` : 'Dynamic'}
+                  </span>
                 </Link>
               </li>
             </ul>
