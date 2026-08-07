@@ -10,6 +10,14 @@ export const siteConfig = {
   apiVersion: config.apiVersion,
   versionBadge: 'v1.0.0',
   githubUrl: 'https://github.com/nileshcodehub/playground_api',
+  author: {
+    name: 'Nilesh Kumar',
+    website: 'https://nileshcodehub.github.io/',
+    github: 'https://github.com/nileshcodehub',
+  },
+  healthUrl: `${config.apiUrl}/health`,
+  llmsUrl: '/llms.txt',
+  llmsFullUrl: '/llms-full.txt',
 
   navLinks: [
     { label: 'Overview', href: '/docs/introduction', icon: 'ph:info-bold' },

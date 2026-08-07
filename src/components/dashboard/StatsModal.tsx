@@ -296,11 +296,11 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2 w-full">
           <button
             onClick={handleReset}
             disabled={resetting}
-            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-sans text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
+            className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-sans text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
           >
             <Icon icon={resetting ? 'ph:spinner-bold' : 'ph:trash-bold'} className={`w-4 h-4 ${resetting ? 'animate-spin' : ''}`} />
             <span>{resetting ? 'Resetting Sandbox...' : 'Reset Session Sandbox'}</span>
@@ -309,7 +309,7 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
           <a
             href="/docs/export-import"
             onClick={onClose}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-bg-tertiary hover:bg-border-theme text-text-primary text-xs font-semibold transition-colors"
+            className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-bg-tertiary hover:bg-border-theme text-text-primary text-xs font-semibold transition-colors"
           >
             <Icon icon="ph:cloud-arrow-up-bold" className="w-4 h-4 text-accent-primary" />
             <span>Export / Import JSON</span>
