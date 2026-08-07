@@ -84,7 +84,7 @@ export function EndpointCard({ endpoint }: EndpointCardProps) {
         {endpoint.requestBody && (
           <div className="space-y-1.5">
             <span className="text-[11px] font-mono font-bold text-amber-400 uppercase">Request Body (JSON)</span>
-            <div className="p-4 rounded-xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto leading-relaxed">
+            <div className="p-4 rounded-xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto max-h-64 overflow-y-auto leading-relaxed">
               <pre>
                 <code>{JSON.stringify(endpoint.requestBody, null, 2)}</code>
               </pre>
@@ -94,13 +94,14 @@ export function EndpointCard({ endpoint }: EndpointCardProps) {
 
         <div className="space-y-1.5">
           <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase">Response JSON Example</span>
-          <div className="p-4 rounded-xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto leading-relaxed">
+          <div className="p-4 rounded-xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto max-h-64 overflow-y-auto leading-relaxed">
             <pre>
               <code>{typeof endpoint.responseExample === 'string' ? endpoint.responseExample : JSON.stringify(endpoint.responseExample, null, 2)}</code>
             </pre>
           </div>
         </div>
       </div>
+
 
       {/* Interactive Try-It Runner */}
       <div className="pt-2">
