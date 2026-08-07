@@ -27,13 +27,5 @@
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://playground-api-backend.vercel.app/api/:path*"
-    }
   ]
 }
-
-
