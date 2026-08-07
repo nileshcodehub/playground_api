@@ -12,7 +12,6 @@ Version: ${config.apiVersion}
 
 `;
 
-
   apiCatalog.forEach((resource) => {
     fullText += `## Resource: ${resource.name}\n`;
     fullText += `Description: ${resource.description}\n`;
@@ -31,7 +30,9 @@ Version: ${config.apiVersion}
       if (ep.requestBody) {
         fullText += `Request Body Example:\n\`\`\`json\n${JSON.stringify(ep.requestBody, null, 2)}\n\`\`\`\n`;
       }
-      fullText += `Response Example:\n\`\`\`json\n${JSON.stringify(ep.responseExample, null, 2)}\n\`\`\`\n\n`;
+      const isXml = typeof ep.responseExample === 'string' && ep.responseExample.trim().startsWith('<');
+      const responseStr = typeof ep.responseExample === 'string' ? ep.responseExample : JSON.stringify(ep.responseExample, null, 2);
+      fullText += `Response Example:\n\`\`\`${isXml ? 'xml' : 'json'}\n${responseStr}\n\`\`\`\n\n`;
     });
   });
 

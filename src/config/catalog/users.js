@@ -125,6 +125,41 @@ export const getUsersEndpoints = (sampleRecord = null) => {
       ],
       bodyExample: null,
       responseExample: "204 No Content"
+    },
+    {
+      method: "GET",
+      path: "/users/:userId/posts",
+      summary: "Retrieve all blog posts authored by a specific user with pagination, full-text search, and sorting.",
+      params: [
+        { name: "userId", in: "path", type: "string | integer", description: "Author user ID (e.g. 1 or local-<uuid>)." },
+        { name: "page", in: "query", type: "integer", description: "Page number (1-indexed)." },
+        { name: "limit", in: "query", type: "integer", description: "Posts per page." },
+        { name: "q", in: "query", type: "string", description: "Full-text search query across title and body." }
+      ],
+      bodyExample: null,
+      responseExample: JSON.stringify({
+        data: [
+          { id: 1, user_id: 1, title: "sunt aut facere repellat provident occaecati excepturi", body: "quia et suscipit..." }
+        ],
+        pagination: { page: 1, limit: 10, total: 10, totalPages: 1, hasNextPage: false, hasPrevPage: false }
+      }, null, 2)
+    },
+    {
+      method: "GET",
+      path: "/users/:userId/todos",
+      summary: "Retrieve all task todos assigned to a specific user, with optional completion status filtering.",
+      params: [
+        { name: "userId", in: "path", type: "string | integer", description: "Owner user ID (e.g. 1 or local-<uuid>)." },
+        { name: "completed", in: "query", type: "boolean", description: "Filter tasks by completion status (true or false)." },
+        { name: "page", in: "query", type: "integer", description: "Page number." }
+      ],
+      bodyExample: null,
+      responseExample: JSON.stringify({
+        data: [
+          { id: 1, user_id: 1, title: "delectus aut autem", completed: false }
+        ],
+        pagination: { page: 1, limit: 10, total: 20, totalPages: 2, hasNextPage: true, hasPrevPage: false }
+      }, null, 2)
     }
   ];
 };

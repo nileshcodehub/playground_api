@@ -107,6 +107,24 @@ export const getPostsEndpoints = (sampleRecord = null) => {
       ],
       bodyExample: null,
       responseExample: "204 No Content"
+    },
+    {
+      method: "GET",
+      path: "/posts/:postId/comments",
+      summary: "Retrieve all comments linked directly to a specific blog post.",
+      params: [
+        { name: "postId", in: "path", type: "string | integer", description: "Target post ID (e.g. 1 or local-<uuid>)." },
+        { name: "page", in: "query", type: "integer", description: "Page number (1-indexed)." },
+        { name: "limit", in: "query", type: "integer", description: "Comments per page." },
+        { name: "q", in: "query", type: "string", description: "Search query across comment body." }
+      ],
+      bodyExample: null,
+      responseExample: JSON.stringify({
+        data: [
+          { id: 1, post_id: 1, name: "id labore ex et quam laborum", email: "Eliseo@gardner.biz", body: "laudantium..." }
+        ],
+        pagination: { page: 1, limit: 10, total: 5, totalPages: 1, hasNextPage: false, hasPrevPage: false }
+      }, null, 2)
     }
   ];
 };
