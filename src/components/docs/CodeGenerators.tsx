@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Icon } from '@iconify/react';
+import React from 'react';
 import { EndpointDef } from '@/config/api-catalog';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
 interface CodeGeneratorsProps {
@@ -10,18 +10,15 @@ interface CodeGeneratorsProps {
 }
 
 export function CodeGenerators({ endpoint }: CodeGeneratorsProps) {
-  const [activeLang, setActiveLang] = useState('javascript');
-  const [copied, setCopied] = useState(false);
-
   const fullUrl = `${config.apiUrl}${endpoint.path}`;
+  const hasBody = ['POST', 'PUT', 'PATCH'].includes(endpoint.method) && endpoint.requestBody;
+  const bodyStr = hasBody ? JSON.stringify(endpoint.requestBody, null, 2) : '';
 
-  const generators: Record<string, string> = {
+  const snippets: Record<string, string> = {
     javascript: `fetch('${fullUrl}', {
   method: '${endpoint.method}',
   headers: { 'Content-Type': 'application/json' }${
-    ['POST', 'PUT', 'PATCH'].includes(endpoint.method)
-      ? `,\n  body: JSON.stringify(${JSON.stringify(endpoint.requestBody || {}, null, 2)})`
-      : ''
+    hasBody ? `,\n  body: JSON.stringify(${bodyStr})` : ''
   }
 })
   .then(res => res.json())
@@ -30,85 +27,109 @@ export function CodeGenerators({ endpoint }: CodeGeneratorsProps) {
     axios: `import axios from 'axios';
 
 axios.${endpoint.method.toLowerCase()}('${fullUrl}'${
-      ['POST', 'PUT', 'PATCH'].includes(endpoint.method)
-        ? `, ${JSON.stringify(endpoint.requestBody || {}, null, 2)}`
-        : ''
+      hasBody ? `, ${bodyStr}` : ''
     })
   .then(response => console.log(response.data))
   .catch(error => console.error(error));`,
 
     curl: `curl -X ${endpoint.method} "${fullUrl}" \\
   -H "Content-Type: application/json"${
-    ['POST', 'PUT', 'PATCH'].includes(endpoint.method)
-      ? ` \\\n  -d '${JSON.stringify(endpoint.requestBody || {})}'`
-      : ''
+    hasBody ? ` \\\n  -d '${JSON.stringify(endpoint.requestBody)}'` : ''
   }`,
 
     python: `import requests
 
 url = "${fullUrl}"
 response = requests.${endpoint.method.toLowerCase()}(url${
-      ['POST', 'PUT', 'PATCH'].includes(endpoint.method)
-        ? `, json=${JSON.stringify(endpoint.requestBody || {})}`
-        : ''
+      hasBody ? `, json=${JSON.stringify(endpoint.requestBody)}` : ''
     })
 print(response.json())`,
 
     go: `package main
 
 import (
-	"fmt"
-	"io"
-	"net/http"
+\t"fmt"
+\t"io"
+\t"net/http"${hasBody ? '\n\t"strings"' : ''}
 )
 
 func main() {
-	req, _ := http.NewRequest("${endpoint.method}", "${fullUrl}", nil)
-	resp, _ := http.DefaultClient.Do(req)
-	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
-	fmt.Println(string(body))
+\treq, _ := http.NewRequest("${endpoint.method}", "${fullUrl}", ${
+      hasBody ? `strings.NewReader(\`${bodyStr}\`)` : 'nil'
+    })
+\treq.Header.Set("Content-Type", "application/json")
+\tresp, err := http.DefaultClient.Do(req)
+\tif err != nil {
+\t\tpanic(err)
+\t}
+\tdefer resp.Body.Close()
+\tbody, _ := io.ReadAll(resp.Body)
+\tfmt.Println(string(body))
 }`,
+
+    swift: `import Foundation
+
+var request = URLRequest(url: URL(string: "${fullUrl}")!)
+request.httpMethod = "${endpoint.method}"
+request.setValue("application/json", forHTTPHeaderField: "Content-Type")${
+      hasBody
+        ? `\nrequest.httpBody = """\n${bodyStr}\n""".data(using: .utf8)`
+        : ''
+    }
+let task = URLSession.shared.dataTask(with: request) { data, response, error in
+    if let data = data, let str = String(data: data, encoding: .utf8) {
+        print(str)
+    }
+}
+task.resume()`,
+
+    kotlin: `import okhttp3.*
+
+val client = OkHttpClient()
+val request = Request.Builder()
+    .url("${fullUrl}")
+    .method("${endpoint.method}", ${
+      hasBody
+        ? `RequestBody.create(MediaType.parse("application/json"), """${bodyStr}""")`
+        : `null`
+    })
+    .build()
+
+client.newCall(request).execute().use { response ->
+    println(response.body()?.string())
+}`,
+
+    rust: `use reqwest;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
+    let res = client.${endpoint.method.toLowerCase()}("${fullUrl}")
+        .header("Content-Type", "application/json")${
+          hasBody ? `\n        .body(r#"${bodyStr}"#)` : ''
+        }
+        .send()
+        .await?
+        .text()
+        .await?;
+    println!("{}", res);
+    Ok(())
+}`,
+
+    php: `<?php
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, "${fullUrl}");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "${endpoint.method}");
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);${
+      hasBody
+        ? `\ncurl_setopt($ch, CURLOPT_POSTFIELDS, '${JSON.stringify(endpoint.requestBody)}');`
+        : ''
+    }
+$response = curl_exec($ch);
+curl_close($ch);
+echo $response;`,
   };
 
-  const code = generators[activeLang] || generators.javascript;
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="rounded-xl border border-border-theme bg-code-bg overflow-hidden shadow-xs">
-      <div className="flex items-center justify-between bg-bg-tertiary px-3 py-1.5 border-b border-border-theme overflow-x-auto">
-        <div className="flex items-center gap-1">
-          {['javascript', 'axios', 'curl', 'python', 'go'].map((lang) => (
-            <button
-              key={lang}
-              onClick={() => setActiveLang(lang)}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-mono font-medium capitalize transition-colors cursor-pointer shrink-0 ${
-                activeLang === lang
-                  ? 'bg-accent-primary text-white font-bold'
-                  : 'text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              {lang}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={handleCopy}
-          className="text-text-muted hover:text-text-primary text-xs flex items-center gap-1 font-mono transition-colors cursor-pointer shrink-0 ml-2"
-        >
-          <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5" />
-          <span>{copied ? 'Copied' : 'Copy'}</span>
-        </button>
-      </div>
-
-      <pre className="p-4 font-mono text-xs text-gray-200 overflow-x-auto">
-        <code>{code}</code>
-      </pre>
-    </div>
-  );
+  return <CodeBlock snippets={snippets} defaultTab="javascript" maxHeight="max-h-72" />;
 }

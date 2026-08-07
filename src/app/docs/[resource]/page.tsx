@@ -13,7 +13,8 @@ interface ResourcePageProps {
 }
 
 export default function ResourcePage({ params }: ResourcePageProps) {
-  const { resource } = use(params);
+  const resolvedParams = use(params);
+  const resource = resolvedParams?.resource;
   const res = apiCatalog.find((r) => r.id === resource);
 
   const [activeMethodFilter, setActiveMethodFilter] = useState<'ALL' | 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'>('ALL');

@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { EndpointDef, QueryParamDef } from '@/config/api-catalog';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
 interface TryItRunnerProps {
@@ -393,9 +394,11 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
             <span className="text-[11px] font-semibold text-text-secondary">
               {response.isSvg ? 'Raw SVG XML Code:' : 'Response Payload:'}
             </span>
-            <pre className="p-4 rounded-xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto max-h-64 overflow-y-auto leading-relaxed">
-              <code>{typeof response.data === 'string' ? response.data : JSON.stringify(response.data, null, 2)}</code>
-            </pre>
+            <CodeBlock
+              code={response.data}
+              language={response.isSvg ? 'xml' : 'json'}
+              maxHeight="max-h-64"
+            />
           </div>
         </div>
       )}

@@ -1,11 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 
-export interface CodeBlockProps {
+export interface CodeBlockTab {
+  id: string;
+  label?: string;
   code: unknown;
+  icon?: string;
+  language?: string;
+}
+
+export interface CodeBlockProps {
+  code?: unknown;
+  snippets?: Record<string, unknown>;
+  tabs?: CodeBlockTab[];
+  defaultTab?: string;
   language?: string;
   title?: string;
   subtitle?: string;
@@ -15,10 +26,34 @@ export interface CodeBlockProps {
   className?: string;
   codeClassName?: string;
   showHeader?: boolean;
+  onTabChange?: (tabId: string) => void;
 }
+
+const LANGUAGE_ICONS: Record<string, string> = {
+  javascript: 'simple-icons:javascript',
+  node: 'simple-icons:nodedotjs',
+  axios: 'simple-icons:axios',
+  python: 'simple-icons:python',
+  curl: 'ph:terminal-window-bold',
+  bash: 'ph:terminal-window-bold',
+  sh: 'ph:terminal-window-bold',
+  go: 'simple-icons:go',
+  swift: 'simple-icons:swift',
+  kotlin: 'simple-icons:kotlin',
+  rust: 'simple-icons:rust',
+  php: 'simple-icons:php',
+  json: 'ph:brackets-curly-bold',
+  graphql: 'simple-icons:graphql',
+  xml: 'ph:code-bold',
+  svg: 'ph:sparkle-bold',
+  typescript: 'simple-icons:typescript',
+};
 
 export function CodeBlock({
   code,
+  snippets,
+  tabs: customTabs,
+  defaultTab,
   language,
   title,
   subtitle,
@@ -28,19 +63,63 @@ export function CodeBlock({
   className,
   codeClassName,
   showHeader,
+  onTabChange,
 }: CodeBlockProps) {
+  // Normalize tabs from customTabs, snippets, or single code
+  const tabs: CodeBlockTab[] = useMemo(() => {
+    if (customTabs && customTabs.length > 0) {
+      return customTabs;
+    }
+    if (snippets && Object.keys(snippets).length > 0) {
+      return Object.entries(snippets).map(([key, val]) => {
+        const langKey = key.toLowerCase();
+        return {
+          id: key,
+          label: key.charAt(0).toUpperCase() + key.slice(1),
+          code: val,
+          icon: LANGUAGE_ICONS[langKey] || 'ph:code-bold',
+          language: langKey,
+        };
+      });
+    }
+    return [];
+  }, [customTabs, snippets]);
+
+  const [activeTabId, setActiveTabId] = useState<string>(() => {
+    if (defaultTab && tabs.some((t) => t.id === defaultTab)) {
+      return defaultTab;
+    }
+    return tabs[0]?.id || '';
+  });
+
   const [copied, setCopied] = useState(false);
 
-  // Normalize code content to formatted string
-  const formattedCode = React.useMemo(() => {
-    if (code === null || code === undefined) return '';
-    if (typeof code === 'string') return code;
-    try {
-      return JSON.stringify(code, null, 2);
-    } catch {
-      return String(code);
+  // Determine current active code
+  const currentRawCode = useMemo(() => {
+    if (tabs.length > 0) {
+      const found = tabs.find((t) => t.id === activeTabId) || tabs[0];
+      return found?.code;
     }
-  }, [code]);
+    return code;
+  }, [tabs, activeTabId, code]);
+
+  // Format code to display string
+  const formattedCode = useMemo(() => {
+    if (currentRawCode === null || currentRawCode === undefined) return '';
+    if (typeof currentRawCode === 'string') return currentRawCode;
+    try {
+      return JSON.stringify(currentRawCode, null, 2);
+    } catch {
+      return String(currentRawCode);
+    }
+  }, [currentRawCode]);
+
+  const handleTabSelect = (tabId: string) => {
+    setActiveTabId(tabId);
+    if (onTabChange) {
+      onTabChange(tabId);
+    }
+  };
 
   const handleCopy = () => {
     if (!formattedCode) return;
@@ -49,24 +128,51 @@ export function CodeBlock({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const shouldRenderHeader = showHeader ?? Boolean(title || subtitle || language);
+  const hasTabs = tabs.length > 0;
+  const shouldRenderHeader = showHeader ?? Boolean(hasTabs || title || subtitle || language);
 
   return (
-    <div className={cn('rounded-xl border border-border-theme bg-code-bg overflow-hidden shadow-sm group', className)}>
-      {/* Optional Code Header Bar */}
+    <div className={cn('rounded-xl border border-border-theme bg-code-bg overflow-hidden shadow-xs group', className)}>
+      {/* Header Bar: Either Multi-tab Bar or Single Code Info Header */}
       {shouldRenderHeader && (
-        <div className="flex items-center justify-between bg-bg-tertiary px-3.5 py-2 border-b border-border-theme text-xs font-mono">
-          <div className="flex items-center gap-2 text-text-secondary truncate">
-            {icon && <Icon icon={icon} className="w-4 h-4 text-accent-primary shrink-0" />}
-            {title && <span className="font-bold text-text-primary truncate">{title}</span>}
-            {language && !title && (
-              <span className="text-[11px] font-bold text-accent-primary uppercase tracking-wider">
-                {language}
-              </span>
-            )}
-          </div>
+        <div className="flex items-center justify-between bg-bg-tertiary px-3.5 py-1.5 border-b border-border-theme text-xs font-mono overflow-x-auto gap-2">
+          {hasTabs ? (
+            <div className="flex items-center gap-1 overflow-x-auto py-0.5">
+              {tabs.map((tab) => {
+                const isActive = tab.id === activeTabId;
+                const tabIcon = tab.icon || LANGUAGE_ICONS[tab.id.toLowerCase()];
 
-          <div className="flex items-center gap-3 shrink-0 ml-2">
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => handleTabSelect(tab.id)}
+                    className={cn(
+                      'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-medium transition-colors cursor-pointer shrink-0',
+                      isActive
+                        ? 'bg-accent-primary text-white font-bold shadow-xs'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
+                    )}
+                  >
+                    {tabIcon && <Icon icon={tabIcon} className="w-3.5 h-3.5 shrink-0" />}
+                    <span>{tab.label || tab.id}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-text-secondary truncate">
+              {icon && <Icon icon={icon} className="w-4 h-4 text-accent-primary shrink-0" />}
+              {title && <span className="font-bold text-text-primary truncate">{title}</span>}
+              {language && !title && (
+                <span className="text-[11px] font-bold text-accent-primary uppercase tracking-wider">
+                  {language}
+                </span>
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3 shrink-0 ml-auto">
             {subtitle && <span className="text-emerald-400 font-semibold text-[11px] select-all truncate">{subtitle}</span>}
             {copyable && (
               <button
@@ -83,7 +189,7 @@ export function CodeBlock({
         </div>
       )}
 
-      {/* Code Container */}
+      {/* Code Viewer Container */}
       <div className="relative">
         {!shouldRenderHeader && copyable && (
           <button
