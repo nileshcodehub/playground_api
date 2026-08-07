@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
 const sampleQueries = [
@@ -157,9 +158,11 @@ export default function GraphqlPage() {
                 </span>
               )}
             </div>
-            <pre className="p-4 rounded-xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto min-h-[300px] max-h-[350px] leading-relaxed">
-              <code>{result ? JSON.stringify(result, null, 2) : '# Hit Execute Query to run GraphQL query'}</code>
-            </pre>
+            <CodeBlock
+              code={result ? result : '# Hit Execute Query to run GraphQL query'}
+              language="json"
+              maxHeight="max-h-[350px]"
+            />
           </div>
         </div>
       </div>

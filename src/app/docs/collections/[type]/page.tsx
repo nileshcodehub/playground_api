@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Icon } from '@iconify/react';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
 interface CollectionsPageProps {
@@ -216,21 +217,13 @@ export default async function CollectionsPage({ params }: CollectionsPageProps) 
         </ol>
 
         {/* Client Preview Card Box */}
-        <div className="p-6 rounded-2xl bg-code-bg border border-border-theme space-y-3 shadow-xl">
-          <div className="flex items-center justify-between text-xs text-text-muted font-mono border-b border-border-theme pb-3">
-            <span className="flex items-center gap-2">
-              <Icon icon={item.icon} className="w-4 h-4 text-accent-primary" />
-              {item.title} Workspace Preview
-            </span>
-            <span className="text-emerald-400">GET {item.downloadUrl}</span>
-          </div>
-
-          <div className="p-4 rounded-xl bg-bg-secondary border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto leading-relaxed">
-            <pre>
-              <code>{item.codeSnippet}</code>
-            </pre>
-          </div>
-        </div>
+        <CodeBlock
+          code={item.codeSnippet}
+          title={`${item.title} Workspace Preview`}
+          subtitle={`GET ${item.downloadUrl}`}
+          icon={item.icon}
+          className="shadow-xl"
+        />
       </div>
 
       {/* 4. Getting Started Instructions */}

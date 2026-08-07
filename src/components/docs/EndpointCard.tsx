@@ -3,6 +3,7 @@ import { EndpointDef } from '@/config/api-catalog';
 import { MethodBadge } from './MethodBadge';
 import { CodeGenerators } from './CodeGenerators';
 import { TryItRunner } from './TryItRunner';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 
 interface EndpointCardProps {
   endpoint: EndpointDef;
@@ -84,21 +85,21 @@ export function EndpointCard({ endpoint }: EndpointCardProps) {
         {endpoint.requestBody && (
           <div className="space-y-1.5">
             <span className="text-[11px] font-mono font-bold text-amber-400 uppercase">Request Body (JSON)</span>
-            <div className="p-4 rounded-xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto max-h-64 overflow-y-auto leading-relaxed">
-              <pre>
-                <code>{JSON.stringify(endpoint.requestBody, null, 2)}</code>
-              </pre>
-            </div>
+            <CodeBlock
+              code={endpoint.requestBody}
+              language="json"
+              maxHeight="max-h-64"
+            />
           </div>
         )}
 
         <div className="space-y-1.5">
           <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase">Response JSON Example</span>
-          <div className="p-4 rounded-xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto max-h-64 overflow-y-auto leading-relaxed">
-            <pre>
-              <code>{typeof endpoint.responseExample === 'string' ? endpoint.responseExample : JSON.stringify(endpoint.responseExample, null, 2)}</code>
-            </pre>
-          </div>
+          <CodeBlock
+            code={endpoint.responseExample}
+            language={typeof endpoint.responseExample === 'string' && endpoint.responseExample.startsWith('<svg') ? 'svg' : 'json'}
+            maxHeight="max-h-64"
+          />
         </div>
       </div>
 

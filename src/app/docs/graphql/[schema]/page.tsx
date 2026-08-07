@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Icon } from '@iconify/react';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 
 interface GraphqlSchemaPageProps {
   params: Promise<{ schema: string }>;
@@ -696,21 +697,21 @@ export default async function GraphqlSchemaPage({ params }: GraphqlSchemaPagePro
             {/* Query Block */}
             <div className="space-y-1.5">
               <span className="text-[11px] font-mono font-bold text-pink-400 uppercase">Query / Mutation</span>
-              <div className="p-4 rounded-2xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto shadow-lg leading-relaxed">
-                <pre>
-                  <code>{op.query}</code>
-                </pre>
-              </div>
+              <CodeBlock
+                code={op.query}
+                language="graphql"
+                maxHeight="max-h-72"
+              />
             </div>
 
             {/* Response Block */}
             <div className="space-y-1.5">
               <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase">Response JSON</span>
-              <div className="p-4 rounded-2xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto shadow-lg leading-relaxed">
-                <pre>
-                  <code>{op.response}</code>
-                </pre>
-              </div>
+              <CodeBlock
+                code={op.response}
+                language="json"
+                maxHeight="max-h-72"
+              />
             </div>
           </div>
         </div>
@@ -724,20 +725,20 @@ export default async function GraphqlSchemaPage({ params }: GraphqlSchemaPagePro
         <div className="grid grid-cols-1 gap-4">
           <div className="space-y-1.5">
             <span className="text-[11px] font-mono font-bold text-pink-400 uppercase">Paginated Query</span>
-            <div className="p-4 rounded-2xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto shadow-lg">
-              <pre>
-                <code>{item.pagination.query}</code>
-              </pre>
-            </div>
+            <CodeBlock
+              code={item.pagination.query}
+              language="graphql"
+              maxHeight="max-h-72"
+            />
           </div>
 
           <div className="space-y-1.5">
             <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase">Paginated Response</span>
-            <div className="p-4 rounded-2xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto shadow-lg">
-              <pre>
-                <code>{item.pagination.response}</code>
-              </pre>
-            </div>
+            <CodeBlock
+              code={item.pagination.response}
+              language="json"
+              maxHeight="max-h-72"
+            />
           </div>
         </div>
 

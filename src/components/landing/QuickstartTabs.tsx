@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
 const languages = [
@@ -161,11 +162,13 @@ curl -X POST "${config.apiUrl}/posts" \\
           </div>
 
           {/* Snippet Code Body */}
-          <div className="p-6 font-mono text-xs leading-relaxed text-gray-200 overflow-x-auto">
-            <pre>
-              <code>{currentSnippet}</code>
-            </pre>
-          </div>
+          <CodeBlock
+            code={currentSnippet}
+            copyable={false}
+            showHeader={false}
+            className="border-0 bg-transparent rounded-none shadow-none"
+            codeClassName="p-6 text-xs leading-relaxed"
+          />
         </div>
       </div>
     </section>

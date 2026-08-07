@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
 const presetTemplates = [
@@ -283,9 +284,11 @@ export default function StudioPage() {
 
             <div className="space-y-2">
               <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">Response Payload Output</span>
-              <pre className="p-4 rounded-xl bg-code-bg border border-border-theme font-mono text-xs text-gray-200 overflow-x-auto max-h-96 leading-relaxed">
-                <code>{typeof response.data === 'string' ? response.data : JSON.stringify(response.data, null, 2)}</code>
-              </pre>
+              <CodeBlock
+                code={response.data}
+                language={typeof response.data === 'string' && response.data.startsWith('<svg') ? 'svg' : 'json'}
+                maxHeight="max-h-96"
+              />
             </div>
           </div>
         )}
