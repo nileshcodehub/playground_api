@@ -159,7 +159,7 @@ function ThemeSelector() {
 
       {/* Dropdown */}
       <div className="absolute right-0 pt-2">
-        <div className="flex flex-col gap-1 w-32 hidden group-hover:block bg-bg-secondary border border-border-theme rounded-xl shadow-xl p-1 z-50 animate-in fade-in duration-150">
+        <div className="w-32 hidden group-hover:flex flex-col gap-1 bg-bg-secondary border border-border-theme rounded-xl shadow-xl p-1 z-50 animate-in fade-in duration-150">
           <button
             onClick={() => setTheme('light')}
             className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${activeTheme === 'light' ? 'bg-accent-light text-accent-primary' : 'text-text-secondary hover:bg-bg-tertiary'

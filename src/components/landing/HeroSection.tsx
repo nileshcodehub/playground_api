@@ -17,7 +17,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative overflow-hidden py-20 lg:py-28 border-b border-border-theme bg-gradient-to-b from-bg-primary via-bg-secondary to-bg-primary">
+    <section className="relative overflow-hidden py-20 lg:py-28 border-b border-border-theme bg-linear-to-b from-bg-primary via-bg-secondary to-bg-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 text-center relative z-10">
         {/* Version Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-light border border-accent-primary/30 text-accent-primary text-xs font-semibold shadow-xs animate-bounce">
@@ -31,7 +31,7 @@ export function HeroSection() {
         <div className="max-w-4xl mx-auto space-y-5">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-text-primary leading-tight">
             Free, Instant & Sandboxed{' '}
-            <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Mock REST & GraphQL API
             </span>
           </h1>
