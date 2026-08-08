@@ -105,8 +105,11 @@ export const getPostsEndpoints = (sampleRecord = null) => {
       params: [
         { name: "id", in: "path", type: "string | integer", description: `Post ID to delete (e.g. ${realPost.id} or local-<uuid>).` }
       ],
-      bodyExample: null,
-      responseExample: "204 No Content"
+      responseExample: JSON.stringify({
+        message: `Resource 'posts' with id '${realPost.id}' deleted successfully from sandbox overlay`,
+        id: realPost.id,
+        resource: "posts"
+      }, null, 2)
     },
     {
       method: "GET",

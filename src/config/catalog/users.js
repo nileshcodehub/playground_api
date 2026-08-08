@@ -123,8 +123,11 @@ export const getUsersEndpoints = (sampleRecord = null) => {
       params: [
         { name: "id", in: "path", type: "string | integer", description: `User ID to delete (e.g. ${realUser.id} or local-<uuid>).` }
       ],
-      bodyExample: null,
-      responseExample: "204 No Content"
+      responseExample: JSON.stringify({
+        message: `Resource 'users' with id '${realUser.id}' deleted successfully from sandbox overlay`,
+        id: realUser.id,
+        resource: "users"
+      }, null, 2)
     },
     {
       method: "GET",
