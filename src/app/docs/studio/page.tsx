@@ -85,11 +85,20 @@ export default function StudioPage() {
       const res = await fetch(fullUrl, opts);
       const timeMs = Math.round(performance.now() - start);
 
-      let data: unknown;
-      try {
-        data = await res.json();
-      } catch {
-        data = await res.text();
+      let data: unknown = null;
+      if (res.status === 204 || res.status === 205) {
+        data = null;
+      } else {
+        const text = await res.text();
+        if (text.trim() === '') {
+          data = null;
+        } else {
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = text;
+          }
+        }
       }
 
       const resHeaders: Record<string, string> = {};

@@ -153,20 +153,27 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
       const res = await fetch(computedUrl, options);
       const timeMs = Math.round(performance.now() - startTime);
 
-      let data: unknown;
+      let data: unknown = null;
       let isSvg = false;
       const contentType = res.headers.get('content-type') || '';
 
-      if (contentType.includes('image/svg') || endpoint.path.includes('avatars') || endpoint.path.includes('thumbnails')) {
-        data = await res.text();
-        if (typeof data === 'string' && data.trim().startsWith('<svg')) {
-          isSvg = true;
-        }
+      if (res.status === 204 || res.status === 205) {
+        data = null;
       } else {
-        try {
-          data = await res.json();
-        } catch {
-          data = await res.text();
+        const text = await res.text();
+        if (contentType.includes('image/svg') || endpoint.path.includes('avatars') || endpoint.path.includes('thumbnails') || text.trim().startsWith('<svg')) {
+          data = text;
+          if (text.trim().startsWith('<svg')) {
+            isSvg = true;
+          }
+        } else if (text.trim() === '') {
+          data = null;
+        } else {
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = text;
+          }
         }
       }
 
