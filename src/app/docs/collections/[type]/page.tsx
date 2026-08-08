@@ -188,7 +188,7 @@ export default async function CollectionsPage({ params }: CollectionsPageProps) 
   return (
     <div className="space-y-10 w-full max-w-none">
       {/* 1. Page Title */}
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <h1 className="text-4xl sm:text-5xl font-black text-text-primary tracking-tight">{item.title}</h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed">{item.subtitle}</p>
       </div>
@@ -200,7 +200,7 @@ export default async function CollectionsPage({ params }: CollectionsPageProps) 
       </div>
 
       {/* 3. Using Our Collection Section */}
-      <div className="space-y-4 pt-2">
+      <div id="using-collection" className="space-y-4 pt-2 scroll-mt-20">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
           Using Our {item.title} Collection
         </h2>
@@ -227,7 +227,7 @@ export default async function CollectionsPage({ params }: CollectionsPageProps) 
       </div>
 
       {/* 4. Getting Started Instructions */}
-      <div className="space-y-4 pt-4">
+      <div id="getting-started" className="space-y-4 pt-4 scroll-mt-20">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">Getting Started</h2>
         <ol className="space-y-3 text-sm sm:text-base text-text-secondary pl-5 list-decimal font-medium">
           {item.gettingStarted.map((step, idx) => (

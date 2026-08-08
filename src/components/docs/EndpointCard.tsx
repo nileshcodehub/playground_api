@@ -11,7 +11,11 @@ interface EndpointCardProps {
 
 export function EndpointCard({ endpoint }: EndpointCardProps) {
   return (
-    <div id={endpoint.id} className="p-6 rounded-2xl glass-panel border border-border-theme space-y-6 scroll-mt-20 shadow-xl">
+    <div
+      id={endpoint.id}
+      data-toc-title={endpoint.title}
+      className="p-6 rounded-2xl glass-panel border border-border-theme space-y-6 scroll-mt-20 shadow-xl"
+    >
       {/* Endpoint Header Row */}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-3 flex-wrap">

@@ -133,7 +133,7 @@ export default function ExportImportPage() {
   return (
     <div className="space-y-10 w-full max-w-none">
       {/* Page Title & Overview */}
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:cloud-arrow-up-bold" className="w-4 h-4" />
           Session Snapshot Management
@@ -147,7 +147,7 @@ export default function ExportImportPage() {
       </div>
 
       {/* What it is & Where it is used */}
-      <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4">
+      <div id="use-cases" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4 scroll-mt-20">
         <h2 className="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
           <Icon icon="ph:info-bold" className="w-5 h-5 text-accent-primary" />
           What is Snapshot Export & Import and Where is it Used?
@@ -189,7 +189,7 @@ export default function ExportImportPage() {
       </div>
 
       {/* Interactive Tool Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div id="snapshot-actions" data-toc-title="Snapshot Actions" className="grid grid-cols-1 md:grid-cols-2 gap-6 scroll-mt-20">
         <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-500">
@@ -251,7 +251,7 @@ export default function ExportImportPage() {
       )}
 
       {/* Sample Payload Explanation & Interactive Code Viewer */}
-      <div className="space-y-3">
+      <div id="payload-schema" data-toc-title="Snapshot Payload Schema" className="space-y-3 scroll-mt-20">
         <div className="flex items-center justify-between">
           <label className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
             <Icon icon="ph:code-bold" className="w-4 h-4 text-accent-primary" />

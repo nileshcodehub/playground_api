@@ -9,7 +9,7 @@ export const metadata = {
 export default function ShowcasePage() {
   return (
     <div className="space-y-8 w-full max-w-none">
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:rocket-launch-bold" className="w-4 h-4" />
           Project Showcase
@@ -22,7 +22,7 @@ export default function ShowcasePage() {
         </p>
       </div>
 
-      <div className="p-8 rounded-2xl glass-panel border border-border-theme text-center space-y-4">
+      <div id="community-submissions" data-toc-title="Community Submissions" className="p-8 rounded-2xl glass-panel border border-border-theme text-center space-y-4 scroll-mt-20">
         <div className="w-16 h-16 rounded-2xl bg-accent-light text-accent-primary flex items-center justify-center mx-auto">
           <Icon icon="ph:sparkle-bold" className="w-8 h-8" />
         </div>

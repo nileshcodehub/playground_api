@@ -151,7 +151,7 @@ export default function StatsPage() {
   return (
     <div className="space-y-10 w-full max-w-none">
       {/* Title Header */}
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:chart-bar-bold" className="w-4 h-4" />
           User Session & Quota Dashboard
@@ -165,7 +165,7 @@ export default function StatsPage() {
       </div>
 
       {/* 1. IDENTITY UUID Card */}
-      <div className="p-6 rounded-2xl bg-code-bg border border-border-theme space-y-4 font-mono shadow-xl">
+      <div id="identity-uuid" data-toc-title="Identity Token" className="p-6 rounded-2xl bg-code-bg border border-border-theme space-y-4 font-mono shadow-xl scroll-mt-20">
         <div className="flex items-center justify-between">
           <span className="text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider">IDENTITY UUID</span>
           <span className="text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
@@ -208,7 +208,7 @@ export default function StatsPage() {
       </div>
 
       {/* 2. 4 Summary Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+      <div id="metrics-summary" data-toc-title="Session Metrics" className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center scroll-mt-20">
         <div className="p-5 rounded-2xl bg-bg-tertiary border border-border-theme space-y-1">
           <div className="text-3xl font-black text-emerald-400">{stats?.summary?.totalOverlays ?? 0}</div>
           <div className="text-xs sm:text-sm font-medium text-text-secondary">Total Sandbox Records</div>
@@ -228,7 +228,7 @@ export default function StatsPage() {
       </div>
 
       {/* 3. Resource Quotas & Mutations Table */}
-      <div className="space-y-3">
+      <div id="resource-quotas" data-toc-title="Resource Quotas" className="space-y-3 scroll-mt-20">
         <h2 className="text-base sm:text-lg font-bold text-text-primary tracking-wide">Resource Quotas & Mutations</h2>
         <div className="overflow-x-auto rounded-2xl border border-border-theme glass-panel shadow-lg">
           <table className="w-full text-left border-collapse text-xs sm:text-sm">
@@ -264,7 +264,9 @@ export default function StatsPage() {
       </div>
 
       {/* 4. How Session Sandboxing Works Card */}
-      <SandboxExplanationCard />
+      <div id="sandbox-explanation" data-toc-title="How Sandboxing Works" className="scroll-mt-20">
+        <SandboxExplanationCard />
+      </div>
 
       {resetMsg && (
         <div className="p-4 rounded-xl bg-emerald-500/15 text-emerald-400 text-xs sm:text-sm font-medium border border-emerald-500/30 flex items-center gap-2">
@@ -274,7 +276,7 @@ export default function StatsPage() {
       )}
 
       {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 pt-2 w-full">
+      <div id="sandbox-actions" data-toc-title="Sandbox Actions" className="flex flex-col sm:flex-row items-center gap-4 pt-2 w-full scroll-mt-20">
         <button
           onClick={handleReset}
           disabled={resetting}

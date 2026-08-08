@@ -678,7 +678,7 @@ export default async function GraphqlSchemaPage({ params }: GraphqlSchemaPagePro
   return (
     <div className="space-y-12 w-full max-w-none">
       {/* 1. Resource Title & Intro Header */}
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-pink-500/15 text-pink-500 text-xs font-bold">
           <Icon icon="simple-icons:graphql" className="w-4 h-4" />
           GraphQL Schema Documentation
@@ -688,37 +688,40 @@ export default async function GraphqlSchemaPage({ params }: GraphqlSchemaPagePro
       </div>
 
       {/* 2. Operations High-Density Blocks */}
-      {item.operations.map((op) => (
-        <div key={op.title} className="space-y-4 pt-2">
-          <h2 className="text-xl font-extrabold text-text-primary tracking-tight">{op.title}</h2>
-          <p className="text-xs text-text-secondary leading-relaxed">{op.desc}</p>
+      {item.operations.map((op) => {
+        const opId = op.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        return (
+          <div key={op.title} id={opId} className="space-y-4 pt-2 scroll-mt-20">
+            <h2 className="text-xl font-extrabold text-text-primary tracking-tight">{op.title}</h2>
+            <p className="text-xs text-text-secondary leading-relaxed">{op.desc}</p>
 
-          <div className="grid grid-cols-1 gap-4">
-            {/* Query Block */}
-            <div className="space-y-1.5">
-              <span className="text-[11px] font-mono font-bold text-pink-400 uppercase">Query / Mutation</span>
-              <CodeBlock
-                code={op.query}
-                language="graphql"
-                maxHeight="max-h-72"
-              />
-            </div>
+            <div className="grid grid-cols-1 gap-4">
+              {/* Query Block */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-mono font-bold text-pink-400 uppercase">Query / Mutation</span>
+                <CodeBlock
+                  code={op.query}
+                  language="graphql"
+                  maxHeight="max-h-72"
+                />
+              </div>
 
-            {/* Response Block */}
-            <div className="space-y-1.5">
-              <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase">Response JSON</span>
-              <CodeBlock
-                code={op.response}
-                language="json"
-                maxHeight="max-h-72"
-              />
+              {/* Response Block */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase">Response JSON</span>
+                <CodeBlock
+                  code={op.response}
+                  language="json"
+                  maxHeight="max-h-72"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {/* 3. Pagination & Filtering Section */}
-      <div className="space-y-4 pt-6 border-t border-border-theme">
+      <div id="pagination" className="space-y-4 pt-6 border-t border-border-theme scroll-mt-20">
         <h2 className="text-xl font-extrabold text-text-primary tracking-tight">Pagination & Filtering</h2>
         <p className="text-xs text-text-secondary leading-relaxed">{item.pagination.desc}</p>
 
@@ -769,7 +772,7 @@ export default async function GraphqlSchemaPage({ params }: GraphqlSchemaPagePro
       </div>
 
       {/* 4. Schema Type Definition Table */}
-      <div className="space-y-3 pt-6 border-t border-border-theme">
+      <div id="schema-type" className="space-y-3 pt-6 border-t border-border-theme scroll-mt-20">
         <h2 className="text-xl font-extrabold text-text-primary tracking-tight">Schema {item.name.split(' ')[0]} Type</h2>
         <div className="overflow-x-auto rounded-2xl border border-border-theme glass-panel shadow-lg">
           <table className="w-full text-left border-collapse text-xs">

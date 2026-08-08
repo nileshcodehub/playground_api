@@ -89,7 +89,7 @@ export default function GraphqlPage() {
   return (
     <div className="space-y-10 w-full max-w-none">
       {/* Header */}
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-pink-500/15 text-pink-500 text-xs sm:text-sm font-bold">
           <Icon icon="simple-icons:graphql" className="w-4 h-4" />
           GraphQL API Gateway & GraphiQL IDE
@@ -103,7 +103,7 @@ export default function GraphqlPage() {
       </div>
 
       {/* Preset Queries Bar */}
-      <div className="space-y-2">
+      <div id="preset-queries" data-toc-title="Preset Queries" className="space-y-2 scroll-mt-20">
         <span className="text-xs sm:text-sm font-bold text-text-secondary uppercase tracking-wider">Preset GraphQL Queries:</span>
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
           {sampleQueries.map((item) => (
@@ -120,7 +120,7 @@ export default function GraphqlPage() {
       </div>
 
       {/* GraphiQL Interactive IDE Container */}
-      <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-6 shadow-2xl">
+      <div id="graphql-ide" data-toc-title="GraphiQL Interactive IDE" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-6 shadow-2xl scroll-mt-20">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 font-mono text-xs sm:text-sm text-text-secondary">
             <span className="text-pink-400 font-bold">POST</span>

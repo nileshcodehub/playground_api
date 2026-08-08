@@ -130,7 +130,7 @@ export default function StudioPage() {
   return (
     <div className="space-y-10 w-full max-w-none">
       {/* Title Header */}
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:play-circle-bold" className="w-4 h-4" />
           Interactive API Studio & Request Builder
@@ -144,7 +144,7 @@ export default function StudioPage() {
       </div>
 
       {/* What this section is used for */}
-      <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3">
+      <div id="how-to-use" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3 scroll-mt-20">
         <h2 className="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
           <Icon icon="ph:info-bold" className="w-5 h-5 text-accent-primary" />
           How to Use the Interactive API Studio
@@ -166,7 +166,7 @@ export default function StudioPage() {
       </div>
 
       {/* Preset Quick Templates */}
-      <div className="space-y-2">
+      <div id="preset-templates" data-toc-title="Preset Templates" className="space-y-2 scroll-mt-20">
         <span className="text-xs sm:text-sm font-bold text-text-secondary uppercase tracking-wider">Preset Request Templates:</span>
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
           {presetTemplates.map((tpl) => (
@@ -183,7 +183,7 @@ export default function StudioPage() {
       </div>
 
       {/* Main Request Form */}
-      <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-6 shadow-xl">
+      <div id="request-builder" data-toc-title="Request Builder" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-6 shadow-xl scroll-mt-20">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <select
             value={method}

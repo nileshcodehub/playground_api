@@ -12,7 +12,7 @@ export default function IntroductionPage() {
   return (
     <div className="space-y-10 w-full max-w-none">
       {/* Title Header */}
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:sparkle-bold" className="w-4 h-4" />
           Overview & Architecture Guide
@@ -26,7 +26,7 @@ export default function IntroductionPage() {
       </div>
 
       {/* Why Playground API Was Built */}
-      <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4">
+      <div id="why-playground-api" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4 scroll-mt-20">
         <h2 className="text-lg sm:text-xl font-bold text-text-primary flex items-center gap-2">
           <Icon icon="ph:rocket-launch-bold" className="w-5 h-5 text-accent-primary" />
           Why Playground API?
@@ -40,7 +40,7 @@ export default function IntroductionPage() {
       </div>
 
       {/* Base API v1 URL Section */}
-      <div className="p-6 rounded-2xl glass-panel border border-accent-primary/30 bg-accent-light/10 space-y-3">
+      <div id="base-api-endpoint" className="p-6 rounded-2xl glass-panel border border-accent-primary/30 bg-accent-light/10 space-y-3 scroll-mt-20">
         <h2 className="text-sm sm:text-base font-bold text-accent-primary flex items-center gap-2">
           <Icon icon="ph:globe-bold" className="w-5 h-5" />
           Base API v1 Endpoint
@@ -54,7 +54,7 @@ export default function IntroductionPage() {
       </div>
 
       {/* Core Architectural Pillars */}
-      <div className="space-y-4">
+      <div id="architectural-pillars" className="space-y-4 scroll-mt-20">
         <h2 className="text-xl sm:text-2xl font-extrabold text-text-primary">Core Architectural Pillars</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="p-5 rounded-2xl border border-border-theme bg-bg-secondary space-y-2">
@@ -100,7 +100,7 @@ export default function IntroductionPage() {
       </div>
 
       {/* Step-by-Step Integration Guide */}
-      <div className="space-y-4 pt-4 border-t border-border-theme">
+      <div id="implementation-guide" className="space-y-4 pt-4 border-t border-border-theme scroll-mt-20">
         <h2 className="text-xl sm:text-2xl font-extrabold text-text-primary">Step-by-Step Implementation Guide</h2>
         <ol className="space-y-3 text-sm text-text-secondary list-decimal pl-5 leading-relaxed">
           <li><strong>Target base URL:</strong> Configure your frontend HTTP client (Fetch, Axios, TanStack Query) to use <code className="font-mono text-accent-primary">{config.apiUrl}</code>.</li>
@@ -111,7 +111,7 @@ export default function IntroductionPage() {
       </div>
 
       {/* Quick Links */}
-      <div className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div id="quick-links" className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 scroll-mt-20">
         <Link
           href="/docs/posts"
           className="p-4 rounded-xl border border-border-theme bg-bg-secondary hover:border-accent-primary/50 transition-all text-xs sm:text-sm font-semibold text-text-primary flex items-center justify-between group"

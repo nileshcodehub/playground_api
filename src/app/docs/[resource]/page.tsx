@@ -100,7 +100,7 @@ export default function ResourcePage({ params }: ResourcePageProps) {
   return (
     <div className="space-y-10 w-full max-w-none">
       {/* Resource Header */}
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="flex items-center gap-3">
           <div className="p-3.5 rounded-2xl bg-accent-light text-accent-primary">
             <Icon icon={res.icon} className="w-7 h-7" />

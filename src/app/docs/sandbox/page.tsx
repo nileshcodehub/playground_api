@@ -54,7 +54,7 @@ export default function SandboxPage() {
 
   return (
     <div className="space-y-10 w-full max-w-none">
-      <div className="space-y-3 border-b border-border-theme pb-6">
+      <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:key-bold" className="w-4 h-4" />
           Session Architecture & Security
@@ -68,7 +68,7 @@ export default function SandboxPage() {
       </div>
 
       {/* Live Active Identity Token Box */}
-      <div className="p-6 rounded-2xl bg-code-bg border border-border-theme space-y-4 font-mono shadow-xl">
+      <div id="session-token" className="p-6 rounded-2xl bg-code-bg border border-border-theme space-y-4 font-mono shadow-xl scroll-mt-20">
         <div className="flex items-center justify-between">
           <span className="text-xs sm:text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
             <Icon icon="ph:key-bold" className="w-4 h-4" />
@@ -108,7 +108,7 @@ export default function SandboxPage() {
 
       {/* Detailed Architectural Pillars */}
       <div className="space-y-6">
-        <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3">
+        <div id="transport-mechanism" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3 scroll-mt-20">
           <h2 className="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
             <Icon icon="ph:cookie-bold" className="w-5 h-5 text-amber-400" />
             1. Cookie & Header Transport Mechanism
@@ -121,7 +121,7 @@ export default function SandboxPage() {
           </div>
         </div>
 
-        <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3">
+        <div id="ip-auto-recovery" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3 scroll-mt-20">
           <h2 className="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
             <Icon icon="ph:shield-warning-bold" className="w-5 h-5 text-indigo-400" />
             2. IP Auto-Recovery Fallback
@@ -131,7 +131,7 @@ export default function SandboxPage() {
           </p>
         </div>
 
-        <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3">
+        <div id="overlay-ordering" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3 scroll-mt-20">
           <h2 className="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
             <Icon icon="ph:tree-structure-bold" className="w-5 h-5 text-pink-400" />
             3. Virtual Overlay Ordering Rules
