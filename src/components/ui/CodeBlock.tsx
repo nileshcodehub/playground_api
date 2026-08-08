@@ -353,7 +353,7 @@ export function CodeBlock({
       )}
 
       {/* Code Area with Line Numbers, Zebra Striping, and Interactive Line Hover */}
-      <div className="relative font-mono text-xs">
+      <div className="relative font-mono text-xs sm:text-sm">
         {!shouldRenderHeader && copyable && (
           <button
             type="button"

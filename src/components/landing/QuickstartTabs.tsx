@@ -102,10 +102,10 @@ curl -X POST "${config.apiUrl}/posts" \\
     <section className="py-20 bg-bg-primary border-b border-border-theme">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-extrabold text-text-primary tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
             Quickstart Integration Snippets
           </h2>
-          <p className="text-sm text-text-secondary">
+          <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
             Copy and paste integration code in Fetch, Axios, Python, Go, Swift, Rust, or cURL.
           </p>
         </div>

@@ -134,54 +134,54 @@ export default function ExportImportPage() {
     <div className="space-y-10 w-full max-w-none">
       {/* Page Title & Overview */}
       <div className="space-y-3 border-b border-border-theme pb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs font-bold">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:cloud-arrow-up-bold" className="w-4 h-4" />
           Session Snapshot Management
         </div>
-        <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
           Export & Import Session Sandbox
         </h1>
-        <p className="text-sm text-text-secondary leading-relaxed">
+        <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
           Save your complete sandboxed mutation state into a portable JSON snapshot or restore mock data across devices and team environments.
         </p>
       </div>
 
       {/* What it is & Where it is used */}
       <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4">
-        <h2 className="text-base font-bold text-text-primary flex items-center gap-2">
+        <h2 className="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
           <Icon icon="ph:info-bold" className="w-5 h-5 text-accent-primary" />
           What is Snapshot Export & Import and Where is it Used?
         </h2>
-        <p className="text-xs text-text-secondary leading-relaxed">
+        <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
           When prototyping or building automated test suites, you often create complex mock states—such as multiple created posts, modified user profiles, and deleted task items.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
           <div className="p-4 rounded-xl bg-bg-secondary border border-border-theme space-y-1.5">
-            <div className="font-bold text-text-primary text-xs flex items-center gap-1.5">
+            <div className="font-bold text-text-primary text-sm flex items-center gap-1.5">
               <Icon icon="ph:share-network-bold" className="w-4 h-4 text-emerald-400" />
               Team Collaboration
             </div>
-            <p className="text-[11px] text-text-secondary leading-relaxed">
+            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
               Export your sandbox state into a JSON snapshot file and share it with frontend team members so everyone tests against the exact same mock data scenario.
             </p>
           </div>
 
           <div className="p-4 rounded-xl bg-bg-secondary border border-border-theme space-y-1.5">
-            <div className="font-bold text-text-primary text-xs flex items-center gap-1.5">
+            <div className="font-bold text-text-primary text-sm flex items-center gap-1.5">
               <Icon icon="ph:test-tube-bold" className="w-4 h-4 text-indigo-400" />
               Automated E2E Testing
             </div>
-            <p className="text-[11px] text-text-secondary leading-relaxed">
+            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
               Pre-load deterministic snapshot JSON files into Playwright or Cypress E2E test suites before running component tests.
             </p>
           </div>
 
           <div className="p-4 rounded-xl bg-bg-secondary border border-border-theme space-y-1.5">
-            <div className="font-bold text-text-primary text-xs flex items-center gap-1.5">
+            <div className="font-bold text-text-primary text-sm flex items-center gap-1.5">
               <Icon icon="ph:devices-bold" className="w-4 h-4 text-pink-400" />
               Cross-Device Backup
             </div>
-            <p className="text-[11px] text-text-secondary leading-relaxed">
+            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
               Transfer session state between desktop browsers, mobile emulators, or postman workspaces effortlessly.
             </p>
           </div>
@@ -196,17 +196,17 @@ export default function ExportImportPage() {
               <Icon icon="ph:download-simple-bold" className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-text-primary">1. Export Session State</h3>
-              <p className="text-xs text-text-secondary">Download active overlay JSON</p>
+              <h3 className="text-base sm:text-lg font-bold text-text-primary">1. Export Session State</h3>
+              <p className="text-xs sm:text-sm text-text-secondary">Download active overlay JSON</p>
             </div>
           </div>
-          <p className="text-xs text-text-secondary leading-relaxed">
+          <p className="text-sm text-text-secondary leading-relaxed">
             Generates a structured JSON file containing all created local records, updated rows, and deleted record IDs.
           </p>
           <button
             onClick={handleExport}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
           >
             <Icon icon={loading ? 'ph:spinner-bold' : 'ph:export-bold'} className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             <span>{loading ? 'Exporting...' : 'Export & Download JSON'}</span>
@@ -219,17 +219,17 @@ export default function ExportImportPage() {
               <Icon icon="ph:upload-simple-bold" className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-text-primary">2. Restore State Snapshot</h3>
-              <p className="text-xs text-text-secondary">Import JSON payload state</p>
+              <h3 className="text-base sm:text-lg font-bold text-text-primary">2. Restore State Snapshot</h3>
+              <p className="text-xs sm:text-sm text-text-secondary">Import JSON payload state</p>
             </div>
           </div>
-          <p className="text-xs text-text-secondary leading-relaxed">
+          <p className="text-sm text-text-secondary leading-relaxed">
             Paste or load a JSON snapshot file into the editor below and click restore to apply the state to your session identity.
           </p>
           <button
             onClick={handleImport}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-sm font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
           >
             <Icon icon={loading ? 'ph:spinner-bold' : 'ph:import-bold'} className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             <span>{loading ? 'Restoring...' : 'Restore State from Payload'}</span>
@@ -239,7 +239,7 @@ export default function ExportImportPage() {
 
       {statusMsg && (
         <div
-          className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+          className={`p-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 ${
             statusMsg.type === 'success'
               ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
               : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
@@ -253,11 +253,11 @@ export default function ExportImportPage() {
       {/* Sample Payload Explanation & Interactive Code Viewer */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
+          <label className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
             <Icon icon="ph:code-bold" className="w-4 h-4 text-accent-primary" />
             Snapshot JSON Payload Schema
           </label>
-          <span className="text-[11px] font-mono text-text-muted">Format: JSON v1.0.0</span>
+          <span className="text-xs sm:text-sm font-mono text-text-muted">Format: JSON v1.0.0</span>
         </div>
         <CodeBlock
           code={snapshotJson}

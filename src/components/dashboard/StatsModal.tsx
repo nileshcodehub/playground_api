@@ -172,8 +172,8 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
               <Icon icon="ph:chart-bar-bold" className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-text-primary">Session Quota & Activity Dashboard</h3>
-              <p className="text-xs text-text-secondary">Sandboxed Session Stats & Mutation Quotas</p>
+              <h3 className="text-lg sm:text-xl font-bold text-text-primary">Session Quota & Activity Dashboard</h3>
+              <p className="text-xs sm:text-sm text-text-secondary">Sandboxed Session Stats & Mutation Quotas</p>
             </div>
           </div>
           <button
@@ -187,21 +187,21 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
         {/* 1. IDENTITY UUID Card */}
         <div className="p-5 rounded-2xl bg-code-bg border border-border-theme space-y-3 font-mono">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-text-muted uppercase tracking-wider">IDENTITY UUID</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider">IDENTITY UUID</span>
+            <span className="text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
               10-DAY INACTIVITY RETENTION ACTIVE
             </span>
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <span className="text-lg font-bold text-emerald-400 break-all select-all">
+            <span className="text-lg sm:text-xl font-bold text-emerald-400 break-all select-all">
               {uuid || (loading ? 'Loading...' : 'Anonymous Session')}
             </span>
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={handleCopyUuid}
                 disabled={!uuid}
-                className="px-2.5 py-1 rounded-lg bg-bg-tertiary hover:bg-border-theme text-text-primary text-[11px] font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50"
+                className="px-2.5 py-1 rounded-lg bg-bg-tertiary hover:bg-border-theme text-text-primary text-xs sm:text-sm font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50"
                 title="Copy Identity UUID"
               >
                 <Icon icon={copiedUuid ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5" />
@@ -210,7 +210,7 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
               <button
                 onClick={handleCopyToken}
                 disabled={!uuid && !fullToken}
-                className="px-2.5 py-1 rounded-lg bg-accent-light hover:bg-accent-primary hover:text-white text-accent-primary text-[11px] font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50"
+                className="px-2.5 py-1 rounded-lg bg-accent-light hover:bg-accent-primary hover:text-white text-accent-primary text-xs sm:text-sm font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50"
                 title="Copy Full Signed Token (<uuid>.<signature>)"
               >
                 <Icon icon={copiedToken ? 'ph:check-bold' : 'ph:key-bold'} className="w-3.5 h-3.5" />
@@ -219,7 +219,7 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] text-text-muted pt-1 border-t border-border-theme/40 font-sans">
+          <div className="flex items-center gap-4 text-xs sm:text-sm text-text-muted pt-1 border-t border-border-theme/40 font-sans">
             <span className="flex items-center gap-1">
               🗓️ Created: <strong className="text-text-secondary">{createdDate}</strong>
             </span>
@@ -232,28 +232,28 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
         {/* 2. 4 Summary Metric Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
           <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme space-y-1">
-            <div className="text-2xl font-black text-emerald-400">{stats?.summary?.totalOverlays ?? 0}</div>
-            <div className="text-[11px] font-medium text-text-secondary">Total Sandbox Records</div>
+            <div className="text-2xl sm:text-3xl font-black text-emerald-400">{stats?.summary?.totalOverlays ?? 0}</div>
+            <div className="text-xs sm:text-sm font-medium text-text-secondary">Total Sandbox Records</div>
           </div>
           <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme space-y-1">
-            <div className="text-2xl font-black text-emerald-400">{stats?.summary?.creates ?? 0}</div>
-            <div className="text-[11px] font-medium text-text-secondary">Records Created</div>
+            <div className="text-2xl sm:text-3xl font-black text-emerald-400">{stats?.summary?.creates ?? 0}</div>
+            <div className="text-xs sm:text-sm font-medium text-text-secondary">Records Created</div>
           </div>
           <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme space-y-1">
-            <div className="text-2xl font-black text-amber-400">{stats?.summary?.updates ?? 0}</div>
-            <div className="text-[11px] font-medium text-text-secondary">Records Updated</div>
+            <div className="text-2xl sm:text-3xl font-black text-amber-400">{stats?.summary?.updates ?? 0}</div>
+            <div className="text-xs sm:text-sm font-medium text-text-secondary">Records Updated</div>
           </div>
           <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme space-y-1">
-            <div className="text-2xl font-black text-rose-400">{stats?.summary?.deletes ?? 0}</div>
-            <div className="text-[11px] font-medium text-text-secondary">Records Deleted</div>
+            <div className="text-2xl sm:text-3xl font-black text-rose-400">{stats?.summary?.deletes ?? 0}</div>
+            <div className="text-xs sm:text-sm font-medium text-text-secondary">Records Deleted</div>
           </div>
         </div>
 
         {/* 3. Resource Quotas & Mutations Table */}
         <div className="space-y-3">
-          <h4 className="text-xs font-bold text-text-primary tracking-wide">Resource Quotas & Mutations</h4>
+          <h4 className="text-xs sm:text-sm font-bold text-text-primary tracking-wide">Resource Quotas & Mutations</h4>
           <div className="overflow-x-auto rounded-xl border border-border-theme bg-bg-secondary">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full text-left border-collapse text-xs sm:text-sm">
               <thead>
                 <tr className="bg-bg-tertiary border-b border-border-theme text-text-secondary font-bold">
                   <th className="p-3">Resource</th>
@@ -289,7 +289,7 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
         <SandboxExplanationCard />
 
         {resetMsg && (
-          <div className="p-3 rounded-xl bg-emerald-500/15 text-emerald-400 text-xs font-medium border border-emerald-500/30 flex items-center gap-2">
+          <div className="p-3 rounded-xl bg-emerald-500/15 text-emerald-400 text-xs sm:text-sm font-medium border border-emerald-500/30 flex items-center gap-2">
             <Icon icon="ph:check-circle-bold" className="w-4 h-4" />
             <span>{resetMsg}</span>
           </div>
@@ -300,7 +300,7 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
           <button
             onClick={handleReset}
             disabled={resetting}
-            className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-sans text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
+            className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-sans text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
           >
             <Icon icon={resetting ? 'ph:spinner-bold' : 'ph:trash-bold'} className={`w-4 h-4 ${resetting ? 'animate-spin' : ''}`} />
             <span>{resetting ? 'Resetting Sandbox...' : 'Reset Session Sandbox'}</span>
@@ -309,7 +309,7 @@ export function StatsModal({ isOpen, onClose }: StatsModalProps) {
           <a
             href="/docs/export-import"
             onClick={onClose}
-            className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-bg-tertiary hover:bg-border-theme text-text-primary text-xs font-semibold transition-colors"
+            className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-bg-tertiary hover:bg-border-theme text-text-primary text-xs sm:text-sm font-semibold transition-colors"
           >
             <Icon icon="ph:cloud-arrow-up-bold" className="w-4 h-4 text-accent-primary" />
             <span>Export / Import JSON</span>

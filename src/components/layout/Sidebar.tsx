@@ -50,7 +50,7 @@ export function Sidebar({ onSelect, className = '' }: SidebarProps) {
               {/* Group Header */}
               <button
                 onClick={() => toggleGroup(group.title)}
-                className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider text-text-primary hover:bg-bg-tertiary rounded-lg transition-colors cursor-pointer"
+                className="w-full flex items-center justify-between px-3 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-text-primary hover:bg-bg-tertiary rounded-lg transition-colors cursor-pointer"
               >
                 <span className="flex items-center gap-2">
                   <Icon icon={group.icon} className="w-4 h-4 text-accent-primary" />
@@ -76,7 +76,7 @@ export function Sidebar({ onSelect, className = '' }: SidebarProps) {
                         <Link
                           href={item.href}
                           onClick={() => onSelect?.()}
-                          className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                          className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                             isActive
                               ? 'bg-accent-light text-accent-primary font-bold shadow-xs border-l-2 border-accent-primary'
                               : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary'
@@ -87,7 +87,7 @@ export function Sidebar({ onSelect, className = '' }: SidebarProps) {
                             <span className="truncate">{item.title}</span>
                           </span>
                           {badgeText && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-bg-tertiary text-text-muted border border-border-theme font-mono">
+                            <span className="text-[11px] sm:text-xs px-1.5 py-0.5 rounded-md bg-bg-tertiary text-text-muted border border-border-theme font-mono">
                               {badgeText}
                             </span>
                           )}

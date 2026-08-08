@@ -189,26 +189,26 @@ export default async function CollectionsPage({ params }: CollectionsPageProps) 
     <div className="space-y-10 w-full max-w-none">
       {/* 1. Page Title */}
       <div className="space-y-3 border-b border-border-theme pb-6">
-        <h1 className="text-4xl font-black text-text-primary tracking-tight">{item.title}</h1>
-        <p className="text-sm text-text-secondary leading-relaxed">{item.subtitle}</p>
+        <h1 className="text-4xl sm:text-5xl font-black text-text-primary tracking-tight">{item.title}</h1>
+        <p className="text-sm sm:text-base text-text-secondary leading-relaxed">{item.subtitle}</p>
       </div>
 
       {/* 2. Overview Section */}
       <div className="space-y-3">
-        <h2 className="text-2xl font-extrabold text-text-primary tracking-tight">Overview</h2>
-        <p className="text-xs text-text-secondary leading-relaxed">{item.overview}</p>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">Overview</h2>
+        <p className="text-sm sm:text-base text-text-secondary leading-relaxed">{item.overview}</p>
       </div>
 
       {/* 3. Using Our Collection Section */}
       <div className="space-y-4 pt-2">
-        <h2 className="text-2xl font-extrabold text-text-primary tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
           Using Our {item.title} Collection
         </h2>
-        <p className="text-xs text-text-secondary leading-relaxed">
+        <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
           We&apos;ve prepared a comprehensive {item.title} collection that includes all available endpoints in our API, properly organized and documented. This collection will help you:
         </p>
 
-        <ol className="space-y-2 text-xs text-text-secondary pl-5 list-decimal font-medium">
+        <ol className="space-y-2 text-sm sm:text-base text-text-secondary pl-5 list-decimal font-medium">
           {item.benefits.map((b, i) => (
             <li key={i} className="leading-relaxed">
               <span className="text-text-primary font-semibold">{b}</span>
@@ -228,8 +228,8 @@ export default async function CollectionsPage({ params }: CollectionsPageProps) 
 
       {/* 4. Getting Started Instructions */}
       <div className="space-y-4 pt-4">
-        <h2 className="text-2xl font-extrabold text-text-primary tracking-tight">Getting Started</h2>
-        <ol className="space-y-3 text-xs text-text-secondary pl-5 list-decimal font-medium">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">Getting Started</h2>
+        <ol className="space-y-3 text-sm sm:text-base text-text-secondary pl-5 list-decimal font-medium">
           {item.gettingStarted.map((step, idx) => (
             <li key={idx} className="leading-relaxed">
               <span>{step}</span>
@@ -243,9 +243,9 @@ export default async function CollectionsPage({ params }: CollectionsPageProps) 
             href={item.downloadUrl}
             target="_blank"
             download
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-sm font-bold transition-all shadow-md cursor-pointer"
           >
-            <Icon icon="ph:download-simple-bold" className="w-4 h-4" />
+            <Icon icon="ph:download-simple-bold" className="w-4 h-4 sm:w-5 sm:h-5" />
             Download {item.title} Collection
           </a>
         </div>
@@ -256,7 +256,7 @@ export default async function CollectionsPage({ params }: CollectionsPageProps) 
         {item.prevPage ? (
           <Link
             href={item.prevPage.href}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs font-bold text-text-primary transition-all group"
+            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group"
           >
             <Icon icon="ph:arrow-left-bold" className="w-4 h-4 text-accent-primary group-hover:-translate-x-1 transition-transform" />
             <span>Prev: {item.prevPage.title}</span>
@@ -268,7 +268,7 @@ export default async function CollectionsPage({ params }: CollectionsPageProps) 
         {item.nextPage && (
           <Link
             href={item.nextPage.href}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs font-bold text-text-primary transition-all group ml-auto"
+            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group ml-auto"
           >
             <span>Next: {item.nextPage.title}</span>
             <Icon icon="ph:arrow-right-bold" className="w-4 h-4 text-accent-primary group-hover:translate-x-1 transition-transform" />

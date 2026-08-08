@@ -206,12 +206,12 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
           onClick={() => setIsOpen(true)}
           className="rounded-xl border border-border-theme bg-bg-secondary hover:border-emerald-500/40 p-4 flex items-center justify-between cursor-pointer transition-all shadow-xs group"
         >
-          <div className="flex items-center gap-2 font-bold text-sm text-emerald-500">
-            <Icon icon="ph:lightning-fill" className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+          <div className="flex items-center gap-2 font-bold text-sm sm:text-base text-emerald-500">
+            <Icon icon="ph:lightning-fill" className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 group-hover:scale-110 transition-transform" />
             <span>Try it out — Test endpoint live</span>
           </div>
 
-          <span className="text-emerald-500 hover:text-emerald-400 font-medium text-xs transition-colors">
+          <span className="text-emerald-500 hover:text-emerald-400 font-semibold text-xs sm:text-sm transition-colors">
             Test now
           </span>
         </div>
@@ -227,17 +227,17 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
         onClick={() => setIsOpen(false)}
         className="flex items-center justify-between cursor-pointer pb-2 border-b border-border-theme"
       >
-        <div className="flex items-center gap-2 font-bold text-sm text-emerald-500">
-          <Icon icon="ph:lightning-fill" className="w-4 h-4 text-emerald-500" />
+        <div className="flex items-center gap-2 font-bold text-sm sm:text-base text-emerald-500">
+          <Icon icon="ph:lightning-fill" className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
           <span>Try it out — Test endpoint live</span>
         </div>
-        <span className="text-emerald-500 hover:text-emerald-400 font-medium text-xs transition-colors">
+        <span className="text-emerald-500 hover:text-emerald-400 font-semibold text-xs sm:text-sm transition-colors">
           Collapse
         </span>
       </div>
 
       {/* Target URL Display */}
-      <div className="flex items-center gap-2 text-xs font-mono text-text-muted overflow-x-auto py-1">
+      <div className="flex items-center gap-2 text-xs sm:text-sm font-mono text-text-muted overflow-x-auto py-1">
         <span className="font-bold text-accent-primary uppercase">{endpoint.method}</span>
         <span className="text-text-primary truncate select-all">{computedUrl}</span>
       </div>
@@ -247,7 +247,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
         <div className="space-y-3">
           {pathParamsList.map((param) => (
             <div key={param} className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary flex items-center gap-1">
+              <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-1">
                 <span>{param}</span>
                 <span className="text-text-muted font-normal">(path parameter):</span>
               </label>
@@ -256,7 +256,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
                 value={pathValues[param] ?? ''}
                 onChange={(e) => setPathValues((prev) => ({ ...prev, [param]: e.target.value }))}
                 placeholder={`Value for :${param} (e.g. ${getSmartInitialParamVal(param)})`}
-                className="w-full font-mono text-xs p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
+                className="w-full font-mono text-xs sm:text-sm p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
               />
             </div>
           ))}
@@ -268,7 +268,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
         <div className="space-y-3">
           {activeQueryParams.map((qp) => (
             <div key={qp.name} className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary flex items-center gap-1">
+              <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-1">
                 <span>{qp.name}</span>
                 <span className="text-text-muted font-normal">(query):</span>
               </label>
@@ -277,7 +277,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
                 value={queryValues[qp.name] || ''}
                 onChange={(e) => setQueryValues((prev) => ({ ...prev, [qp.name]: e.target.value }))}
                 placeholder={qp.description}
-                className="w-full font-mono text-xs p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
+                className="w-full font-mono text-xs sm:text-sm p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
               />
             </div>
           ))}
@@ -287,7 +287,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
       {/* Editable Request Body if POST/PUT/PATCH */}
       {['POST', 'PUT', 'PATCH'].includes(endpoint.method) && (
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-text-secondary">
+          <label className="text-xs sm:text-sm font-semibold text-text-secondary">
             JSON Request Body:
           </label>
           <CodeBlock
@@ -302,8 +302,8 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
       {/* Network Simulation Headers Inputs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
-            <Icon icon="ph:timer-bold" className="w-3.5 h-3.5 text-purple-400" />
+          <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-1.5">
+            <Icon icon="ph:timer-bold" className="w-4 h-4 text-purple-400" />
             <span>Simulate Delay (ms):</span>
           </label>
           <input
@@ -311,13 +311,13 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
             value={simulateDelay}
             onChange={(e) => setSimulateDelay(e.target.value)}
             placeholder="e.g. 1500 (0-20000ms)"
-            className="w-full font-mono text-xs p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
+            className="w-full font-mono text-xs sm:text-sm p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
-            <Icon icon="ph:warning-circle-bold" className="w-3.5 h-3.5 text-amber-400" />
+          <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-1.5">
+            <Icon icon="ph:warning-circle-bold" className="w-4 h-4 text-amber-400" />
             <span>Simulate Status Code:</span>
           </label>
           <input
@@ -325,7 +325,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
             value={simulateStatus}
             onChange={(e) => setSimulateStatus(e.target.value)}
             placeholder="e.g. 500, 404, 503"
-            className="w-full font-mono text-xs p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
+            className="w-full font-mono text-xs sm:text-sm p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
           />
         </div>
       </div>
@@ -335,7 +335,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
         <button
           onClick={handleExecute}
           disabled={loading}
-          className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
+          className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
         >
           <Icon
             icon={loading ? 'ph:spinner-bold' : 'ph:paper-plane-right-bold'}
@@ -346,7 +346,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
 
         <button
           onClick={() => setIsOpen(false)}
-          className="text-xs text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+          className="text-xs sm:text-sm text-text-muted hover:text-text-primary transition-colors cursor-pointer"
         >
           Collapse
         </button>
@@ -355,7 +355,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
       {/* Response Inspector Display */}
       {response && (
         <div className="space-y-3 pt-3 border-t border-border-theme animate-in fade-in duration-200">
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between text-xs sm:text-sm">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-text-secondary">Response Status:</span>
               <span
@@ -369,15 +369,15 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 text-text-muted font-mono text-[11px]">
-                <Icon icon="ph:timer-bold" className="w-3.5 h-3.5 text-accent-primary" />
+              <div className="flex items-center gap-1 text-text-muted font-mono text-xs sm:text-sm">
+                <Icon icon="ph:timer-bold" className="w-4 h-4 text-accent-primary" />
                 <span>{response.timeMs} ms</span>
               </div>
               <button
                 onClick={handleCopyResponse}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-bg-tertiary hover:bg-border-theme text-text-secondary text-[11px] font-medium transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-bg-tertiary hover:bg-border-theme text-text-secondary text-xs sm:text-sm font-medium transition-colors cursor-pointer"
               >
-                <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3 h-3 text-accent-primary" />
+                <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5 text-accent-primary" />
                 <span>{copied ? 'Copied' : 'Copy'}</span>
               </button>
             </div>
@@ -386,7 +386,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
           {/* Render Live SVG Visual Preview if Response is SVG Vector */}
           {response.isSvg && typeof response.data === 'string' && (
             <div className="space-y-1.5">
-              <span className="text-[11px] font-semibold text-emerald-400">Live SVG Vector Render:</span>
+              <span className="text-xs sm:text-sm font-semibold text-emerald-400">Live SVG Vector Render:</span>
               <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme flex items-center justify-center min-h-35 overflow-hidden">
                 <div
                   className="max-w-full max-h-64 flex items-center justify-center [&>svg]:max-w-full [&>svg]:h-auto [&>svg]:shadow-lg [&>svg]:rounded-xl"
@@ -397,7 +397,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
           )}
 
           <div className="space-y-1">
-            <span className="text-[11px] font-semibold text-text-secondary">
+            <span className="text-xs sm:text-sm font-semibold text-text-secondary">
               {response.isSvg ? 'Raw SVG XML Code:' : 'Response Payload:'}
             </span>
             <CodeBlock

@@ -106,10 +106,10 @@ export default function ResourcePage({ params }: ResourcePageProps) {
             <Icon icon={res.icon} className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-text-primary tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-black text-text-primary tracking-tight">
               {res.name} Resource Documentation
             </h1>
-            <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+            <p className="text-sm sm:text-base text-text-secondary mt-1.5 leading-relaxed">
               REST API endpoints for managing {res.name} records in global baseline seed data overlaid with your active session sandbox.
             </p>
           </div>
@@ -127,14 +127,14 @@ export default function ResourcePage({ params }: ResourcePageProps) {
               key={method}
               onClick={() => setActiveMethodFilter(method)}
               disabled={count === 0}
-              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 disabled:opacity-30 disabled:cursor-not-allowed ${
+              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 disabled:opacity-30 disabled:cursor-not-allowed ${
                 isActive
                   ? 'bg-accent-primary text-white shadow-md'
                   : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
               }`}
             >
               <span>{method}</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-black/20 font-sans">
+              <span className="text-[11px] sm:text-xs px-1.5 py-0.5 rounded-md bg-black/20 font-sans">
                 {count}
               </span>
             </button>
@@ -154,7 +154,7 @@ export default function ResourcePage({ params }: ResourcePageProps) {
         {res.prevPage ? (
           <Link
             href={res.prevPage.href}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs font-bold text-text-primary transition-all group"
+            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group"
           >
             <Icon icon="ph:arrow-left-bold" className="w-4 h-4 text-accent-primary group-hover:-translate-x-1 transition-transform" />
             <span>Prev: {res.prevPage.title}</span>
@@ -166,7 +166,7 @@ export default function ResourcePage({ params }: ResourcePageProps) {
         {res.nextPage && (
           <Link
             href={res.nextPage.href}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs font-bold text-text-primary transition-all group ml-auto"
+            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group ml-auto"
           >
             <span>Next: {res.nextPage.title}</span>
             <Icon icon="ph:arrow-right-bold" className="w-4 h-4 text-accent-primary group-hover:translate-x-1 transition-transform" />

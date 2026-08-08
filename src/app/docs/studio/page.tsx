@@ -122,35 +122,35 @@ export default function StudioPage() {
     <div className="space-y-10 w-full max-w-none">
       {/* Title Header */}
       <div className="space-y-3 border-b border-border-theme pb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs font-bold">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:play-circle-bold" className="w-4 h-4" />
           Interactive API Studio & Request Builder
         </div>
-        <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
           Interactive Request Builder & Response Inspector
         </h1>
-        <p className="text-sm text-text-secondary leading-relaxed">
+        <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
           The API Studio is an in-browser request tester. Use it to prototype API queries, inspect JSON payloads, test network latency delays, simulate HTTP error codes, and verify your session identity overlays in real time.
         </p>
       </div>
 
       {/* What this section is used for */}
       <div className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3">
-        <h2 className="text-base font-bold text-text-primary flex items-center gap-2">
+        <h2 className="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
           <Icon icon="ph:info-bold" className="w-5 h-5 text-accent-primary" />
           How to Use the Interactive API Studio
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-text-secondary">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs sm:text-sm text-text-secondary">
           <div className="p-3.5 rounded-xl bg-bg-secondary border border-border-theme space-y-1">
-            <div className="font-bold text-text-primary">1. Choose or Build Request</div>
+            <div className="font-bold text-text-primary text-sm">1. Choose or Build Request</div>
             <p className="leading-relaxed">Select HTTP method (GET, POST, PUT, PATCH, DELETE) or pick a preset template below.</p>
           </div>
           <div className="p-3.5 rounded-xl bg-bg-secondary border border-border-theme space-y-1">
-            <div className="font-bold text-text-primary">2. Test Middleware Simulation</div>
+            <div className="font-bold text-text-primary text-sm">2. Test Middleware Simulation</div>
             <p className="leading-relaxed">Add artificial network latency (e.g. 1500ms) or force 500 error status codes to test UI spinners.</p>
           </div>
           <div className="p-3.5 rounded-xl bg-bg-secondary border border-border-theme space-y-1">
-            <div className="font-bold text-text-primary">3. Inspect Response Metrics</div>
+            <div className="font-bold text-text-primary text-sm">3. Inspect Response Metrics</div>
             <p className="leading-relaxed">View exact HTTP status codes, execution latency in milliseconds, headers, and formatted JSON output.</p>
           </div>
         </div>
@@ -158,15 +158,15 @@ export default function StudioPage() {
 
       {/* Preset Quick Templates */}
       <div className="space-y-2">
-        <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">Preset Request Templates:</span>
+        <span className="text-xs sm:text-sm font-bold text-text-secondary uppercase tracking-wider">Preset Request Templates:</span>
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
           {presetTemplates.map((tpl) => (
             <button
               key={tpl.name}
               onClick={() => applyTemplate(tpl)}
-              className="px-3 py-1.5 rounded-xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs font-semibold text-text-primary shrink-0 transition-colors cursor-pointer flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-semibold text-text-primary shrink-0 transition-colors cursor-pointer flex items-center gap-1.5"
             >
-              <Icon icon="ph:magic-wand-bold" className="w-3.5 h-3.5 text-accent-primary" />
+              <Icon icon="ph:magic-wand-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent-primary" />
               <span>{tpl.name}</span>
             </button>
           ))}
@@ -179,7 +179,7 @@ export default function StudioPage() {
           <select
             value={method}
             onChange={(e) => setMethod(e.target.value as any)}
-            className="w-full sm:w-32 font-mono text-xs font-bold p-3 rounded-xl bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none focus:border-accent-primary cursor-pointer"
+            className="w-full sm:w-32 font-mono text-xs sm:text-sm font-bold p-3 rounded-xl bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none focus:border-accent-primary cursor-pointer"
           >
             <option value="GET">GET</option>
             <option value="POST">POST</option>
@@ -189,13 +189,13 @@ export default function StudioPage() {
           </select>
 
           <div className="flex-1 w-full flex items-center bg-bg-secondary border border-border-theme rounded-xl overflow-hidden px-3">
-            <span className="font-mono text-xs text-text-muted shrink-0">{config.publicApiUrl || config.apiUrl}</span>
+            <span className="font-mono text-xs sm:text-sm text-text-muted shrink-0">{config.publicApiUrl || config.apiUrl}</span>
 
             <input
               type="text"
               value={endpointPath}
               onChange={(e) => setEndpointPath(e.target.value)}
-              className="w-full font-mono text-xs text-text-primary bg-transparent p-3 focus:outline-none"
+              className="w-full font-mono text-xs sm:text-sm text-text-primary bg-transparent p-3 focus:outline-none"
               placeholder="/posts?_limit=5"
             />
           </div>
@@ -203,7 +203,7 @@ export default function StudioPage() {
           <button
             onClick={handleSend}
             disabled={loading}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-xs font-bold transition-all shrink-0 cursor-pointer shadow-md"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-sm font-bold transition-all shrink-0 cursor-pointer shadow-md"
           >
             <Icon icon={loading ? 'ph:spinner-bold' : 'ph:paper-plane-right-bold'} className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             <span>{loading ? 'Sending...' : 'Send Request'}</span>
@@ -213,14 +213,14 @@ export default function StudioPage() {
         {/* Network Middleware Simulation Controls */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border-theme">
           <div className="space-y-1">
-            <label className="text-[11px] font-semibold text-text-secondary flex items-center gap-1.5">
-              <Icon icon="ph:clock-afternoon-bold" className="w-3.5 h-3.5 text-amber-400" />
+            <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-1.5">
+              <Icon icon="ph:clock-afternoon-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
               Simulate Delay Header (X-Simulate-Delay):
             </label>
             <select
               value={simDelay}
               onChange={(e) => setSimDelay(e.target.value)}
-              className="w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none"
+              className="w-full font-mono text-xs sm:text-sm p-2.5 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none"
             >
               <option value="0">0 ms (Instant)</option>
               <option value="500">500 ms (Fast)</option>
@@ -231,14 +231,14 @@ export default function StudioPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-[11px] font-semibold text-text-secondary flex items-center gap-1.5">
-              <Icon icon="ph:warning-circle-bold" className="w-3.5 h-3.5 text-rose-400" />
+            <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-1.5">
+              <Icon icon="ph:warning-circle-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400" />
               Simulate Status Code (X-Simulate-Status):
             </label>
             <select
               value={simStatus}
               onChange={(e) => setSimStatus(e.target.value)}
-              className="w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none"
+              className="w-full font-mono text-xs sm:text-sm p-2.5 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none"
             >
               <option value="200">200 OK (Normal)</option>
               <option value="400">400 Bad Request</option>
@@ -252,7 +252,7 @@ export default function StudioPage() {
         {/* Payload Body Editor */}
         {['POST', 'PUT', 'PATCH'].includes(method) && (
           <div className="space-y-2 pt-2 border-t border-border-theme">
-            <label className="text-[11px] font-semibold text-text-secondary">Request Body Payload (JSON):</label>
+            <label className="text-xs sm:text-sm font-semibold text-text-secondary">Request Body Payload (JSON):</label>
             <CodeBlock
               code={jsonPayload}
               language="json"
@@ -268,7 +268,7 @@ export default function StudioPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span
-                  className={`font-mono text-xs font-bold px-3 py-1 rounded-lg ${
+                  className={`font-mono text-xs sm:text-sm font-bold px-3 py-1 rounded-lg ${
                     response.status >= 200 && response.status < 300
                       ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                       : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
@@ -276,15 +276,15 @@ export default function StudioPage() {
                 >
                   {response.status} {response.statusText}
                 </span>
-                <span className="font-mono text-xs text-text-muted flex items-center gap-1">
-                  <Icon icon="ph:timer-bold" className="w-3.5 h-3.5" />
+                <span className="font-mono text-xs sm:text-sm text-text-muted flex items-center gap-1">
+                  <Icon icon="ph:timer-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   {response.timeMs} ms execution
                 </span>
               </div>
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">Response Payload Output</span>
+              <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-secondary">Response Payload Output</span>
               <CodeBlock
                 code={response.data}
                 language={typeof response.data === 'string' && response.data.startsWith('<svg') ? 'svg' : 'json'}

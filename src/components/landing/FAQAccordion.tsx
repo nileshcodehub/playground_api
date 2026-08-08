@@ -59,14 +59,14 @@ export function FAQAccordion() {
       />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-light text-accent-primary text-xs font-bold">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
             <Icon icon="ph:question-bold" className="w-4 h-4" />
             10 Common Questions
           </div>
-          <h2 className="text-3xl font-extrabold text-text-primary tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p className="text-sm text-text-secondary">
+          <p className="text-sm sm:text-base text-text-secondary">
             Everything you need to know about Playground API architecture and integration.
           </p>
         </div>
@@ -82,7 +82,7 @@ export function FAQAccordion() {
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="w-full flex items-center justify-between p-5 text-left text-sm font-bold text-text-primary hover:bg-bg-tertiary transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between p-5 text-left text-sm sm:text-base font-bold text-text-primary hover:bg-bg-tertiary transition-colors cursor-pointer"
                 >
                   <span>{faq.question}</span>
                   <Icon
@@ -94,7 +94,7 @@ export function FAQAccordion() {
                 </button>
 
                 {isOpen && (
-                  <div className="p-5 pt-0 text-xs text-text-secondary leading-relaxed border-t border-border-theme/50 bg-bg-secondary/50">
+                  <div className="p-5 pt-0 text-sm sm:text-base text-text-secondary leading-relaxed border-t border-border-theme/50 bg-bg-secondary/50">
                     {faq.answer}
                   </div>
                 )}

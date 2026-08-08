@@ -152,14 +152,14 @@ export default function StatsPage() {
     <div className="space-y-10 w-full max-w-none">
       {/* Title Header */}
       <div className="space-y-3 border-b border-border-theme pb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs font-bold">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:chart-bar-bold" className="w-4 h-4" />
           User Session & Quota Dashboard
         </div>
-        <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
           Session Sandbox Activity & Quota Status
         </h1>
-        <p className="text-sm text-text-secondary leading-relaxed">
+        <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
           Comprehensive overview of your personal identity token, sandbox mutation usage, rate limit status, and resource quotas.
         </p>
       </div>
@@ -167,21 +167,21 @@ export default function StatsPage() {
       {/* 1. IDENTITY UUID Card */}
       <div className="p-6 rounded-2xl bg-code-bg border border-border-theme space-y-4 font-mono shadow-xl">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-text-muted uppercase tracking-wider">IDENTITY UUID</span>
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+          <span className="text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider">IDENTITY UUID</span>
+          <span className="text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
             10-DAY INACTIVITY RETENTION ACTIVE
           </span>
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <span className="text-xl font-bold text-emerald-400 break-all select-all">
+          <span className="text-xl sm:text-2xl font-bold text-emerald-400 break-all select-all">
             {uuid || 'Anonymous Session'}
           </span>
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={handleCopyUuid}
               disabled={!uuid}
-              className="px-3 py-1.5 rounded-xl bg-bg-tertiary hover:bg-border-theme text-text-primary text-xs font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl bg-bg-tertiary hover:bg-border-theme text-text-primary text-xs sm:text-sm font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
             >
               <Icon icon={copiedUuid ? 'ph:check-bold' : 'ph:copy-bold'} className="w-4 h-4" />
               <span>{copiedUuid ? 'UUID Copied' : 'Copy UUID'}</span>
@@ -189,7 +189,7 @@ export default function StatsPage() {
             <button
               onClick={handleCopyToken}
               disabled={!uuid && !fullToken}
-              className="px-3 py-1.5 rounded-xl bg-accent-light hover:bg-accent-primary hover:text-white text-accent-primary text-xs font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl bg-accent-light hover:bg-accent-primary hover:text-white text-accent-primary text-xs sm:text-sm font-sans font-semibold transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
             >
               <Icon icon={copiedToken ? 'ph:check-bold' : 'ph:key-bold'} className="w-4 h-4" />
               <span>{copiedToken ? 'Token Copied' : 'Copy Full Signed Token'}</span>
@@ -197,7 +197,7 @@ export default function StatsPage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-6 text-xs text-text-muted pt-2 border-t border-border-theme/40 font-sans">
+        <div className="flex flex-wrap items-center gap-6 text-xs sm:text-sm text-text-muted pt-2 border-t border-border-theme/40 font-sans">
           <span className="flex items-center gap-1">
             🗓️ Created: <strong className="text-text-secondary">{createdDate}</strong>
           </span>
@@ -211,27 +211,27 @@ export default function StatsPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
         <div className="p-5 rounded-2xl bg-bg-tertiary border border-border-theme space-y-1">
           <div className="text-3xl font-black text-emerald-400">{stats?.summary?.totalOverlays ?? 0}</div>
-          <div className="text-xs font-medium text-text-secondary">Total Sandbox Records</div>
+          <div className="text-xs sm:text-sm font-medium text-text-secondary">Total Sandbox Records</div>
         </div>
         <div className="p-5 rounded-2xl bg-bg-tertiary border border-border-theme space-y-1">
           <div className="text-3xl font-black text-emerald-400">{stats?.summary?.creates ?? 0}</div>
-          <div className="text-xs font-medium text-text-secondary">Records Created</div>
+          <div className="text-xs sm:text-sm font-medium text-text-secondary">Records Created</div>
         </div>
         <div className="p-5 rounded-2xl bg-bg-tertiary border border-border-theme space-y-1">
           <div className="text-3xl font-black text-amber-400">{stats?.summary?.updates ?? 0}</div>
-          <div className="text-xs font-medium text-text-secondary">Records Updated</div>
+          <div className="text-xs sm:text-sm font-medium text-text-secondary">Records Updated</div>
         </div>
         <div className="p-5 rounded-2xl bg-bg-tertiary border border-border-theme space-y-1">
           <div className="text-3xl font-black text-rose-400">{stats?.summary?.deletes ?? 0}</div>
-          <div className="text-xs font-medium text-text-secondary">Records Deleted</div>
+          <div className="text-xs sm:text-sm font-medium text-text-secondary">Records Deleted</div>
         </div>
       </div>
 
       {/* 3. Resource Quotas & Mutations Table */}
       <div className="space-y-3">
-        <h2 className="text-base font-bold text-text-primary tracking-wide">Resource Quotas & Mutations</h2>
+        <h2 className="text-base sm:text-lg font-bold text-text-primary tracking-wide">Resource Quotas & Mutations</h2>
         <div className="overflow-x-auto rounded-2xl border border-border-theme glass-panel shadow-lg">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full text-left border-collapse text-xs sm:text-sm">
             <thead>
               <tr className="bg-bg-tertiary border-b border-border-theme text-text-secondary font-bold">
                 <th className="p-4">Resource</th>
@@ -244,7 +244,7 @@ export default function StatsPage() {
             <tbody className="divide-y divide-border-theme font-medium text-text-primary">
               {resourceList.map((row) => (
                 <tr key={row.name}>
-                  <td className="p-4 font-bold text-sm">{row.name}</td>
+                  <td className="p-4 font-bold text-sm sm:text-base">{row.name}</td>
                   <td className="p-4 font-mono text-text-secondary">{row.created}</td>
                   <td className="p-4 font-mono text-text-secondary">{row.updated}</td>
                   <td className="p-4 font-mono text-text-secondary">{row.deleted}</td>
@@ -267,7 +267,7 @@ export default function StatsPage() {
       <SandboxExplanationCard />
 
       {resetMsg && (
-        <div className="p-4 rounded-xl bg-emerald-500/15 text-emerald-400 text-xs font-medium border border-emerald-500/30 flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-emerald-500/15 text-emerald-400 text-xs sm:text-sm font-medium border border-emerald-500/30 flex items-center gap-2">
           <Icon icon="ph:check-circle-bold" className="w-5 h-5" />
           <span>{resetMsg}</span>
         </div>
@@ -278,7 +278,7 @@ export default function StatsPage() {
         <button
           onClick={handleReset}
           disabled={resetting}
-          className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-sans text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
+          className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-sans text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
         >
           <Icon icon={resetting ? 'ph:spinner-bold' : 'ph:trash-bold'} className={`w-4 h-4 ${resetting ? 'animate-spin' : ''}`} />
           <span>{resetting ? 'Resetting Sandbox...' : 'Reset Session Sandbox'}</span>
@@ -286,7 +286,7 @@ export default function StatsPage() {
 
         <a
           href="/docs/export-import"
-          className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-text-primary text-xs font-semibold transition-colors"
+          className="w-full sm:w-1/2 flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-text-primary text-xs sm:text-sm font-semibold transition-colors"
         >
           <Icon icon="ph:cloud-arrow-up-bold" className="w-4 h-4 text-accent-primary" />
           <span>Export / Import Snapshot JSON</span>

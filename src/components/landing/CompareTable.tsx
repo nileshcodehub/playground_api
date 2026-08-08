@@ -6,23 +6,23 @@ export function CompareTable() {
     <section className="py-20 bg-bg-secondary border-b border-border-theme">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-light text-accent-primary text-xs font-bold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
             Comprehensive Platform Matrix
           </div>
-          <h2 className="text-3xl font-extrabold text-text-primary tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
             How Playground API Compares to Alternatives
           </h2>
-          <p className="text-sm text-text-secondary">
+          <p className="text-sm sm:text-base text-text-secondary">
             See why developers choose Playground API over legacy mock APIs for real-world prototyping.
           </p>
         </div>
 
         <div className="overflow-x-auto rounded-2xl border border-border-theme glass-panel shadow-xl">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full text-left border-collapse text-xs sm:text-sm">
             <thead>
               <tr className="bg-bg-tertiary border-b border-border-theme font-bold text-text-primary">
                 <th className="p-4">Feature / Capability</th>
-                <th className="p-4 text-accent-primary font-extrabold text-sm">Playground API</th>
+                <th className="p-4 text-accent-primary font-extrabold text-xs sm:text-sm">Playground API</th>
                 <th className="p-4 text-text-secondary">JSONPlaceholder</th>
                 <th className="p-4 text-text-secondary">Platzi Fake API</th>
                 <th className="p-4 text-text-secondary">DummyJSON</th>

@@ -24,13 +24,13 @@ export function ResourceGrid() {
     <section className="py-20 bg-bg-secondary border-b border-border-theme">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-light text-accent-primary text-xs font-bold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
             Available Mock API Collections
           </div>
-          <h2 className="text-3xl font-extrabold text-text-primary tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
             Explore Built-in Mock Datasets
           </h2>
-          <p className="text-sm text-text-secondary">
+          <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
             Ready-to-use resources with full pagination, filtering, full-text search, and relational support.
           </p>
         </div>
@@ -49,20 +49,20 @@ export function ResourceGrid() {
                   <div className="w-10 h-10 rounded-xl bg-accent-light text-accent-primary flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Icon icon={res.icon} className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-bg-tertiary text-accent-primary border border-border-theme">
+                  <span className="text-xs sm:text-sm font-mono font-semibold px-2.5 py-1 rounded-full bg-bg-tertiary text-accent-primary border border-border-theme">
                     {badgeText}
                   </span>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-text-primary group-hover:text-accent-primary transition-colors flex items-center gap-1.5">
+                  <h3 className="text-lg sm:text-xl font-bold text-text-primary group-hover:text-accent-primary transition-colors flex items-center gap-1.5">
                     {res.name}
                     <Icon icon="ph:arrow-right-bold" className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </h3>
-                  <p className="text-xs text-text-secondary mt-1 leading-relaxed">{res.description}</p>
+                  <p className="text-sm text-text-secondary mt-1.5 leading-relaxed">{res.description}</p>
                 </div>
 
-                <div className="pt-2 border-t border-border-theme flex items-center justify-between text-xs text-text-muted font-mono">
+                <div className="pt-2 border-t border-border-theme flex items-center justify-between text-xs sm:text-sm text-text-muted font-mono">
                   <span>{res.endpoints.length} Endpoints</span>
                   <span className="text-accent-primary font-semibold">/api/v1/{res.id}</span>
                 </div>

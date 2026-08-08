@@ -17,26 +17,26 @@ export function EndpointCard({ endpoint }: EndpointCardProps) {
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
             <MethodBadge method={endpoint.method} />
-            <span className="font-mono text-sm font-bold text-text-primary bg-bg-tertiary px-3 py-1 rounded-lg border border-border-theme select-all">
+            <span className="font-mono text-sm sm:text-base font-bold text-text-primary bg-bg-tertiary px-3 py-1 rounded-lg border border-border-theme select-all">
               {endpoint.path}
             </span>
           </div>
-          <span className="text-xs font-mono font-bold text-text-muted">
+          <span className="text-xs sm:text-sm font-mono font-bold text-text-muted">
             #{endpoint.id}
           </span>
         </div>
-        <h3 className="text-lg font-bold text-text-primary pt-1">{endpoint.title}</h3>
-        <p className="text-xs text-text-secondary leading-relaxed">{endpoint.description}</p>
+        <h3 className="text-lg sm:text-xl font-bold text-text-primary pt-1">{endpoint.title}</h3>
+        <p className="text-sm text-text-secondary leading-relaxed">{endpoint.description}</p>
       </div>
 
       {/* Query / Path Parameters Table */}
       {endpoint.queryParams && endpoint.queryParams.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+          <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-secondary">
             QUERY / PATH PARAMETERS
           </h4>
           <div className="overflow-x-auto rounded-xl border border-border-theme bg-bg-secondary">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full text-left border-collapse text-xs sm:text-sm">
               <thead>
                 <tr className="bg-bg-tertiary text-text-primary font-bold border-b border-border-theme font-mono">
                   <th className="p-3">Name</th>
@@ -53,7 +53,7 @@ export function EndpointCard({ endpoint }: EndpointCardProps) {
                     <td className="p-3 text-text-muted">{q.type}</td>
                     <td className="p-3">
                       <span
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                        className={`px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-bold ${
                           q.required
                             ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
                             : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
@@ -74,7 +74,7 @@ export function EndpointCard({ endpoint }: EndpointCardProps) {
 
       {/* Request Code Snippet Runner */}
       <div className="space-y-2">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+        <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-secondary">
           REQUEST CODE GENERATOR
         </h4>
         <CodeGenerators endpoint={endpoint} />
@@ -84,7 +84,7 @@ export function EndpointCard({ endpoint }: EndpointCardProps) {
       <div className="grid grid-cols-1 gap-4 pt-2 border-t border-border-theme">
         {endpoint.requestBody && (
           <div className="space-y-1.5">
-            <span className="text-[11px] font-mono font-bold text-amber-400 uppercase">Request Body (JSON)</span>
+            <span className="text-xs sm:text-sm font-mono font-bold text-amber-400 uppercase">Request Body (JSON)</span>
             <CodeBlock
               code={endpoint.requestBody}
               language="json"
@@ -94,7 +94,7 @@ export function EndpointCard({ endpoint }: EndpointCardProps) {
         )}
 
         <div className="space-y-1.5">
-          <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase">Response JSON Example</span>
+          <span className="text-xs sm:text-sm font-mono font-bold text-emerald-400 uppercase">Response JSON Example</span>
           <CodeBlock
             code={endpoint.responseExample}
             language={typeof endpoint.responseExample === 'string' && endpoint.responseExample.startsWith('<svg') ? 'svg' : 'json'}

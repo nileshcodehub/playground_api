@@ -69,14 +69,14 @@ export function FeatureGrid() {
     <section className="py-20 bg-bg-primary border-b border-border-theme">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-light text-accent-primary text-xs font-bold">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
             <Icon icon="ph:sparkle-bold" className="w-4 h-4" />
             Full Feature Capabilities
           </div>
-          <h2 className="text-3xl font-extrabold text-text-primary tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
             Engineered for Modern Web & Mobile Prototyping
           </h2>
-          <p className="text-sm text-text-secondary leading-relaxed">
+          <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
             Everything developers and AI agents need to build, test, and prototype real-world applications.
           </p>
         </div>
@@ -90,8 +90,8 @@ export function FeatureGrid() {
               <div className="w-12 h-12 rounded-xl bg-accent-light text-accent-primary flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Icon icon={feat.icon} className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-text-primary">{feat.title}</h3>
-              <p className="text-xs text-text-secondary leading-relaxed">{feat.description}</p>
+              <h3 className="text-base sm:text-lg font-bold text-text-primary">{feat.title}</h3>
+              <p className="text-sm text-text-secondary leading-relaxed">{feat.description}</p>
             </div>
           ))}
         </div>

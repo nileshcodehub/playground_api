@@ -21,7 +21,7 @@ export function HeroSection() {
     <section className="relative overflow-hidden py-20 lg:py-28 border-b border-border-theme bg-linear-to-b from-bg-primary via-bg-secondary to-bg-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 text-center relative z-10">
         {/* Version Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-light border border-accent-primary/30 text-accent-primary text-xs font-semibold shadow-xs animate-bounce">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-light border border-accent-primary/30 text-accent-primary text-xs sm:text-sm font-semibold shadow-xs animate-bounce">
           <Icon icon="ph:sparkle-fill" className="w-4 h-4 text-accent-primary" />
           <span>Playground API {config.apiVersion} Released</span>
           <span className="text-text-muted">|</span>
@@ -36,7 +36,7 @@ export function HeroSection() {
               Mock REST & GraphQL API
             </span>
           </h1>
-          <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
             The next-generation prototyping API. Perform real POST, PUT, PATCH, and DELETE mutations with isolated per-user sandbox state overlays. Zero setup required.
           </p>
         </div>
@@ -57,14 +57,14 @@ export function HeroSection() {
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
           <Link
             href="/docs/introduction"
-            className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-accent-primary hover:bg-accent-hover text-white text-sm font-bold shadow-lg shadow-accent-primary/25 transition-all hover:scale-105"
+            className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-accent-primary hover:bg-accent-hover text-white text-sm sm:text-base font-bold shadow-lg shadow-accent-primary/25 transition-all hover:scale-105"
           >
             <Icon icon="ph:book-open-text-bold" className="w-5 h-5" />
             Explore Documentation
           </Link>
           <Link
             href="/docs/studio"
-            className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-text-primary text-sm font-bold transition-all hover:scale-105"
+            className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-text-primary text-sm sm:text-base font-bold transition-all hover:scale-105"
           >
             <Icon icon="ph:play-circle-bold" className="w-5 h-5 text-accent-primary" />
             Interactive API Studio
