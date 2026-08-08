@@ -5,6 +5,7 @@ const backendUrl =
 
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
   experimental: {},
   async headers() {
     return [
