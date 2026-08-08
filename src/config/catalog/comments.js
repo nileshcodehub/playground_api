@@ -110,8 +110,11 @@ export const getCommentsEndpoints = (sampleRecord = null) => {
       params: [
         { name: "id", in: "path", type: "string | integer", description: `Comment ID to delete (e.g. ${realComment.id} or local-<uuid>).` }
       ],
-      bodyExample: null,
-      responseExample: "204 No Content"
+      responseExample: JSON.stringify({
+        message: `Resource 'comments' with id '${realComment.id}' deleted successfully from sandbox overlay`,
+        id: realComment.id,
+        resource: "comments"
+      }, null, 2)
     }
   ];
 };

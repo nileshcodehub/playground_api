@@ -1,18 +1,17 @@
-import dotenv from 'dotenv';
-import path from 'path';
-
-// Load .env file
-dotenv.config();
+/**
+ * Environment Configuration Module for Next.js Frontend
+ * Rule: NEVER access process.env directly outside this file.
+ */
 
 const config = {
   env: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '3000', 10),
-  databaseUrl: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/playground_api?schema=public',
-  ipHashSalt: process.env.IP_HASH_SALT || (() => { throw new Error('IP_HASH_SALT must be set'); })(),
-  jwtSecret: process.env.JWT_SECRET || 'default_playground_jwt_secret_key_2026',
-  trustProxy: process.env.TRUST_PROXY === 'true',
+  isDevelopment: process.env.NODE_ENV !== 'production',
   isProduction: process.env.NODE_ENV === 'production',
-  isDevelopment: process.env.NODE_ENV === 'development' || !process.env.NODE_ENV,
+  port: parseInt(process.env.PORT || '3000', 10),
+  apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  apiVersion: 'v1',
+  jwtSecret: process.env.JWT_SECRET || 'default_playground_jwt_secret_key_2026',
   isVercel: Boolean(process.env.VERCEL)
 };
 

@@ -20,6 +20,7 @@ export const getEndpointsForResource = (resource, sampleRecord = null) => {
     case 'auth':
       return getAuthEndpoints();
     case 'media':
+    case 'avatars':
       return getMediaEndpoints();
     case 'session':
       return getSessionEndpoints();

@@ -1,0 +1,423 @@
+'use client';
+
+import React, { useState, useMemo, useCallback } from 'react';
+import { Icon } from '@iconify/react';
+import { cn } from '@/lib/utils';
+import { useTheme } from '@/components/theme/ThemeProvider';
+import styles from './CodeBlock.module.css';
+
+export interface CodeBlockTab {
+  id: string;
+  label?: string;
+  code: unknown;
+  icon?: string;
+  language?: string;
+}
+
+export interface CodeBlockProps {
+  code?: unknown;
+  snippets?: Record<string, unknown>;
+  tabs?: CodeBlockTab[];
+  defaultTab?: string;
+  language?: string;
+  title?: string;
+  subtitle?: string;
+  icon?: string;
+  copyable?: boolean;
+  maxHeight?: string;
+  className?: string;
+  codeClassName?: string;
+  showHeader?: boolean;
+  showLineNumbers?: boolean;
+  oddEvenZebra?: boolean;
+  initialWrap?: boolean;
+  highlightedLines?: number[];
+  onTabChange?: (tabId: string) => void;
+}
+
+const LANGUAGE_ICONS: Record<string, string> = {
+  javascript: 'simple-icons:javascript',
+  js: 'simple-icons:javascript',
+  node: 'simple-icons:nodedotjs',
+  axios: 'simple-icons:axios',
+  python: 'simple-icons:python',
+  py: 'simple-icons:python',
+  curl: 'ph:terminal-window-bold',
+  bash: 'ph:terminal-window-bold',
+  sh: 'ph:terminal-window-bold',
+  go: 'simple-icons:go',
+  swift: 'simple-icons:swift',
+  kotlin: 'simple-icons:kotlin',
+  rust: 'simple-icons:rust',
+  php: 'simple-icons:php',
+  json: 'ph:brackets-curly-bold',
+  graphql: 'simple-icons:graphql',
+  gql: 'simple-icons:graphql',
+  xml: 'ph:code-bold',
+  svg: 'ph:sparkle-bold',
+  typescript: 'simple-icons:typescript',
+  ts: 'simple-icons:typescript',
+};
+
+/**
+ * Intelligent Syntax Tokenizer for JSON, JS/TS, Python, cURL, GraphQL, Go, Rust, Swift, PHP
+ */
+function tokenizeLine(line: string) {
+  if (!line || line.trim() === '') {
+    return [{ text: line || ' ', type: 'plain' }];
+  }
+
+  // 1. Check for single-line comments (//, #, --)
+  const commentMatch = line.match(/^(\s*)((\/\/|#|--).*)$/);
+  if (commentMatch) {
+    return [
+      { text: commentMatch[1], type: 'whitespace' },
+      { text: commentMatch[2], type: 'comment' },
+    ];
+  }
+
+  // 2. Tokenize line with regex rules
+  const tokens: { text: string; type: string }[] = [];
+  const regex = /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`[a-zA-Z0-9_-]+`|\b(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b|\b(?:import|export|from|const|let|var|function|return|async|await|class|def|func|fn|struct|package|query|mutation|type|interface|val|fun|pub|use|new|try|catch|throw|if|else|switch|case|default|while|for)\b|\b(?:true|false|null|nil|None|undefined)\b|\b\d+(?:\.\d+)?\b|[{}\[\](),:;]|\/\/.*$|#.*$|[^\s"'`{}\[\](),:;]+|\s+)/g;
+
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(line)) !== null) {
+    if (match.index === regex.lastIndex) {
+      regex.lastIndex++;
+    }
+    const raw = match[0];
+
+    if (/^\s+$/.test(raw)) {
+      tokens.push({ text: raw, type: 'whitespace' });
+    } else if (raw.startsWith('//') || raw.startsWith('#')) {
+      tokens.push({ text: raw, type: 'comment' });
+    } else if (/^"(?:\\.|[^"\\])*"$/.test(raw)) {
+      // Check if it is a JSON object key (followed by colon)
+      const afterMatch = line.slice(regex.lastIndex).trimStart();
+      if (afterMatch.startsWith(':')) {
+        tokens.push({ text: raw, type: 'key' });
+      } else {
+        tokens.push({ text: raw, type: 'string' });
+      }
+    } else if (/^'(?:\\.|[^'\\])*'$/.test(raw)) {
+      tokens.push({ text: raw, type: 'string' });
+    } else if (/^\b(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b$/.test(raw)) {
+      tokens.push({ text: raw, type: 'http-method' });
+    } else if (/^\b(?:import|export|from|const|let|var|function|return|async|await|class|def|func|fn|struct|package|query|mutation|type|interface|val|fun|pub|use|new|try|catch|throw|if|else|switch|case|default|while|for)\b$/.test(raw)) {
+      tokens.push({ text: raw, type: 'keyword' });
+    } else if (/^\b(?:true|false|null|nil|None|undefined)\b$/.test(raw)) {
+      tokens.push({ text: raw, type: 'boolean' });
+    } else if (/^\b\d+(?:\.\d+)?\b$/.test(raw)) {
+      tokens.push({ text: raw, type: 'number' });
+    } else if (/^[{}()[\]]$/.test(raw)) {
+      tokens.push({ text: raw, type: 'bracket' });
+    } else if (/^[,:;]$/.test(raw)) {
+      tokens.push({ text: raw, type: 'punct' });
+    } else {
+      tokens.push({ text: raw, type: 'plain' });
+    }
+  }
+
+  return tokens.length > 0 ? tokens : [{ text: line, type: 'plain' }];
+}
+
+export function CodeBlock({
+  code,
+  snippets,
+  tabs: customTabs,
+  defaultTab,
+  language,
+  title,
+  subtitle,
+  icon,
+  copyable = true,
+  maxHeight = 'max-h-96',
+  className,
+  codeClassName,
+  showHeader,
+  showLineNumbers: initialShowLineNumbers = true,
+  oddEvenZebra = true,
+  initialWrap = false,
+  highlightedLines = [],
+  onTabChange,
+}: CodeBlockProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
+  // Normalize tabs from customTabs, snippets, or single code
+  const tabs: CodeBlockTab[] = useMemo(() => {
+    if (customTabs && customTabs.length > 0) {
+      return customTabs;
+    }
+    if (snippets && Object.keys(snippets).length > 0) {
+      return Object.entries(snippets).map(([key, val]) => {
+        const langKey = key.toLowerCase();
+        return {
+          id: key,
+          label: key.charAt(0).toUpperCase() + key.slice(1),
+          code: val,
+          icon: LANGUAGE_ICONS[langKey] || 'ph:code-bold',
+          language: langKey,
+        };
+      });
+    }
+    return [];
+  }, [customTabs, snippets]);
+
+  const [activeTabId, setActiveTabId] = useState<string>(() => {
+    if (defaultTab && tabs.some((t) => t.id === defaultTab)) {
+      return defaultTab;
+    }
+    return tabs[0]?.id || '';
+  });
+
+  const [copied, setCopied] = useState(false);
+  const [showLineNumbers, setShowLineNumbers] = useState(initialShowLineNumbers);
+  const [wrapLines, setWrapLines] = useState(initialWrap);
+  const [pinnedLines, setPinnedLines] = useState<Set<number>>(new Set(highlightedLines));
+
+  // Determine current active code
+  const currentRawCode = useMemo(() => {
+    if (tabs.length > 0) {
+      const found = tabs.find((t) => t.id === activeTabId) || tabs[0];
+      return found?.code;
+    }
+    return code;
+  }, [tabs, activeTabId, code]);
+
+  // Format code to display string
+  const formattedCode = useMemo(() => {
+    if (currentRawCode === null || currentRawCode === undefined) return '';
+    if (typeof currentRawCode === 'string') return currentRawCode;
+    try {
+      return JSON.stringify(currentRawCode, null, 2);
+    } catch {
+      return String(currentRawCode);
+    }
+  }, [currentRawCode]);
+
+  // Split into lines
+  const lines = useMemo(() => {
+    return formattedCode ? formattedCode.split('\n') : [''];
+  }, [formattedCode]);
+
+  const handleTabSelect = (tabId: string) => {
+    setActiveTabId(tabId);
+    if (onTabChange) {
+      onTabChange(tabId);
+    }
+  };
+
+  const handleCopy = useCallback(() => {
+    if (!formattedCode) return;
+    navigator.clipboard.writeText(formattedCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [formattedCode]);
+
+  const togglePinLine = (lineNum: number) => {
+    setPinnedLines((prev) => {
+      const next = new Set(prev);
+      if (next.has(lineNum)) {
+        next.delete(lineNum);
+      } else {
+        next.add(lineNum);
+      }
+      return next;
+    });
+  };
+
+  const hasTabs = tabs.length > 0;
+  const shouldRenderHeader = showHeader ?? Boolean(hasTabs || title || subtitle || language || copyable);
+
+  // Render Token using modular CSS classes
+  const renderToken = (token: { text: string; type: string }, idx: number) => {
+    switch (token.type) {
+      case 'key':
+        return <span key={idx} className={styles.tokenKey}>{token.text}</span>;
+      case 'string':
+        return <span key={idx} className={styles.tokenString}>{token.text}</span>;
+      case 'number':
+        return <span key={idx} className={styles.tokenNumber}>{token.text}</span>;
+      case 'boolean':
+        return <span key={idx} className={styles.tokenBoolean}>{token.text}</span>;
+      case 'keyword':
+        return <span key={idx} className={styles.tokenKeyword}>{token.text}</span>;
+      case 'http-method':
+        return <span key={idx} className={styles.tokenMethod}>{token.text}</span>;
+      case 'comment':
+        return <span key={idx} className={styles.tokenComment}>{token.text}</span>;
+      case 'bracket':
+        return <span key={idx} className={styles.tokenBracket}>{token.text}</span>;
+      case 'punct':
+        return <span key={idx} className={styles.tokenPunct}>{token.text}</span>;
+      default:
+        return <span key={idx} className={styles.tokenPlain}>{token.text}</span>;
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        styles.container,
+        isDark ? styles.dark : styles.light,
+        className
+      )}
+    >
+      {/* Header Bar: Multi-tab Switcher, Metadata, and Controls */}
+      {shouldRenderHeader && (
+        <div className={styles.header}>
+          {hasTabs ? (
+            <div className={styles.tabList}>
+              {tabs.map((tab) => {
+                const isActive = tab.id === activeTabId;
+                const tabIcon = tab.icon || LANGUAGE_ICONS[tab.id.toLowerCase()];
+
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => handleTabSelect(tab.id)}
+                    className={cn(
+                      styles.tabItem,
+                      isActive && styles.tabItemActive
+                    )}
+                  >
+                    {tabIcon && <Icon icon={tabIcon} className="w-3.5 h-3.5 shrink-0" />}
+                    <span>{tab.label || tab.id}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className={styles.metaInfo}>
+              {icon && <Icon icon={icon} className="w-4 h-4 text-accent-primary shrink-0" />}
+              {title && <span className={styles.metaTitle}>{title}</span>}
+              {language && !title && (
+                <span className={styles.metaLanguage}>
+                  {language}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Action Toolbar */}
+          <div className={styles.actions}>
+            {subtitle && (
+              <span className={cn(styles.metaSubtitle, 'hidden sm:inline')}>
+                {subtitle}
+              </span>
+            )}
+
+            {/* Line Numbers Toggle */}
+            <button
+              type="button"
+              onClick={() => setShowLineNumbers((prev) => !prev)}
+              className={cn(
+                styles.actionBtn,
+                showLineNumbers && styles.actionBtnActive
+              )}
+              title={showLineNumbers ? 'Hide Line Numbers' : 'Show Line Numbers'}
+            >
+              <Icon icon="ph:list-numbers-bold" className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">{lines.length}L</span>
+            </button>
+
+            {/* Wrap Toggle */}
+            <button
+              type="button"
+              onClick={() => setWrapLines((prev) => !prev)}
+              className={cn(
+                styles.actionBtn,
+                wrapLines && styles.actionBtnActive
+              )}
+              title={wrapLines ? 'Disable Line Wrap' : 'Enable Line Wrap'}
+            >
+              <Icon icon={wrapLines ? 'ph:text-align-left-bold' : 'ph:text-align-justify-bold'} className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Copy Button */}
+            {copyable && (
+              <button
+                type="button"
+                onClick={handleCopy}
+                className={cn(
+                  styles.copyBtn,
+                  copied && styles.copyBtnCopied
+                )}
+                title="Copy code snippet"
+              >
+                <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5 text-accent-primary" />
+                <span>{copied ? 'Copied' : 'Copy'}</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Code Area with Line Numbers, Zebra Striping, and Interactive Line Hover */}
+      <div className="relative font-mono text-xs sm:text-sm">
+        {!shouldRenderHeader && copyable && (
+          <button
+            type="button"
+            onClick={handleCopy}
+            className={styles.floatingCopyBtn}
+            title="Copy code snippet"
+          >
+            <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5 text-accent-primary" />
+            <span>{copied ? 'Copied' : 'Copy'}</span>
+          </button>
+        )}
+
+        <div className={cn(styles.codeViewport, maxHeight, codeClassName)}>
+          <div className={styles.linesWrapper}>
+            {lines.map((line, index) => {
+              const lineNum = index + 1;
+              const isOdd = index % 2 === 0;
+              const isPinned = pinnedLines.has(lineNum);
+              const tokens = tokenizeLine(line);
+
+              return (
+                <div
+                  key={index}
+                  onClick={() => togglePinLine(lineNum)}
+                  className={cn(
+                    styles.lineRow,
+                    // Zebra striping for odd and even lines
+                    oddEvenZebra && (isOdd ? styles.oddLine : styles.evenLine),
+                    // Pinned line highlight
+                    isPinned && styles.pinnedLine
+                  )}
+                >
+                  {/* Line Number Gutter */}
+                  {showLineNumbers && (
+                    <div
+                      className={cn(
+                        styles.lineGutter,
+                        isPinned && styles.lineGutterPinned
+                      )}
+                    >
+                      {lineNum}
+                    </div>
+                  )}
+
+                  {/* Line Content */}
+                  <div
+                    className={cn(
+                      styles.lineContent,
+                      wrapLines && styles.lineWrapped
+                    )}
+                  >
+                    {tokens.map((token, tIdx) => renderToken(token, tIdx))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default CodeBlock;
