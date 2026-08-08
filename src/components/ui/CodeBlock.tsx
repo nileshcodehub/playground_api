@@ -82,6 +82,9 @@ function tokenizeLine(line: string) {
 
   let match: RegExpExecArray | null;
   while ((match = regex.exec(line)) !== null) {
+    if (match.index === regex.lastIndex) {
+      regex.lastIndex++;
+    }
     const raw = match[0];
 
     if (/^\s+$/.test(raw)) {

@@ -11,6 +11,18 @@ interface TryItRunnerProps {
   endpoint: EndpointDef;
 }
 
+/**
+ * Client-side SVG Sanitizer to strip script tags, event handlers, and dangerous attributes
+ */
+function sanitizeSvg(rawSvg: string): string {
+  if (!rawSvg || typeof rawSvg !== 'string') return '';
+  return rawSvg
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/<foreignObject[\s\S]*?>[\s\S]*?<\/foreignObject>/gi, '')
+    .replace(/on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/(?:href|xlink:href)\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*'|javascript:[^\s>]+)/gi, '');
+}
+
 const DEFAULT_GET_QUERY_PARAMS: QueryParamDef[] = [
   { name: 'q', type: 'string', description: 'Full-text search query term across fields.' },
   { name: 'page', type: 'integer', defaultVal: '1', description: 'Page number (1-indexed, default 1).' },
@@ -390,7 +402,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
               <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme flex items-center justify-center min-h-35 overflow-hidden">
                 <div
                   className="max-w-full max-h-64 flex items-center justify-center [&>svg]:max-w-full [&>svg]:h-auto [&>svg]:shadow-lg [&>svg]:rounded-xl"
-                  dangerouslySetInnerHTML={{ __html: response.data }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeSvg(response.data) }}
                 />
               </div>
             </div>
