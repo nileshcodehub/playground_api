@@ -11,9 +11,7 @@ const config = {
   apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   apiVersion: 'v1',
-  databaseUrl: process.env.DATABASE_URL || '',
   jwtSecret: process.env.JWT_SECRET || 'default_playground_jwt_secret_key_2026',
-  trustProxy: process.env.TRUST_PROXY === 'true',
   isVercel: Boolean(process.env.VERCEL)
 };
 
