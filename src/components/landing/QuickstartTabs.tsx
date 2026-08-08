@@ -1,24 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Icon } from '@iconify/react';
+import React from 'react';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
-const languages = [
-  { id: 'javascript', name: 'JavaScript (fetch)', icon: 'simple-icons:javascript' },
-  { id: 'axios', name: 'Axios', icon: 'simple-icons:axios' },
-  { id: 'python', name: 'Python (requests)', icon: 'simple-icons:python' },
-  { id: 'go', name: 'Go', icon: 'simple-icons:go' },
-  { id: 'swift', name: 'Swift', icon: 'simple-icons:swift' },
-  { id: 'rust', name: 'Rust', icon: 'simple-icons:rust' },
-  { id: 'curl', name: 'cURL', icon: 'ph:terminal-window-bold' },
-];
-
 export function QuickstartTabs() {
-  const [activeLang, setActiveLang] = useState('javascript');
-  const [copied, setCopied] = useState(false);
-
   const snippets: Record<string, string> = {
     javascript: `// Fetch posts using standard JavaScript fetch
 const response = await fetch('${config.apiUrl}/posts?_limit=5');
@@ -65,20 +51,20 @@ print("Created Post:", created)`,
     go: `package main
 
 import (
-	"fmt"
-	"io"
-	"net/http"
+\t"fmt"
+\t"io"
+\t"net/http"
 )
 
 func main() {
-	resp, err := http.Get("${config.apiUrl}/posts?_limit=5")
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
+\tresp, err := http.Get("${config.apiUrl}/posts?_limit=5")
+\tif err != nil {
+\t\tpanic(err)
+\t}
+\tdefer resp.Body.Close()
 
-	body, _ := io.ReadAll(resp.Body)
-	fmt.Println(string(body))
+\tbody, _ := io.ReadAll(resp.Body)
+\tfmt.Println(string(body))
 }`,
 
     swift: `import Foundation
@@ -112,14 +98,6 @@ curl -X POST "${config.apiUrl}/posts" \\
   -d '{"title": "New Prototype Article", "user_id": 1}'`,
   };
 
-  const currentSnippet = snippets[activeLang];
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(currentSnippet);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
     <section className="py-20 bg-bg-primary border-b border-border-theme">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -132,45 +110,17 @@ curl -X POST "${config.apiUrl}/posts" \\
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto rounded-2xl border border-border-theme overflow-hidden bg-code-bg shadow-2xl">
-          {/* Tabs Header */}
-          <div className="flex items-center justify-between bg-bg-tertiary px-4 py-2 border-b border-border-theme overflow-x-auto">
-            <div className="flex items-center gap-1">
-              {languages.map((lang) => (
-                <button
-                  key={lang.id}
-                  onClick={() => setActiveLang(lang.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0 ${
-                    activeLang === lang.id
-                      ? 'bg-accent-primary text-white font-bold shadow-xs'
-                      : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
-                  }`}
-                >
-                  <Icon icon={lang.icon} className="w-4 h-4" />
-                  {lang.name}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-bg-secondary hover:bg-border-theme text-text-primary text-xs font-semibold transition-colors cursor-pointer ml-2 shrink-0"
-            >
-              <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5" />
-              <span>{copied ? 'Copied!' : 'Copy'}</span>
-            </button>
-          </div>
-
-          {/* Snippet Code Body */}
+        <div className="max-w-4xl mx-auto">
           <CodeBlock
-            code={currentSnippet}
-            copyable={false}
-            showHeader={false}
-            className="border-0 bg-transparent rounded-none shadow-none"
-            codeClassName="p-6 text-xs leading-relaxed"
+            snippets={snippets}
+            defaultTab="javascript"
+            maxHeight="max-h-[32rem]"
+            className="shadow-xl"
           />
         </div>
       </div>
     </section>
   );
 }
+
+export default QuickstartTabs;

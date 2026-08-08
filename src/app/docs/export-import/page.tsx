@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
 const fallbackSnapshotPayload = {
@@ -249,7 +250,7 @@ export default function ExportImportPage() {
         </div>
       )}
 
-      {/* Sample Payload Explanation & Interactive Editor */}
+      {/* Sample Payload Explanation & Interactive Code Viewer */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
@@ -258,11 +259,11 @@ export default function ExportImportPage() {
           </label>
           <span className="text-[11px] font-mono text-text-muted">Format: JSON v1.0.0</span>
         </div>
-        <textarea
-          value={snapshotJson}
-          onChange={(e) => setSnapshotJson(e.target.value)}
-          rows={12}
-          className="w-full font-mono text-xs p-4 rounded-xl bg-code-bg border border-border-theme text-gray-200 focus:outline-none focus:border-accent-primary leading-relaxed"
+        <CodeBlock
+          code={snapshotJson}
+          language="json"
+          title="Snapshot Payload (JSON)"
+          maxHeight="max-h-[28rem]"
         />
       </div>
     </div>

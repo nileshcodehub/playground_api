@@ -204,14 +204,14 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
       <div className="mt-4">
         <div
           onClick={() => setIsOpen(true)}
-          className="rounded-xl border border-border-theme bg-[#0f172a]/90 hover:border-emerald-500/40 p-4 flex items-center justify-between cursor-pointer transition-all shadow-xs group"
+          className="rounded-xl border border-border-theme bg-bg-secondary hover:border-emerald-500/40 p-4 flex items-center justify-between cursor-pointer transition-all shadow-xs group"
         >
-          <div className="flex items-center gap-2 font-bold text-sm text-emerald-400">
-            <Icon icon="ph:lightning-fill" className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+          <div className="flex items-center gap-2 font-bold text-sm text-emerald-500">
+            <Icon icon="ph:lightning-fill" className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
             <span>Try it out — Test endpoint live</span>
           </div>
 
-          <span className="text-emerald-400 hover:text-emerald-300 font-medium text-xs transition-colors">
+          <span className="text-emerald-500 hover:text-emerald-400 font-medium text-xs transition-colors">
             Test now
           </span>
         </div>
@@ -221,25 +221,25 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
 
   // Expanded View
   return (
-    <div className="mt-4 rounded-xl border border-border-theme bg-[#0f172a]/90 p-4 sm:p-5 space-y-4 shadow-sm animate-in fade-in duration-200">
+    <div className="mt-4 rounded-xl border border-border-theme bg-bg-secondary p-4 sm:p-5 space-y-4 shadow-sm animate-in fade-in duration-200">
       {/* Header Bar */}
       <div
         onClick={() => setIsOpen(false)}
-        className="flex items-center justify-between cursor-pointer pb-2 border-b border-border-theme/60"
+        className="flex items-center justify-between cursor-pointer pb-2 border-b border-border-theme"
       >
-        <div className="flex items-center gap-2 font-bold text-sm text-emerald-400">
-          <Icon icon="ph:lightning-fill" className="w-4 h-4 text-emerald-400" />
+        <div className="flex items-center gap-2 font-bold text-sm text-emerald-500">
+          <Icon icon="ph:lightning-fill" className="w-4 h-4 text-emerald-500" />
           <span>Try it out — Test endpoint live</span>
         </div>
-        <span className="text-emerald-400 hover:text-emerald-300 font-medium text-xs transition-colors">
-          Test now
+        <span className="text-emerald-500 hover:text-emerald-400 font-medium text-xs transition-colors">
+          Collapse
         </span>
       </div>
 
       {/* Target URL Display */}
       <div className="flex items-center gap-2 text-xs font-mono text-text-muted overflow-x-auto py-1">
         <span className="font-bold text-accent-primary uppercase">{endpoint.method}</span>
-        <span className="text-gray-300 truncate select-all">{computedUrl}</span>
+        <span className="text-text-primary truncate select-all">{computedUrl}</span>
       </div>
 
       {/* Path Parameters Inputs */}
@@ -256,7 +256,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
                 value={pathValues[param] ?? ''}
                 onChange={(e) => setPathValues((prev) => ({ ...prev, [param]: e.target.value }))}
                 placeholder={`Value for :${param} (e.g. ${getSmartInitialParamVal(param)})`}
-                className="w-full font-mono text-xs p-3 rounded-lg bg-[#11161d] border border-border-theme text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500/50"
+                className="w-full font-mono text-xs p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
               />
             </div>
           ))}
@@ -277,7 +277,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
                 value={queryValues[qp.name] || ''}
                 onChange={(e) => setQueryValues((prev) => ({ ...prev, [qp.name]: e.target.value }))}
                 placeholder={qp.description}
-                className="w-full font-mono text-xs p-3 rounded-lg bg-[#11161d] border border-border-theme text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500/50"
+                className="w-full font-mono text-xs p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
               />
             </div>
           ))}
@@ -290,11 +290,11 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
           <label className="text-xs font-semibold text-text-secondary">
             JSON Request Body:
           </label>
-          <textarea
-            value={requestBody}
-            onChange={(e) => setRequestBody(e.target.value)}
-            rows={5}
-            className="w-full font-mono text-xs p-3 rounded-lg bg-[#11161d] border border-border-theme text-gray-200 focus:outline-none focus:border-emerald-500/50 leading-relaxed"
+          <CodeBlock
+            code={requestBody}
+            language="json"
+            title="Request Body (JSON)"
+            maxHeight="max-h-56"
           />
         </div>
       )}
@@ -311,7 +311,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
             value={simulateDelay}
             onChange={(e) => setSimulateDelay(e.target.value)}
             placeholder="e.g. 1500 (0-20000ms)"
-            className="w-full font-mono text-xs p-3 rounded-lg bg-[#11161d] border border-border-theme text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500/50"
+            className="w-full font-mono text-xs p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
           />
         </div>
 
@@ -325,7 +325,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
             value={simulateStatus}
             onChange={(e) => setSimulateStatus(e.target.value)}
             placeholder="e.g. 500, 404, 503"
-            className="w-full font-mono text-xs p-3 rounded-lg bg-[#11161d] border border-border-theme text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500/50"
+            className="w-full font-mono text-xs p-3 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
           />
         </div>
       </div>
@@ -387,7 +387,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
           {response.isSvg && typeof response.data === 'string' && (
             <div className="space-y-1.5">
               <span className="text-[11px] font-semibold text-emerald-400">Live SVG Vector Render:</span>
-              <div className="p-4 rounded-xl bg-[#11161d] border border-border-theme flex items-center justify-center min-h-35 overflow-hidden">
+              <div className="p-4 rounded-xl bg-bg-tertiary border border-border-theme flex items-center justify-center min-h-35 overflow-hidden">
                 <div
                   className="max-w-full max-h-64 flex items-center justify-center [&>svg]:max-w-full [&>svg]:h-auto [&>svg]:shadow-lg [&>svg]:rounded-xl"
                   dangerouslySetInnerHTML={{ __html: response.data }}

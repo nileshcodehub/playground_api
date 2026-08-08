@@ -139,12 +139,15 @@ export default function GraphqlPage() {
         {/* Code Query Input & Result Viewer Split Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-text-secondary">GraphQL Query Editor</label>
-            <textarea
-              value={queryText}
-              onChange={(e) => setQueryText(e.target.value)}
-              rows={14}
-              className="w-full font-mono text-xs p-4 rounded-xl bg-code-bg border border-border-theme text-gray-200 focus:outline-none focus:border-pink-500 leading-relaxed"
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold uppercase tracking-wider text-text-secondary">GraphQL Query Editor</label>
+              <span className="text-[11px] font-mono text-text-muted">Interactive</span>
+            </div>
+            <CodeBlock
+              code={queryText}
+              language="graphql"
+              title="Query Source"
+              maxHeight="max-h-[350px]"
             />
           </div>
 

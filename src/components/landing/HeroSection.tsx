@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
 export function HeroSection() {
@@ -41,18 +42,15 @@ export function HeroSection() {
         </div>
 
         {/* Quick cURL Bar */}
-        <div className="max-w-xl mx-auto bg-code-bg border border-border-theme rounded-2xl p-3 shadow-2xl flex items-center justify-between gap-3 font-mono text-xs text-left">
-          <div className="flex items-center gap-2 overflow-x-auto truncate">
-            <span className="text-emerald-400 font-bold">$</span>
-            <span className="text-gray-200 select-all truncate">{sampleCurl}</span>
-          </div>
-          <button
-            onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent-primary hover:bg-accent-hover text-white font-sans text-xs font-semibold transition-all shrink-0 cursor-pointer shadow-md"
-          >
-            <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-4 h-4" />
-            <span>{copied ? 'Copied!' : 'Copy cURL'}</span>
-          </button>
+        <div className="max-w-xl mx-auto text-left shadow-xl">
+          <CodeBlock
+            code={`$ ${sampleCurl}`}
+            language="curl"
+            showHeader={false}
+            showLineNumbers={false}
+            oddEvenZebra={false}
+            copyable={true}
+          />
         </div>
 
         {/* CTA Buttons */}

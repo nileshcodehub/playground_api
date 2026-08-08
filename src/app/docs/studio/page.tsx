@@ -188,14 +188,14 @@ export default function StudioPage() {
             <option value="DELETE">DELETE</option>
           </select>
 
-          <div className="flex-1 w-full flex items-center bg-code-bg border border-border-theme rounded-xl overflow-hidden px-3">
+          <div className="flex-1 w-full flex items-center bg-bg-secondary border border-border-theme rounded-xl overflow-hidden px-3">
             <span className="font-mono text-xs text-text-muted shrink-0">{config.publicApiUrl || config.apiUrl}</span>
 
             <input
               type="text"
               value={endpointPath}
               onChange={(e) => setEndpointPath(e.target.value)}
-              className="w-full font-mono text-xs text-gray-200 bg-transparent p-3 focus:outline-none"
+              className="w-full font-mono text-xs text-text-primary bg-transparent p-3 focus:outline-none"
               placeholder="/posts?_limit=5"
             />
           </div>
@@ -222,17 +222,18 @@ export default function StudioPage() {
               onChange={(e) => setSimDelay(e.target.value)}
               className="w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none"
             >
-              <option value="0">0 ms (No Delay)</option>
-              <option value="500">500 ms Delay</option>
-              <option value="1500">1500 ms Delay</option>
-              <option value="3000">3000 ms Delay</option>
+              <option value="0">0 ms (Instant)</option>
+              <option value="500">500 ms (Fast)</option>
+              <option value="1500">1500 ms (Medium)</option>
+              <option value="3000">3000 ms (Slow)</option>
+              <option value="5000">5000 ms (High Latency)</option>
             </select>
           </div>
 
           <div className="space-y-1">
             <label className="text-[11px] font-semibold text-text-secondary flex items-center gap-1.5">
-              <Icon icon="ph:warning-bold" className="w-3.5 h-3.5 text-rose-400" />
-              Simulate Status Code Header (X-Simulate-Status):
+              <Icon icon="ph:warning-circle-bold" className="w-3.5 h-3.5 text-rose-400" />
+              Simulate Status Code (X-Simulate-Status):
             </label>
             <select
               value={simStatus}
@@ -250,13 +251,13 @@ export default function StudioPage() {
 
         {/* Payload Body Editor */}
         {['POST', 'PUT', 'PATCH'].includes(method) && (
-          <div className="space-y-1 pt-2 border-t border-border-theme">
+          <div className="space-y-2 pt-2 border-t border-border-theme">
             <label className="text-[11px] font-semibold text-text-secondary">Request Body Payload (JSON):</label>
-            <textarea
-              value={jsonPayload}
-              onChange={(e) => setJsonPayload(e.target.value)}
-              rows={5}
-              className="w-full font-mono text-xs p-3 rounded-xl bg-code-bg border border-border-theme text-gray-200 focus:outline-none focus:border-accent-primary leading-relaxed"
+            <CodeBlock
+              code={jsonPayload}
+              language="json"
+              title="Payload (JSON)"
+              maxHeight="max-h-56"
             />
           </div>
         )}
