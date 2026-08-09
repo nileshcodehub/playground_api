@@ -285,12 +285,18 @@ export default function StudioPage() {
         {/* Payload Body Editor */}
         {['POST', 'PUT', 'PATCH'].includes(method) && (
           <div className="space-y-2 pt-2 border-t border-border-theme">
-            <label className="text-xs sm:text-sm font-semibold text-text-secondary">Request Body Payload (JSON):</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs sm:text-sm font-semibold text-text-secondary">Request Body Payload (JSON):</label>
+              <span className="text-[11px] text-accent-primary font-mono font-medium">Editable Payload</span>
+            </div>
             <CodeBlock
               code={jsonPayload}
               language="json"
               title="Payload (JSON)"
-              maxHeight="max-h-56"
+              maxHeight="max-h-60"
+              editable={true}
+              onChange={(val) => setJsonPayload(val)}
+              placeholder="{\n  &quot;title&quot;: &quot;Custom item&quot;\n}"
             />
           </div>
         )}

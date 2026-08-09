@@ -323,14 +323,20 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
       {/* Editable Request Body if POST/PUT/PATCH */}
       {['POST', 'PUT', 'PATCH'].includes(endpoint.method) && (
         <div className="space-y-1.5">
-          <label className="text-xs sm:text-sm font-semibold text-text-secondary">
-            JSON Request Body:
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs sm:text-sm font-semibold text-text-secondary">
+              JSON Request Body:
+            </label>
+            <span className="text-[11px] text-accent-primary font-mono font-medium">Editable Payload</span>
+          </div>
           <CodeBlock
             code={requestBody}
             language="json"
             title="Request Body (JSON)"
-            maxHeight="max-h-56"
+            maxHeight="max-h-60"
+            editable={true}
+            onChange={(newVal) => setRequestBody(newVal)}
+            placeholder="{\n  &quot;title&quot;: &quot;My custom test post&quot;\n}"
           />
         </div>
       )}

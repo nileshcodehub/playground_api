@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme/ThemeProvider';
@@ -33,6 +33,9 @@ export interface CodeBlockProps {
   initialWrap?: boolean;
   highlightedLines?: number[];
   onTabChange?: (tabId: string) => void;
+  editable?: boolean;
+  onChange?: (value: string) => void;
+  placeholder?: string;
 }
 
 const LANGUAGE_ICONS: Record<string, string> = {
@@ -140,6 +143,9 @@ export function CodeBlock({
   initialWrap = false,
   highlightedLines = [],
   onTabChange,
+  editable = false,
+  onChange,
+  placeholder,
 }: CodeBlockProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -175,6 +181,11 @@ export function CodeBlock({
   const [showLineNumbers, setShowLineNumbers] = useState(initialShowLineNumbers);
   const [wrapLines, setWrapLines] = useState(initialWrap);
   const [pinnedLines, setPinnedLines] = useState<Set<number>>(new Set(highlightedLines));
+  const [activeLineNumber, setActiveLineNumber] = useState(1);
+  const [formatSuccess, setFormatSuccess] = useState(false);
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Determine current active code
   const currentRawCode = useMemo(() => {
@@ -201,6 +212,19 @@ export function CodeBlock({
     return formattedCode ? formattedCode.split('\n') : [''];
   }, [formattedCode]);
 
+  // JSON Validation Check for JSON code
+  const jsonStatus = useMemo(() => {
+    if ((language === 'json' || title?.toLowerCase().includes('json')) && formattedCode.trim() !== '') {
+      try {
+        JSON.parse(formattedCode);
+        return { valid: true, error: null };
+      } catch (err: any) {
+        return { valid: false, error: err.message };
+      }
+    }
+    return null;
+  }, [language, title, formattedCode]);
+
   const handleTabSelect = (tabId: string) => {
     setActiveTabId(tabId);
     if (onTabChange) {
@@ -216,6 +240,7 @@ export function CodeBlock({
   }, [formattedCode]);
 
   const togglePinLine = (lineNum: number) => {
+    if (editable) return;
     setPinnedLines((prev) => {
       const next = new Set(prev);
       if (next.has(lineNum)) {
@@ -227,8 +252,80 @@ export function CodeBlock({
     });
   };
 
+  // Format JSON Action
+  const handleFormatJson = () => {
+    if (!formattedCode.trim()) return;
+    try {
+      const parsed = JSON.parse(formattedCode);
+      const formatted = JSON.stringify(parsed, null, 2);
+      if (onChange) {
+        onChange(formatted);
+      }
+      setFormatSuccess(true);
+      setTimeout(() => setFormatSuccess(false), 1500);
+    } catch {
+      // Ignore if invalid
+    }
+  };
+
+  // Cursor tracking to highlight active row
+  const updateCursorLine = (el: HTMLTextAreaElement) => {
+    const cursorIndex = el.selectionStart;
+    const textBeforeCursor = el.value.substring(0, cursorIndex);
+    const lineNumber = textBeforeCursor.split('\n').length;
+    setActiveLineNumber(lineNumber);
+  };
+
+  const handleCursorMove = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+    updateCursorLine(e.currentTarget);
+  };
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (onChange) {
+      onChange(e.target.value);
+    }
+    updateCursorLine(e.target);
+  };
+
+  // Handle Tab key in Textarea for 2 spaces indentation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const textarea = e.currentTarget;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+
+      const updated = formattedCode.substring(0, start) + '  ' + formattedCode.substring(end);
+      if (onChange) {
+        onChange(updated);
+      }
+
+      // Restore cursor position
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + 2;
+          updateCursorLine(textareaRef.current);
+        }
+      }, 0);
+    }
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (textareaRef.current) {
+      textareaRef.current.scrollTop = e.currentTarget.scrollTop;
+      textareaRef.current.scrollLeft = e.currentTarget.scrollLeft;
+    }
+  };
+
+  const handleTextareaScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
+    if (wrapperRef.current) {
+      wrapperRef.current.scrollTop = e.currentTarget.scrollTop;
+      wrapperRef.current.scrollLeft = e.currentTarget.scrollLeft;
+    }
+  };
+
   const hasTabs = tabs.length > 0;
-  const shouldRenderHeader = showHeader ?? Boolean(hasTabs || title || subtitle || language || copyable);
+  const shouldRenderHeader = showHeader ?? Boolean(hasTabs || title || subtitle || language || copyable || editable);
 
   // Render Token using modular CSS classes
   const renderToken = (token: { text: string; type: string }, idx: number) => {
@@ -298,6 +395,12 @@ export function CodeBlock({
                   {language}
                 </span>
               )}
+              {editable && (
+                <span className={styles.editableBadge}>
+                  <Icon icon="ph:pencil-simple-line-bold" className="w-3 h-3" />
+                  Editable
+                </span>
+              )}
             </div>
           )}
 
@@ -307,6 +410,19 @@ export function CodeBlock({
               <span className={cn(styles.metaSubtitle, 'hidden sm:inline')}>
                 {subtitle}
               </span>
+            )}
+
+            {/* Prettify / Format JSON Button (Only in editable mode) */}
+            {editable && (language === 'json' || title?.toLowerCase().includes('json')) && (
+              <button
+                type="button"
+                onClick={handleFormatJson}
+                className={styles.formatBtn}
+                title="Format & Prettify JSON (2 spaces)"
+              >
+                <Icon icon={formatSuccess ? 'ph:check-bold' : 'ph:sparkle-bold'} className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{formatSuccess ? 'Formatted' : 'Format'}</span>
+              </button>
             )}
 
             {/* Line Numbers Toggle */}
@@ -355,67 +471,160 @@ export function CodeBlock({
         </div>
       )}
 
-      {/* Code Area with Line Numbers, Zebra Striping, and Interactive Line Hover */}
-      <div className="relative font-mono text-xs sm:text-sm">
-        {!shouldRenderHeader && copyable && (
-          <button
-            type="button"
-            onClick={handleCopy}
-            className={styles.floatingCopyBtn}
-            title="Copy code snippet"
+      {/* Code Area: Editable Editor Mode OR Syntax Highlighted Display Mode */}
+      {editable ? (
+        <div className="relative font-mono text-xs sm:text-sm">
+          <div
+            ref={wrapperRef}
+            onScroll={handleScroll}
+            className={cn(styles.editorWrapper, maxHeight, codeClassName)}
           >
-            <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5 text-accent-primary" />
-            <span>{copied ? 'Copied' : 'Copy'}</span>
-          </button>
-        )}
+            {/* Visual Background Layer: Zebra Striping + Token Highlighting + Line Numbers + Active Line */}
+            <div className={styles.editorLayerBackground}>
+              {lines.map((line, index) => {
+                const lineNum = index + 1;
+                const isOdd = index % 2 === 0;
+                const isActiveLine = lineNum === activeLineNumber;
+                const isPinned = pinnedLines.has(lineNum);
+                const tokens = tokenizeLine(line);
 
-        <div className={cn(styles.codeViewport, maxHeight, codeClassName)}>
-          <div className={styles.linesWrapper}>
-            {lines.map((line, index) => {
-              const lineNum = index + 1;
-              const isOdd = index % 2 === 0;
-              const isPinned = pinnedLines.has(lineNum);
-              const tokens = tokenizeLine(line);
-
-              return (
-                <div
-                  key={index}
-                  onClick={() => togglePinLine(lineNum)}
-                  className={cn(
-                    styles.lineRow,
-                    // Zebra striping for odd and even lines
-                    oddEvenZebra && (isOdd ? styles.oddLine : styles.evenLine),
-                    // Pinned line highlight
-                    isPinned && styles.pinnedLine
-                  )}
-                >
-                  {/* Line Number Gutter */}
-                  {showLineNumbers && (
-                    <div
-                      className={cn(
-                        styles.lineGutter,
-                        isPinned && styles.lineGutterPinned
-                      )}
-                    >
-                      {lineNum}
-                    </div>
-                  )}
-
-                  {/* Line Content */}
+                return (
                   <div
+                    key={index}
                     className={cn(
-                      styles.lineContent,
-                      wrapLines && styles.lineWrapped
+                      styles.lineRow,
+                      oddEvenZebra && (isOdd ? styles.oddLine : styles.evenLine),
+                      isActiveLine && styles.activeLineHighlight,
+                      isPinned && styles.pinnedLine
                     )}
                   >
-                    {tokens.map((token, tIdx) => renderToken(token, tIdx))}
+                    {/* Line Number Gutter */}
+                    {showLineNumbers && (
+                      <div
+                        className={cn(
+                          styles.lineGutter,
+                          (isActiveLine || isPinned) && styles.lineGutterPinned
+                        )}
+                      >
+                        {lineNum}
+                      </div>
+                    )}
+
+                    {/* Line Content */}
+                    <div
+                      className={cn(
+                        styles.lineContent,
+                        wrapLines && styles.lineWrapped
+                      )}
+                    >
+                      {tokens.map((token, tIdx) => renderToken(token, tIdx))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+
+            {/* Foreground Overlay Textarea: Captures Keystrokes, Caret & Scrolling */}
+            <textarea
+              ref={textareaRef}
+              value={formattedCode}
+              onChange={handleTextareaChange}
+              onKeyDown={handleKeyDown}
+              onKeyUp={handleCursorMove}
+              onClick={handleCursorMove}
+              onSelect={handleCursorMove}
+              onScroll={handleTextareaScroll}
+              placeholder={placeholder || '{\n  "key": "value"\n}'}
+              spellCheck={false}
+              autoCapitalize="none"
+              autoComplete="off"
+              autoCorrect="off"
+              className={cn(
+                styles.editorLayerTextarea,
+                showLineNumbers ? styles.editorLayerTextareaWithGutter : styles.editorLayerTextareaNoGutter,
+                wrapLines && styles.lineWrapped
+              )}
+            />
+          </div>
+
+          {/* Validation Status Footer */}
+          {jsonStatus && (
+            <div className="px-3 py-1.5 border-t border-border-theme/40 bg-bg-secondary/60 flex items-center justify-between text-[11px]">
+              {jsonStatus.valid ? (
+                <span className={styles.jsonStatusValid}>
+                  <Icon icon="ph:check-circle-fill" className="w-3.5 h-3.5 text-emerald-400" />
+                  Valid JSON Payload
+                </span>
+              ) : (
+                <span className={styles.jsonStatusInvalid}>
+                  <Icon icon="ph:warning-circle-fill" className="w-3.5 h-3.5 text-rose-400" />
+                  Invalid JSON: {jsonStatus.error}
+                </span>
+              )}
+              <span className="text-text-muted">Press Tab to indent</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="relative font-mono text-xs sm:text-sm">
+          {!shouldRenderHeader && copyable && (
+            <button
+              type="button"
+              onClick={handleCopy}
+              className={styles.floatingCopyBtn}
+              title="Copy code snippet"
+            >
+              <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5 text-accent-primary" />
+              <span>{copied ? 'Copied' : 'Copy'}</span>
+            </button>
+          )}
+
+          <div className={cn(styles.codeViewport, maxHeight, codeClassName)}>
+            <div className={styles.linesWrapper}>
+              {lines.map((line, index) => {
+                const lineNum = index + 1;
+                const isOdd = index % 2 === 0;
+                const isPinned = pinnedLines.has(lineNum);
+                const tokens = tokenizeLine(line);
+
+                return (
+                  <div
+                    key={index}
+                    onClick={() => togglePinLine(lineNum)}
+                    className={cn(
+                      styles.lineRow,
+                      oddEvenZebra && (isOdd ? styles.oddLine : styles.evenLine),
+                      isPinned && styles.pinnedLine
+                    )}
+                  >
+                    {/* Line Number Gutter */}
+                    {showLineNumbers && (
+                      <div
+                        className={cn(
+                          styles.lineGutter,
+                          isPinned && styles.lineGutterPinned
+                        )}
+                      >
+                        {lineNum}
+                      </div>
+                    )}
+
+                    {/* Line Content */}
+                    <div
+                      className={cn(
+                        styles.lineContent,
+                        wrapLines && styles.lineWrapped
+                      )}
+                    >
+                      {tokens.map((token, tIdx) => renderToken(token, tIdx))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

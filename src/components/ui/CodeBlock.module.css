@@ -572,13 +572,13 @@
   overflow-y: auto;
   padding: 0.625rem 0;
   font-size: 0.8125rem;
-  line-height: 1.65;
+  line-height: 1.5rem;
 }
 
 @media (min-width: 640px) {
   .codeViewport {
     font-size: 0.875rem;
-    line-height: 1.7;
+    line-height: 1.5rem;
   }
 }
 
@@ -590,25 +590,32 @@
 /* Line Rows & Zebra Striping */
 .lineRow {
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  height: 1.5rem;
+  min-height: 1.5rem;
+  line-height: 1.5rem;
   transition: background-color 0.12s ease;
   cursor: pointer;
   user-select: text;
+  box-sizing: border-box;
 }
 
 /* Line Number Gutter */
 .lineGutter {
   width: 2.875rem;
   min-width: 2.875rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
   flex-shrink: 0;
   user-select: none;
   -webkit-user-select: none;
   padding-right: 0.75rem;
   text-align: right;
   font-size: 0.75rem;
-  padding-top: 0.125rem;
-  padding-bottom: 0.125rem;
+  padding-top: 0;
+  padding-bottom: 0;
   transition: color 0.12s ease, font-weight 0.12s ease;
+  box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
@@ -616,20 +623,175 @@
     width: 3.25rem;
     min-width: 3.25rem;
     font-size: 0.8125rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
   }
 }
 
 /* Line Content */
 .lineContent {
   flex: 1;
+  height: 1.5rem;
+  line-height: 1.5rem;
   padding-left: 0.875rem;
   padding-right: 1rem;
-  padding-top: 0.125rem;
-  padding-bottom: 0.125rem;
+  padding-top: 0;
+  padding-bottom: 0;
   white-space: pre;
+  box-sizing: border-box;
 }
 
 .lineWrapped {
   white-space: pre-wrap !important;
   word-break: break-word !important;
+}
+
+/* ==========================================================================
+   EDITABLE DUAL-LAYER CODE BLOCK STYLES (With Odd/Even Zebra & Active Line)
+   ========================================================================== */
+.editorWrapper {
+  position: relative;
+  width: 100%;
+  overflow: auto;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+@media (min-width: 640px) {
+  .editorWrapper {
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+}
+
+.editorLayerBackground {
+  grid-area: 1 / 1 / 2 / 2;
+  min-width: 100%;
+  pointer-events: none;
+  user-select: none;
+  padding: 0.625rem 0;
+  z-index: 1;
+}
+
+.activeLineHighlight {
+  background-color: rgba(99, 102, 241, 0.18) !important;
+  border-left: 2px solid #6366f1;
+}
+
+:global([data-theme="light"]) .activeLineHighlight {
+  background-color: rgba(99, 102, 241, 0.12) !important;
+  border-left: 2px solid #6366f1;
+}
+
+.editorLayerTextarea {
+  grid-area: 1 / 1 / 2 / 2;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  padding-right: 1rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.5rem;
+  letter-spacing: normal;
+  word-spacing: normal;
+  color: transparent;
+  caret-color: #818cf8;
+  resize: none;
+  overflow: hidden;
+  white-space: pre;
+  tab-size: 2;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+@media (min-width: 640px) {
+  .editorLayerTextarea {
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+}
+
+:global([data-theme="light"]) .editorLayerTextarea {
+  caret-color: #4f46e5;
+}
+
+.editorLayerTextareaWithGutter {
+  padding-left: 3.75rem;
+}
+
+@media (min-width: 640px) {
+  .editorLayerTextareaWithGutter {
+    padding-left: 4.125rem;
+  }
+}
+
+.editorLayerTextareaNoGutter {
+  padding-left: 0.875rem;
+}
+
+.editorLayerTextarea::selection {
+  background-color: rgba(99, 102, 241, 0.35);
+  color: transparent;
+}
+
+.editableBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.125rem 0.4rem;
+  border-radius: 0.375rem;
+  background-color: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.formatBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3125rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #818cf8;
+}
+
+.formatBtn:hover {
+  background-color: #6366f1;
+  color: #ffffff;
+}
+
+.jsonStatusValid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #34d399;
+}
+
+.jsonStatusInvalid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #f87171;
 }
