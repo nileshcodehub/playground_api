@@ -27,7 +27,7 @@ export function SandboxPill() {
       updateIdentity(match[1]);
     } else {
       // 2. Fetch backend root/stats to initialize/retrieve identity cookie
-      fetch(`${config.apiUrl}/session/stats`, { credentials: 'include' })
+      fetch(`${config.apiUrl}/session/stats`, { credentials: 'include', cache: 'no-cache' })
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
           if (data?.identity?.id) {

@@ -61,6 +61,7 @@ export default function StatsPage() {
       const res = await fetch(`${config.apiUrl}/session/stats`, {
         headers,
         credentials: 'include',
+        cache: 'no-cache',
       });
 
       if (res.ok) {

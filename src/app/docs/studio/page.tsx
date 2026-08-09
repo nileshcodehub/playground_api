@@ -88,6 +88,7 @@ export default function StudioPage() {
         method,
         headers,
         credentials: 'include',
+        cache: 'no-cache',
       };
 
       if (['POST', 'PUT', 'PATCH'].includes(method) && jsonPayload) {

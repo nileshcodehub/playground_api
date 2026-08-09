@@ -35,7 +35,7 @@ export default function ExportImportPage() {
     const headers: Record<string, string> = {};
     if (cookieToken) headers['X-Playground-Identity'] = cookieToken;
 
-    fetch(`${config.apiUrl}/session/export`, { headers, credentials: 'include' })
+    fetch(`${config.apiUrl}/session/export`, { headers, credentials: 'include', cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) {
@@ -59,6 +59,7 @@ export default function ExportImportPage() {
       const res = await fetch(`${config.apiUrl}/session/export`, {
         headers,
         credentials: 'include',
+        cache: 'no-cache',
       });
 
       let snapshotData = fallbackSnapshotPayload;

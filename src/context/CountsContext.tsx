@@ -79,6 +79,7 @@ export function CountsProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch(`${config.apiUrl}/counts`, {
         headers,
         credentials: 'include',
+        cache: 'no-cache',
       });
 
       if (res.ok) {

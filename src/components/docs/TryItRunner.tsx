@@ -153,6 +153,7 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
         method: endpoint.method,
         headers,
         credentials: 'include',
+        cache: 'no-cache',
       };
 
       if (['POST', 'PUT', 'PATCH'].includes(endpoint.method) && requestBody) {
