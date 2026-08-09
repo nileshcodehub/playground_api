@@ -12,7 +12,8 @@ const config = {
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   apiVersion: 'v1',
   jwtSecret: process.env.JWT_SECRET || 'default_playground_jwt_secret_key_2026',
-  isVercel: Boolean(process.env.VERCEL)
+  isVercel: Boolean(process.env.VERCEL),
+  googleAnalyticsId: process.env.NEXT_PUBLIC_GA_ID || ''
 };
 
 export default config;

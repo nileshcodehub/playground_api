@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { siteConfig } from '@/config/site';
 import { getWebApiSchema } from '@/lib/json-ld';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import config from '../config/env.js';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -101,7 +102,7 @@ export default function RootLayout({
           </CountsProvider>
         </ThemeProvider>
       </body>
-      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
+      <GoogleAnalytics gaId={config.googleAnalyticsId} />
     </html>
   );
 }

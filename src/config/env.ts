@@ -25,6 +25,7 @@ const envConfig = {
   publicApiUrl: apiUrl.startsWith('http') ? apiUrl : `${siteUrl}${apiUrl.startsWith('/') ? '' : '/'}${apiUrl}`,
   siteUrl,
   apiVersion: 'v1',
+  googleAnalyticsId: process.env.NEXT_PUBLIC_GA_ID || ''
 };
 
 export default envConfig;
