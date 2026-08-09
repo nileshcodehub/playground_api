@@ -118,6 +118,10 @@ export function Header() {
             {/* Mobile Footer Extra Actions */}
             <div className="pt-4 border-t border-border-theme space-y-3">
               <div className="flex items-center justify-between gap-2">
+                <span className="text-xs sm:text-sm text-text-muted font-medium">Theme Mode</span>
+                <MobileThemeToggle />
+              </div>
+              <div className="flex items-center justify-between gap-2">
                 <span className="text-xs sm:text-sm text-text-muted font-medium">Sandbox Session</span>
                 <SandboxPill />
               </div>
@@ -132,52 +136,120 @@ export function Header() {
   );
 }
 
+function MobileThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  return (
+    <div className="flex items-center gap-1 bg-bg-tertiary p-1 rounded-xl border border-border-theme">
+      <button
+        onClick={() => setTheme('light')}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+          theme === 'light'
+            ? 'bg-accent-primary text-white shadow-xs'
+            : 'text-text-secondary hover:text-text-primary'
+        }`}
+      >
+        <Icon icon="ph:sun-bold" className="w-3.5 h-3.5" /> Light
+      </button>
+      <button
+        onClick={() => setTheme('dark')}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+          theme === 'dark'
+            ? 'bg-accent-primary text-white shadow-xs'
+            : 'text-text-secondary hover:text-text-primary'
+        }`}
+      >
+        <Icon icon="ph:moon-bold" className="w-3.5 h-3.5" /> Dark
+      </button>
+    </div>
+  );
+}
+
 function ThemeSelector() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen]);
+
   const activeTheme = mounted ? theme : 'dark';
 
   return (
-    <div className="relative group" suppressHydrationWarning>
-      <button className="flex items-center gap-1.5 p-2 rounded-xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-text-secondary hover:text-text-primary transition-colors cursor-pointer">
+    <div className="relative" ref={dropdownRef} suppressHydrationWarning>
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex items-center gap-1.5 p-2 rounded-xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+        aria-label="Toggle theme selection"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
         <Icon
-          icon={
-            activeTheme === 'dark'
-              ? 'ph:moon-bold'
-              : activeTheme === 'light'
-                ? 'ph:sun-bold'
-                : 'ph:desktop-bold'
-          }
+          icon={activeTheme === 'dark' ? 'ph:moon-bold' : 'ph:sun-bold'}
           className="w-4 h-4 text-accent-primary"
         />
       </button>
 
       {/* Dropdown */}
-      <div className="absolute right-0 pt-2">
-        <div className="w-32 hidden group-hover:flex flex-col gap-1 bg-bg-secondary border border-border-theme rounded-xl shadow-xl p-1 z-50 animate-in fade-in duration-150">
-          <button
-            onClick={() => setTheme('light')}
-            className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors cursor-pointer ${
-              activeTheme === 'light' ? 'bg-accent-light text-accent-primary' : 'text-text-secondary hover:bg-bg-tertiary'
-            }`}
-          >
-            <Icon icon="ph:sun-bold" className="w-3.5 h-3.5" /> Light
-          </button>
-          <button
-            onClick={() => setTheme('dark')}
-            className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors cursor-pointer ${
-              activeTheme === 'dark' ? 'bg-accent-light text-accent-primary' : 'text-text-secondary hover:bg-bg-tertiary'
-            }`}
-          >
-            <Icon icon="ph:moon-bold" className="w-3.5 h-3.5" /> Dark
-          </button>
+      {isOpen && (
+        <div className="absolute right-0 top-full pt-2 z-50">
+          <div className="w-36 flex flex-col gap-1 bg-bg-secondary border border-border-theme rounded-xl shadow-2xl p-1.5 animate-in fade-in zoom-in-95 duration-150">
+            <button
+              type="button"
+              onClick={() => {
+                setTheme('light');
+                setIsOpen(false);
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
+                activeTheme === 'light'
+                  ? 'bg-accent-light text-accent-primary'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Icon icon="ph:sun-bold" className="w-4 h-4 text-amber-500" /> Light
+              </span>
+              {activeTheme === 'light' && <Icon icon="ph:check-bold" className="w-3.5 h-3.5 text-accent-primary" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTheme('dark');
+                setIsOpen(false);
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
+                activeTheme === 'dark'
+                  ? 'bg-accent-light text-accent-primary'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Icon icon="ph:moon-bold" className="w-4 h-4 text-indigo-400" /> Dark
+              </span>
+              {activeTheme === 'dark' && <Icon icon="ph:check-bold" className="w-3.5 h-3.5 text-accent-primary" />}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

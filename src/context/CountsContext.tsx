@@ -66,10 +66,27 @@ export function CountsProvider({ children }: { children: React.ReactNode }) {
   const fetchCounts = useCallback(async () => {
     try {
       setIsLoading(true);
+      const localToken = typeof window !== 'undefined' ? localStorage.getItem('pg_identity') : '';
+      const match = typeof document !== 'undefined' ? document.cookie.match(/pg_identity=([^;]+)/) : null;
+      const cookieToken = match ? match[1] : '';
+      const token = localToken || cookieToken;
+
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['X-Playground-Identity'] = token;
+      }
+
       const res = await fetch(`${config.apiUrl}/counts`, {
+        headers,
         credentials: 'include',
       });
+
       if (res.ok) {
+        const returnedToken = res.headers.get('x-playground-identity');
+        if (returnedToken && typeof window !== 'undefined') {
+          localStorage.setItem('pg_identity', returnedToken);
+        }
+
         const data = await res.json();
         if (data && data.counts) {
           setCounts({
@@ -101,6 +118,17 @@ export function CountsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     fetchCounts();
+
+    const handleMutation = () => {
+      fetchCounts();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('playground:mutation', handleMutation);
+      return () => {
+        window.removeEventListener('playground:mutation', handleMutation);
+      };
+    }
   }, [fetchCounts]);
 
   return (

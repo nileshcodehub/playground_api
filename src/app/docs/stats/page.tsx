@@ -5,6 +5,8 @@ import { Icon } from '@iconify/react';
 import config from '@/config/env';
 import { SandboxExplanationCard } from '@/components/dashboard/SandboxExplanationCard';
 
+import { useLiveCounts } from '@/context/CountsContext';
+
 interface SessionStats {
   identity: {
     id: string;
@@ -31,6 +33,7 @@ interface SessionStats {
 }
 
 export default function StatsPage() {
+  const { refreshCounts } = useLiveCounts();
   const [copiedUuid, setCopiedUuid] = useState(false);
   const [copiedToken, setCopiedToken] = useState(false);
   const [resetting, setResetting] = useState(false);
@@ -45,12 +48,14 @@ export default function StatsPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const match = document.cookie.match(/pg_identity=([^;]+)/);
+      const localToken = typeof window !== 'undefined' ? localStorage.getItem('pg_identity') : '';
+      const match = typeof document !== 'undefined' ? document.cookie.match(/pg_identity=([^;]+)/) : null;
       const cookieToken = match ? match[1] : '';
+      const token = localToken || cookieToken;
 
       const headers: Record<string, string> = {};
-      if (cookieToken) {
-        headers['X-Playground-Identity'] = cookieToken;
+      if (token) {
+        headers['X-Playground-Identity'] = token;
       }
 
       const res = await fetch(`${config.apiUrl}/session/stats`, {
@@ -59,11 +64,27 @@ export default function StatsPage() {
       });
 
       if (res.ok) {
-        const data: SessionStats = await res.json();
-        setStats(data);
+        const returnedToken = res.headers.get('x-playground-identity');
+        if (returnedToken && typeof window !== 'undefined') {
+          localStorage.setItem('pg_identity', returnedToken);
+        }
+
+        const data = await res.json();
+        const normalizedStats: SessionStats = {
+          identity: data.identity || { id: '' },
+          summary: data.summary || {
+            totalOverlays: data.stats?.totalRecords || 0,
+            creates: 0,
+            updates: 0,
+            deletes: 0,
+          },
+          byResource: data.byResource || data.stats?.byResource || {},
+        };
+
+        setStats(normalizedStats);
         if (data.identity?.id) {
           setUuid(data.identity.id);
-          setFullToken(cookieToken || data.identity.id);
+          setFullToken(returnedToken || token || data.identity.id);
 
           if (data.identity.createdAt) {
             setCreatedDate(new Date(data.identity.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
@@ -80,6 +101,17 @@ export default function StatsPage() {
 
   useEffect(() => {
     fetchStats();
+
+    const handleMutation = () => {
+      fetchStats();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('playground:mutation', handleMutation);
+      return () => {
+        window.removeEventListener('playground:mutation', handleMutation);
+      };
+    }
   }, [fetchStats]);
 
   const handleCopyUuid = () => {
@@ -100,11 +132,14 @@ export default function StatsPage() {
     setResetting(true);
     setResetMsg(null);
     try {
-      const match = document.cookie.match(/pg_identity=([^;]+)/);
+      const localToken = typeof window !== 'undefined' ? localStorage.getItem('pg_identity') : '';
+      const match = typeof document !== 'undefined' ? document.cookie.match(/pg_identity=([^;]+)/) : null;
       const cookieToken = match ? match[1] : '';
+      const token = localToken || cookieToken;
+
       const headers: Record<string, string> = {};
-      if (cookieToken) {
-        headers['X-Playground-Identity'] = cookieToken;
+      if (token) {
+        headers['X-Playground-Identity'] = token;
       }
 
       const res = await fetch(`${config.apiUrl}/session/reset`, {
@@ -120,6 +155,10 @@ export default function StatsPage() {
         setResetMsg('Session purged.');
       }
       await fetchStats();
+      await refreshCounts();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('playground:mutation'));
+      }
     } catch {
       setResetMsg('Session purged.');
     } finally {

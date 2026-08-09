@@ -129,9 +129,18 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
     const startTime = performance.now();
 
     try {
+      const localToken = typeof window !== 'undefined' ? localStorage.getItem('pg_identity') : '';
+      const match = typeof document !== 'undefined' ? document.cookie.match(/pg_identity=([^;]+)/) : null;
+      const cookieToken = match ? match[1] : '';
+      const token = localToken || cookieToken;
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
+
+      if (token) {
+        headers['X-Playground-Identity'] = token;
+      }
 
       if (simulateDelay.trim()) {
         headers['X-Simulate-Delay'] = simulateDelay.trim();
@@ -152,6 +161,11 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
 
       const res = await fetch(computedUrl, options);
       const timeMs = Math.round(performance.now() - startTime);
+
+      const returnedToken = res.headers.get('x-playground-identity');
+      if (returnedToken && typeof window !== 'undefined') {
+        localStorage.setItem('pg_identity', returnedToken);
+      }
 
       let data: unknown = null;
       let isSvg = false;
@@ -193,6 +207,9 @@ export function TryItRunner({ endpoint }: TryItRunnerProps) {
 
       if (res.ok && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(endpoint.method)) {
         refreshCounts();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('playground:mutation'));
+        }
       }
     } catch (err) {
       const timeMs = Math.round(performance.now() - startTime);

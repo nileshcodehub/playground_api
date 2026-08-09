@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
+import { useLiveCounts } from '@/context/CountsContext';
 
 const presetTemplates = [
   {
@@ -39,11 +40,12 @@ const presetTemplates = [
 ];
 
 export default function StudioPage() {
+  const { refreshCounts } = useLiveCounts();
   const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'>('GET');
-  const [endpointPath, setEndpointPath] = useState('/posts?_limit=5');
+  const [endpointPath, setEndpointPath] = useState('/posts');
   const [simDelay, setSimDelay] = useState('0');
   const [simStatus, setSimStatus] = useState('200');
-  const [jsonPayload, setJsonPayload] = useState('{\n  "title": "Interactive Studio Article",\n  "user_id": 1\n}');
+  const [jsonPayload, setJsonPayload] = useState('');
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<{
     status: number;
@@ -66,9 +68,18 @@ export default function StudioPage() {
     const start = performance.now();
 
     try {
+      const localToken = typeof window !== 'undefined' ? localStorage.getItem('pg_identity') : '';
+      const match = typeof document !== 'undefined' ? document.cookie.match(/pg_identity=([^;]+)/) : null;
+      const cookieToken = match ? match[1] : '';
+      const token = localToken || cookieToken;
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
+
+      if (token) {
+        headers['X-Playground-Identity'] = token;
+      }
 
       if (simDelay !== '0') headers['X-Simulate-Delay'] = simDelay;
       if (simStatus !== '200') headers['X-Simulate-Status'] = simStatus;
@@ -76,6 +87,7 @@ export default function StudioPage() {
       const opts: RequestInit = {
         method,
         headers,
+        credentials: 'include',
       };
 
       if (['POST', 'PUT', 'PATCH'].includes(method) && jsonPayload) {
@@ -84,6 +96,11 @@ export default function StudioPage() {
 
       const res = await fetch(fullUrl, opts);
       const timeMs = Math.round(performance.now() - start);
+
+      const returnedToken = res.headers.get('x-playground-identity');
+      if (returnedToken && typeof window !== 'undefined') {
+        localStorage.setItem('pg_identity', returnedToken);
+      }
 
       let data: unknown = null;
       if (res.status === 204 || res.status === 205) {
@@ -113,6 +130,13 @@ export default function StudioPage() {
         headers: resHeaders,
         data,
       });
+
+      if (res.ok && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+        refreshCounts();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('playground:mutation'));
+        }
+      }
     } catch (err) {
       const timeMs = Math.round(performance.now() - start);
       setResponse({
