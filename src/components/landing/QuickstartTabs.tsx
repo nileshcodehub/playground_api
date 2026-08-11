@@ -1,18 +1,30 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 
 export function QuickstartTabs() {
+  const [baseUrl, setBaseUrl] = useState<string>(config.publicApiUrl || 'https://playground-api-xi.vercel.app/api/v1');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const origin = window.location.origin;
+      const apiPrefix = config.apiUrl.startsWith('http')
+        ? config.apiUrl
+        : `${origin}${config.apiUrl.startsWith('/') ? '' : '/'}${config.apiUrl}`;
+      setBaseUrl(apiPrefix);
+    }
+  }, []);
+
   const snippets: Record<string, string> = {
     javascript: `// Fetch posts using standard JavaScript fetch
-const response = await fetch('${config.apiUrl}/posts?_limit=5');
+const response = await fetch('${baseUrl}/posts?_limit=5');
 const posts = await response.json();
 console.log('Posts:', posts);
 
 // Create a new post in your session sandbox
-const createRes = await fetch('${config.apiUrl}/posts', {
+const createRes = await fetch('${baseUrl}/posts', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ title: 'New Prototype Article', user_id: 1 })
@@ -23,13 +35,13 @@ console.log('Created post:', newPost);`,
     axios: `import axios from 'axios';
 
 // Fetch posts using Axios
-const { data: posts } = await axios.get('${config.apiUrl}/posts', {
+const { data: posts } = await axios.get('${baseUrl}/posts', {
   params: { _limit: 5 }
 });
 console.log('Fetched posts:', posts);
 
 // Create a new post overlay
-const { data: newPost } = await axios.post('${config.apiUrl}/posts', {
+const { data: newPost } = await axios.post('${baseUrl}/posts', {
   title: 'New Prototype Article',
   user_id: 1
 });
@@ -38,7 +50,7 @@ console.log('Created post:', newPost);`,
     python: `import requests
 
 # Fetch posts
-url = "${config.apiUrl}/posts"
+url = "${baseUrl}/posts"
 response = requests.get(url, params={"_limit": 5})
 posts = response.json()
 print("Posts:", posts)
@@ -57,7 +69,7 @@ import (
 )
 
 func main() {
-\tresp, err := http.Get("${config.apiUrl}/posts?_limit=5")
+\tresp, err := http.Get("${baseUrl}/posts?_limit=5")
 \tif err != nil {
 \t\tpanic(err)
 \t}
@@ -69,7 +81,7 @@ func main() {
 
     swift: `import Foundation
 
-let url = URL(string: "${config.apiUrl}/posts?_limit=5")!
+let url = URL(string: "${baseUrl}/posts?_limit=5")!
 let task = URLSession.shared.dataTask(with: url) { data, response, error in
     if let data = data, let json = String(data: data, encoding: .utf8) {
         print("Response:", json)
@@ -81,7 +93,7 @@ task.resume()`,
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let resp = reqwest::get("${config.apiUrl}/posts?_limit=5")
+    let resp = reqwest::get("${baseUrl}/posts?_limit=5")
         .await?
         .text()
         .await?;
@@ -90,10 +102,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }`,
 
     curl: `# Fetch paginated posts
-curl -X GET "${config.apiUrl}/posts?_limit=5"
+curl -X GET "${baseUrl}/posts?_limit=5"
 
 # Create a new sandboxed post
-curl -X POST "${config.apiUrl}/posts" \\
+curl -X POST "${baseUrl}/posts" \\
   -H "Content-Type: application/json" \\
   -d '{"title": "New Prototype Article", "user_id": 1}'`,
   };

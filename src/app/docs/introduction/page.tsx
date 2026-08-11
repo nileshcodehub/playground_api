@@ -46,7 +46,7 @@ export default function IntroductionPage() {
           Base API v1 Endpoint
         </h2>
         <div className="p-3.5 rounded-xl bg-code-bg font-mono text-xs sm:text-sm font-bold text-emerald-400 select-all border border-border-theme">
-          {config.apiUrl}
+          {config.publicApiUrl}
         </div>
         <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
           All endpoints are scoped under version 1 (<code className="font-mono text-accent-primary">/api/v1/...</code>). This guarantees future updates (e.g. <code className="font-mono text-text-muted">/api/v2/</code>) will maintain full backwards compatibility for your applications.

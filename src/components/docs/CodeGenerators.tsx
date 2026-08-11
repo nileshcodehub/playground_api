@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { EndpointDef } from '@/config/api-catalog';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
@@ -10,7 +10,19 @@ interface CodeGeneratorsProps {
 }
 
 export function CodeGenerators({ endpoint }: CodeGeneratorsProps) {
-  const fullUrl = `${config.apiUrl}${endpoint.path}`;
+  const [baseUrl, setBaseUrl] = useState<string>(config.publicApiUrl || 'https://playground-api-xi.vercel.app/api/v1');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const origin = window.location.origin;
+      const apiPrefix = config.apiUrl.startsWith('http')
+        ? config.apiUrl
+        : `${origin}${config.apiUrl.startsWith('/') ? '' : '/'}${config.apiUrl}`;
+      setBaseUrl(apiPrefix);
+    }
+  }, []);
+
+  const fullUrl = `${baseUrl}${endpoint.path}`;
   const hasBody = ['POST', 'PUT', 'PATCH'].includes(endpoint.method) && endpoint.requestBody;
   const bodyStr = hasBody ? JSON.stringify(endpoint.requestBody, null, 2) : '';
 
