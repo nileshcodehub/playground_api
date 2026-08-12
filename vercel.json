@@ -16,6 +16,22 @@
         {
           "key": "Expires",
           "value": "0"
+        },
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-Playground-Identity, X-Simulate-Delay, X-Simulate-Status, X-Simulate-Chaos, X-Simulate-RateLimit, X-Simulate-JWT-Expiry, X-Requested-With, Accept, Origin, Cache-Control, Pragma"
+        },
+        {
+          "key": "Access-Control-Expose-Headers",
+          "value": "X-Playground-Identity, X-Total-Count, X-Page, X-Limit, X-Total-Pages, Content-Range, Location"
         }
       ]
     },
