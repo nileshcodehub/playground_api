@@ -193,3 +193,19 @@ export interface CustomSeedResult {
   collections: string[];
   totalSeeded: number;
 }
+
+// Media & Dynamic Vector Image Generator Types
+export interface AvatarOptions {
+  size?: number;
+  rounded?: boolean | string;
+}
+
+export interface ThumbnailOptions {
+  width?: number;
+  height?: number;
+  text?: string;
+  description?: string;
+  desc?: string;
+  subtitle?: string;
+}
+

@@ -30,7 +30,8 @@ export const getMediaEndpoints = () => {
         { name: 'seed', type: 'String (Required)', desc: 'Seed string used for background color hashing and title formatting (e.g. post-1, react-tutorial).' },
         { name: 'width', type: 'Integer (Query)', desc: 'Thumbnail width in pixels (default: 600).' },
         { name: 'height', type: 'Integer (Query)', desc: 'Thumbnail height in pixels (default: 400).' },
-        { name: 'text', type: 'String (Query)', desc: 'Custom title label text to display instead of formatted seed.' }
+        { name: 'text', type: 'String (Query)', desc: 'Custom title label text with multiline word-wrapping instead of formatted seed.' },
+        { name: 'description', type: 'String (Query)', desc: 'Optional subtitle/description text rendered beneath title with auto word-wrapping.' }
       ],
       responseExample: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
   <defs>
