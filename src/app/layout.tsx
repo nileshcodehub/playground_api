@@ -97,13 +97,16 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Documentation" />
         <link rel="alternate" type="text/plain" href="/llms-full.txt" title="Full LLM Reference Specification" />
         <link rel="alternate" type="application/json" href="/product.json" title="Product Manifest" />
       </head>
       <body
         suppressHydrationWarning
-        className="flex flex-col min-h-screen antialiased selection:bg-accent-primary selection:text-white"
+        className="flex flex-col min-h-screen antialiased selection:bg-accent-primary selection:text-white font-comic"
       >
         <Script
           id="json-ld"

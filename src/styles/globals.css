@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,400;1,700&display=swap');
 @import "tailwindcss";
 
 @layer base {
@@ -61,12 +62,13 @@
   --color-card-bg: var(--card-bg);
   --color-card-border: var(--card-border);
   --color-code-bg: var(--code-bg);
+  --font-comic: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
 }
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.65;
