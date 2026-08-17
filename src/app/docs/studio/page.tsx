@@ -6,43 +6,124 @@ import { CodeBlock } from '@/components/ui/CodeBlock';
 import config from '@/config/env';
 import { useLiveCounts } from '@/context/CountsContext';
 
-const presetTemplates = [
+const scenarioCategories = [
   {
-    name: 'GET /posts (List Posts)',
-    method: 'GET' as const,
-    path: '/posts?_limit=5&_sort=title&_order=asc',
-    payload: '',
+    category: '1. CRUD Lifecycle Demo',
+    scenarios: [
+      {
+        name: 'Step 1: Create Post (POST)',
+        method: 'POST' as const,
+        path: '/posts',
+        payload: '{\n  "title": "My Interactive Studio Article",\n  "body": "Testing sandboxed POST overlay from the API Studio.",\n  "user_id": 1\n}',
+      },
+      {
+        name: 'Step 2: List Posts (GET)',
+        method: 'GET' as const,
+        path: '/posts?_limit=5',
+        payload: '',
+      },
+      {
+        name: 'Step 3: Edit Post (PATCH)',
+        method: 'PATCH' as const,
+        path: '/posts/1',
+        payload: '{\n  "title": "Patched Title from Studio"\n}',
+      },
+      {
+        name: 'Step 4: Reset Sandbox (DELETE)',
+        method: 'DELETE' as const,
+        path: '/session/reset',
+        payload: '',
+      },
+    ],
   },
   {
-    name: 'POST /posts (Create Post)',
-    method: 'POST' as const,
-    path: '/posts',
-    payload: '{\n  "title": "Interactive Studio Prototype Article",\n  "body": "Testing sandboxed POST overlay from the API Studio.",\n  "user_id": 1\n}',
+    category: '2. Latency & Error Simulation',
+    scenarios: [
+      {
+        name: 'Simulate Slow 3G (1.5s Delay)',
+        method: 'GET' as const,
+        path: '/posts?_limit=3',
+        delay: '1500',
+        status: '200',
+        payload: '',
+      },
+      {
+        name: 'Simulate 500 Server Error',
+        method: 'GET' as const,
+        path: '/posts?_status=500',
+        delay: '0',
+        status: '500',
+        payload: '',
+      },
+      {
+        name: 'Simulate 404 Not Found',
+        method: 'GET' as const,
+        path: '/users/9999?_status=404',
+        delay: '0',
+        status: '404',
+        payload: '',
+      },
+    ],
   },
   {
-    name: 'POST /auth/login (JWT Login)',
-    method: 'POST' as const,
-    path: '/auth/login',
-    payload: '{\n  "username": "kminchelle",\n  "password": "password123"\n}',
+    category: '3. JWT Authentication Flow',
+    scenarios: [
+      {
+        name: 'Login as Bret (POST /auth/login)',
+        method: 'POST' as const,
+        path: '/auth/login',
+        payload: '{\n  "username": "Bret",\n  "password": "password123"\n}',
+      },
+      {
+        name: 'Get Current Profile (GET /auth/me)',
+        method: 'GET' as const,
+        path: '/auth/me',
+        payload: '',
+      },
+      {
+        name: 'Refresh Token (POST /auth/refresh)',
+        method: 'POST' as const,
+        path: '/auth/refresh',
+        payload: '{\n  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."\n}',
+      },
+    ],
   },
   {
-    name: 'POST /custom/products (Create Custom Item)',
-    method: 'POST' as const,
-    path: '/custom/products',
-    payload: '{\n  "name": "MacBook Pro M3",\n  "price": 2499,\n  "category": "Laptops"\n}',
-  },
-  {
-    name: 'GET /avatars/Bret.svg (Avatar Image)',
-    method: 'GET' as const,
-    path: '/avatars/Bret.svg?size=128',
-    payload: '',
+    category: '4. Dynamic Custom Collections',
+    scenarios: [
+      {
+        name: 'Seed E-Commerce Template',
+        method: 'POST' as const,
+        path: '/custom/seed?template=ecommerce',
+        payload: '{\n  "template": "ecommerce"\n}',
+      },
+      {
+        name: 'List Products (GET)',
+        method: 'GET' as const,
+        path: '/custom/products',
+        payload: '',
+      },
+      {
+        name: 'Create Custom Product (POST)',
+        method: 'POST' as const,
+        path: '/custom/products',
+        payload: '{\n  "name": "MacBook Pro M3 Max",\n  "price": 3499,\n  "category": "Laptops"\n}',
+      },
+      {
+        name: 'Generate Avatar SVG (GET)',
+        method: 'GET' as const,
+        path: '/avatars/Bret.svg?size=128',
+        payload: '',
+      },
+    ],
   },
 ];
 
 export default function StudioPage() {
   const { refreshCounts } = useLiveCounts();
+  const [activeCategory, setActiveCategory] = useState(0);
   const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'>('GET');
-  const [endpointPath, setEndpointPath] = useState('/posts');
+  const [endpointPath, setEndpointPath] = useState('/posts?_limit=5');
   const [simDelay, setSimDelay] = useState('0');
   const [simStatus, setSimStatus] = useState('200');
   const [jsonPayload, setJsonPayload] = useState('');
@@ -57,10 +138,12 @@ export default function StudioPage() {
 
   const fullUrl = `${config.apiUrl}${endpointPath.startsWith('/') ? endpointPath : '/' + endpointPath}`;
 
-  const applyTemplate = (tpl: typeof presetTemplates[0]) => {
-    setMethod(tpl.method);
-    setEndpointPath(tpl.path);
-    if (tpl.payload) setJsonPayload(tpl.payload);
+  const applyScenario = (sc: any) => {
+    setMethod(sc.method);
+    setEndpointPath(sc.path);
+    setJsonPayload(sc.payload || '');
+    if (sc.delay !== undefined) setSimDelay(sc.delay);
+    if (sc.status !== undefined) setSimStatus(sc.status);
   };
 
   const handleSend = async () => {
@@ -79,6 +162,13 @@ export default function StudioPage() {
 
       if (token) {
         headers['X-Playground-Identity'] = token;
+      }
+
+      if (typeof window !== 'undefined') {
+        const savedAuth = localStorage.getItem('pg_access_token');
+        if (savedAuth && endpointPath.includes('/auth/me')) {
+          headers['Authorization'] = `Bearer ${savedAuth}`;
+        }
       }
 
       if (simDelay !== '0') headers['X-Simulate-Delay'] = simDelay;
@@ -119,6 +209,14 @@ export default function StudioPage() {
         }
       }
 
+      // If token returned, store it
+      if (data && typeof data === 'object') {
+        const anyData = data as Record<string, any>;
+        if (anyData.accessToken && typeof window !== 'undefined') {
+          localStorage.setItem('pg_access_token', anyData.accessToken);
+        }
+      }
+
       const resHeaders: Record<string, string> = {};
       res.headers.forEach((v, k) => {
         resHeaders[k] = v;
@@ -154,61 +252,70 @@ export default function StudioPage() {
 
   return (
     <div className="space-y-10 w-full max-w-none">
-      {/* Title Header */}
+      {/* 1. Title Header */}
       <div id="overview" className="space-y-3 border-b border-border-theme pb-6 scroll-mt-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-light text-accent-primary text-xs sm:text-sm font-bold">
           <Icon icon="ph:play-circle-bold" className="w-4 h-4" />
-          Interactive API Studio & Request Builder
+          Interactive API Studio & Scenario Presets
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
-          Interactive Request Builder & Response Inspector
+          Interactive API Studio
         </h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
-          The API Studio is an in-browser request tester. Use it to prototype API queries, inspect JSON payloads, test network latency delays, simulate HTTP error codes, and verify your session identity overlays in real time.
+          Test stateful CRUD operations, simulate network conditions, and verify your isolated session overlay in real time.
         </p>
       </div>
 
-      {/* What this section is used for */}
-      <div id="how-to-use" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-3 scroll-mt-20">
-        <h2 className="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
-          <Icon icon="ph:info-bold" className="w-5 h-5 text-accent-primary" />
-          How to Use the Interactive API Studio
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs sm:text-sm text-text-secondary">
-          <div className="p-3.5 rounded-xl bg-bg-secondary border border-border-theme space-y-1">
-            <div className="font-bold text-text-primary text-sm">1. Choose or Build Request</div>
-            <p className="leading-relaxed">Select HTTP method (GET, POST, PUT, PATCH, DELETE) or pick a preset template below.</p>
-          </div>
-          <div className="p-3.5 rounded-xl bg-bg-secondary border border-border-theme space-y-1">
-            <div className="font-bold text-text-primary text-sm">2. Test Middleware Simulation</div>
-            <p className="leading-relaxed">Add artificial network latency (e.g. 1500ms) or force 500 error status codes to test UI spinners.</p>
-          </div>
-          <div className="p-3.5 rounded-xl bg-bg-secondary border border-border-theme space-y-1">
-            <div className="font-bold text-text-primary text-sm">3. Inspect Response Metrics</div>
-            <p className="leading-relaxed">View exact HTTP status codes, execution latency in milliseconds, headers, and formatted JSON output.</p>
-          </div>
+      {/* 2. Guided Scenario Presets */}
+      <div id="scenario-presets" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4 shadow-xl scroll-mt-20">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h2 className="text-xs sm:text-sm font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2">
+            <Icon icon="ph:sparkle-bold" className="w-4 h-4 text-accent-primary" />
+            Guided Workflow Scenarios
+          </h2>
+          <span className="text-xs text-text-muted">1-Click presets</span>
         </div>
-      </div>
 
-      {/* Preset Quick Templates */}
-      <div id="preset-templates" data-toc-title="Preset Templates" className="space-y-2 scroll-mt-20">
-        <span className="text-xs sm:text-sm font-bold text-text-secondary uppercase tracking-wider">Preset Request Templates:</span>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          {presetTemplates.map((tpl) => (
+        {/* Category Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-border-theme/70">
+          {scenarioCategories.map((cat, idx) => (
             <button
-              key={tpl.name}
-              onClick={() => applyTemplate(tpl)}
-              className="px-3 py-1.5 rounded-xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-semibold text-text-primary shrink-0 transition-colors cursor-pointer flex items-center gap-1.5"
+              key={cat.category}
+              onClick={() => setActiveCategory(idx)}
+              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                activeCategory === idx
+                  ? 'bg-accent-primary text-white shadow-xs'
+                  : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
+              }`}
             >
-              <Icon icon="ph:magic-wand-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent-primary" />
-              <span>{tpl.name}</span>
+              {cat.category}
+            </button>
+          ))}
+        </div>
+
+        {/* Scenario Buttons in Active Category */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-1">
+          {scenarioCategories[activeCategory].scenarios.map((sc) => (
+            <button
+              key={sc.name}
+              onClick={() => applyScenario(sc)}
+              className="p-3 rounded-xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-left transition-all cursor-pointer group space-y-1"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-md bg-accent-light text-accent-primary">
+                  {sc.method}
+                </span>
+                <Icon icon="ph:arrow-elbow-down-right-bold" className="w-3.5 h-3.5 text-text-muted group-hover:text-accent-primary transition-colors" />
+              </div>
+              <div className="font-bold text-xs text-text-primary">{sc.name}</div>
+              <div className="font-mono text-[11px] text-text-muted truncate">{sc.path}</div>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Main Request Form */}
-      <div id="request-builder" data-toc-title="Request Builder" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-6 shadow-xl scroll-mt-20">
+      {/* 3. Main Request Form */}
+      <div id="request-builder" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-6 shadow-xl scroll-mt-20">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <select
             value={method}
@@ -224,7 +331,6 @@ export default function StudioPage() {
 
           <div className="flex-1 w-full flex items-center bg-bg-secondary border border-border-theme rounded-xl overflow-hidden px-3">
             <span className="font-mono text-xs sm:text-sm text-text-muted shrink-0">{config.publicApiUrl || config.apiUrl}</span>
-
             <input
               type="text"
               value={endpointPath}
@@ -244,96 +350,108 @@ export default function StudioPage() {
           </button>
         </div>
 
-        {/* Network Middleware Simulation Controls */}
+        {/* Latency & Status Controls */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border-theme">
-          <div className="space-y-1">
-            <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-1.5">
-              <Icon icon="ph:clock-afternoon-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
-              Simulate Delay Header (X-Simulate-Delay):
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
+              <Icon icon="ph:timer-bold" className="w-4 h-4 text-purple-400" />
+              <span>Simulate Latency Delay (ms):</span>
             </label>
-            <select
-              value={simDelay}
-              onChange={(e) => setSimDelay(e.target.value)}
-              className="w-full font-mono text-xs sm:text-sm p-2.5 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none"
-            >
-              <option value="0">0 ms (Instant)</option>
-              <option value="500">500 ms (Fast)</option>
-              <option value="1500">1500 ms (Medium)</option>
-              <option value="3000">3000 ms (Slow)</option>
-              <option value="5000">5000 ms (High Latency)</option>
-            </select>
+            <div className="flex items-center gap-2">
+              {['0', '500', '1500', '3000'].map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => setSimDelay(d)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                    simDelay === d ? 'bg-purple-600 text-white' : 'bg-bg-tertiary text-text-secondary hover:bg-border-theme'
+                  }`}
+                >
+                  {d === '0' ? '0ms' : `${d}ms`}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-1.5">
-              <Icon icon="ph:warning-circle-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400" />
-              Simulate Status Code (X-Simulate-Status):
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
+              <Icon icon="ph:warning-circle-bold" className="w-4 h-4 text-amber-400" />
+              <span>Simulate HTTP Status Code:</span>
             </label>
-            <select
-              value={simStatus}
-              onChange={(e) => setSimStatus(e.target.value)}
-              className="w-full font-mono text-xs sm:text-sm p-2.5 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none"
-            >
-              <option value="200">200 OK (Normal)</option>
-              <option value="400">400 Bad Request</option>
-              <option value="401">401 Unauthorized</option>
-              <option value="404">404 Not Found</option>
-              <option value="500">500 Server Error</option>
-            </select>
+            <div className="flex items-center gap-2">
+              {['200', '400', '401', '404', '500'].map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSimStatus(s)}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                    simStatus === s ? 'bg-amber-600 text-white' : 'bg-bg-tertiary text-text-secondary hover:bg-border-theme'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Payload Body Editor */}
+        {/* JSON Request Body if applicable */}
         {['POST', 'PUT', 'PATCH'].includes(method) && (
-          <div className="space-y-2 pt-2 border-t border-border-theme">
+          <div className="space-y-1.5 pt-2 border-t border-border-theme">
             <div className="flex items-center justify-between">
-              <label className="text-xs sm:text-sm font-semibold text-text-secondary">Request Body Payload (JSON):</label>
-              <span className="text-[11px] text-accent-primary font-mono font-medium">Editable Payload</span>
+              <label className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                JSON Request Body Payload:
+              </label>
+              <span className="text-xs text-text-muted font-mono">application/json</span>
             </div>
             <CodeBlock
               code={jsonPayload}
               language="json"
-              title="Payload (JSON)"
+              title="Request Payload"
               maxHeight="max-h-60"
               editable={true}
-              onChange={(val) => setJsonPayload(val)}
-              placeholder="{\n  &quot;title&quot;: &quot;Custom item&quot;\n}"
+              onChange={(v) => setJsonPayload(v)}
             />
           </div>
         )}
+      </div>
 
-        {/* Response Viewer */}
-        {response && (
-          <div className="space-y-4 pt-4 border-t border-border-theme animate-in fade-in duration-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span
-                  className={`font-mono text-xs sm:text-sm font-bold px-3 py-1 rounded-lg ${
-                    response.status >= 200 && response.status < 300
-                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
-                  }`}
-                >
-                  {response.status} {response.statusText}
-                </span>
-                <span className="font-mono text-xs sm:text-sm text-text-muted flex items-center gap-1">
-                  <Icon icon="ph:timer-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  {response.timeMs} ms execution
-                </span>
-              </div>
+      {/* 4. Response Output */}
+      {response && (
+        <div id="response-output" className="p-6 rounded-2xl glass-panel border border-border-theme space-y-4 shadow-xl scroll-mt-20 animate-in fade-in duration-200">
+          <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-border-theme">
+            <div className="flex items-center gap-3">
+              <span className="text-xs sm:text-sm font-bold text-text-secondary">Response Status:</span>
+              <span
+                className={`font-mono text-xs sm:text-sm font-bold px-2.5 py-1 rounded-md ${
+                  response.status >= 200 && response.status < 300
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                }`}
+              >
+                {response.status} {response.statusText}
+              </span>
             </div>
 
-            <div className="space-y-2">
-              <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-secondary">Response Payload Output</span>
-              <CodeBlock
-                code={response.data}
-                language={typeof response.data === 'string' && response.data.startsWith('<svg') ? 'svg' : 'json'}
-                maxHeight="max-h-96"
-              />
+            <div className="flex items-center gap-1 font-mono text-xs text-text-muted">
+              <Icon icon="ph:timer-bold" className="w-4 h-4 text-accent-primary" />
+              <span>Latency: {response.timeMs} ms</span>
             </div>
           </div>
-        )}
-      </div>
+
+          <div className="space-y-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+              Response Body (JSON):
+            </span>
+            <CodeBlock
+              code={response.data}
+              language="json"
+              title="Studio Response Output"
+              maxHeight="max-h-96"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
