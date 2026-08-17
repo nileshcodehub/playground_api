@@ -32,10 +32,12 @@ export const siteConfig = {
       title: 'Getting Started',
       icon: 'ph:rocket-launch-bold',
       items: [
-        { title: 'Overview', href: '/docs/introduction', icon: 'ph:sparkle-bold' },
+        { title: 'Overview & Features', href: '/docs/introduction', icon: 'ph:sparkle-bold' },
         { title: '30-Second Quickstart', href: '/docs/quickstart', icon: 'ph:lightning-fill' },
         { title: 'How Sandboxing Works', href: '/docs/how-it-works', icon: 'ph:shield-check-bold' },
         { title: 'Framework Recipes', href: '/docs/recipes', icon: 'ph:code-bold' },
+        { title: 'Query Filtering & Relations', href: '/docs/filtering', icon: 'ph:funnel-bold' },
+        { title: 'HTTP Status & Errors', href: '/docs/errors', icon: 'ph:warning-circle-bold' },
       ],
     },
     {
