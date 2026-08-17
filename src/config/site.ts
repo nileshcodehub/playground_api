@@ -38,6 +38,8 @@ export const siteConfig = {
         { title: 'Framework Recipes', href: '/docs/recipes', icon: 'ph:code-bold' },
         { title: 'Query Filtering & Relations', href: '/docs/filtering', icon: 'ph:funnel-bold' },
         { title: 'HTTP Status & Errors', href: '/docs/errors', icon: 'ph:warning-circle-bold' },
+        { title: 'Playground API vs Alternatives', href: '/docs/comparisons', icon: 'ph:scales-bold' },
+        { title: 'AI Agent Knowledge & Rules', href: '/docs/ai', icon: 'ph:robot-bold' },
       ],
     },
     {

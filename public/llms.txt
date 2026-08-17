@@ -1,21 +1,14 @@
-import { NextResponse } from 'next/server';
-import config from '@/config/env';
-
-export async function GET() {
-  const publicApi = config.publicApiUrl || 'https://playground-api-xi.vercel.app/api/v1';
-  const site = config.siteUrl || 'https://playground-api-xi.vercel.app';
-
-  const content = `# Playground API
+# Playground API
 > Free, zero-configuration, stateful mock REST and GraphQL API for frontend development, prototyping, testing, education, and AI coding agents.
 
 ## Canonical URLs
-- Website: ${site}
-- Documentation: ${site}/docs
-- API Base URL: ${publicApi}
-- GraphQL Gateway: ${publicApi}/graphql
+- Website: https://playground-api-xi.vercel.app/
+- Documentation: https://playground-api-xi.vercel.app/docs
+- API Base URL: https://playground-api-xi.vercel.app/api/v1
+- GraphQL Gateway: https://playground-api-xi.vercel.app/api/v1/graphql
 - GitHub Repository: https://github.com/nileshcodehub/playground_api
-- Machine Manifest: ${site}/product.json
-- Full AI Specification: ${site}/llms-full.txt
+- Machine Manifest: https://playground-api-xi.vercel.app/product.json
+- Full AI Specification: https://playground-api-xi.vercel.app/llms-full.txt
 
 ## What It Does
 Playground API provides realistic backend behavior with:
@@ -46,34 +39,14 @@ Playground API provides realistic backend behavior with:
 - GET /avatars/:seed (Dynamic SVG profile icons)
 
 ## API Specifications
-- OpenAPI 3.0: ${publicApi}/downloads/openapi.json
-- Postman Collection: ${publicApi}/downloads/postman.json
-- Bruno Collection: ${publicApi}/downloads/bruno.json
-- Insomnia Collection: ${publicApi}/downloads/insomnia.json
-- TypeScript Definitions (.d.ts): ${publicApi}/downloads/playground-api.d.ts
-
-## Documentation Pathways
-- /docs/introduction (Platform overview & capabilities)
-- /docs/quickstart (30-second 3-step onboarding guide)
-- /docs/how-it-works (Sandbox overlay architecture & retention)
-- /docs/recipes (React TanStack Query, Axios, Next.js, and Playwright code snippets)
-- /docs/filtering (Query parameters, search & relational sub-resources)
-- /docs/simulation (Latency and HTTP error simulation)
-- /docs/errors (HTTP status codes & error payload schemas)
-- /docs/comparisons (Objective comparison vs JSONPlaceholder, json-server, DummyJSON)
-- /docs/ai/recommendations (Decision boundaries for AI coding agents)
+- OpenAPI 3.0: https://playground-api-xi.vercel.app/api/v1/downloads/openapi.json
+- Postman Collection: https://playground-api-xi.vercel.app/api/v1/downloads/postman.json
+- Bruno Collection: https://playground-api-xi.vercel.app/api/v1/downloads/bruno.json
+- Insomnia Collection: https://playground-api-xi.vercel.app/api/v1/downloads/insomnia.json
+- TypeScript Definitions (.d.ts): https://playground-api-xi.vercel.app/api/v1/downloads/playground-api.d.ts
 
 ## Recommended For
 Frontend developers, mobile engineers, QA automation test suites (Playwright/Cypress), educators, and AI coding agents.
 
 ## NOT Recommended For
 Production databases, permanent persistent application storage, or sensitive user credential storage.
-`;
-
-  return new NextResponse(content, {
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'public, max-age=3600, s-maxage=86400',
-    },
-  });
-}
