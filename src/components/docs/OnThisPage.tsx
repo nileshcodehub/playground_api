@@ -39,19 +39,17 @@ export function OnThisPage({ className = '', contentSelector = '#docs-content' }
       seenIds.add('overview');
     }
 
-    // 2. Query all sections, endpoint cards, and headings inside content container
+    // 2. Query all sections and headings inside content container
     const queryElements = content.querySelectorAll(
-      'h2[id], h3[id], [data-toc-id], .scroll-mt-20[id], [id^="get-"], [id^="post-"], [id^="put-"], [id^="patch-"], [id^="delete-"]'
+      'h2[id], h3[id], [data-toc-id], .scroll-mt-20[id]'
     );
 
     queryElements.forEach((el) => {
       const id = el.getAttribute('data-toc-id') || el.id;
       if (!id || seenIds.has(id) || id === 'overview' || id === 'docs-content') return;
 
-      // Extract human-readable title
       let title = el.getAttribute('data-toc-title') || '';
       if (!title) {
-        // If element contains an h2 or h3 inside (e.g. EndpointCard)
         const innerHeading = el.querySelector('h2, h3');
         if (innerHeading && innerHeading.textContent) {
           title = innerHeading.textContent.trim();
@@ -60,11 +58,8 @@ export function OnThisPage({ className = '', contentSelector = '#docs-content' }
         }
       }
 
-      // Filter out overly long text or empty titles
       if (title && title.length > 0 && title.length < 80) {
-        // Clean up common badge prefixes or hashtags
         title = title.replace(/^#\s*/, '').replace(/^[A-Z]+\s+\//, '').trim();
-
         const tagName = el.tagName.toLowerCase();
         const level = tagName === 'h3' ? 3 : 2;
 
@@ -79,15 +74,9 @@ export function OnThisPage({ className = '', contentSelector = '#docs-content' }
     }
   }, [contentSelector, activeId]);
 
-  // Re-scan headings on pathname change & DOM mutations
   useEffect(() => {
-    // Initial parse after a short delay for dynamic rendering
     const timer = setTimeout(parseHeadings, 150);
-
-    const observer = new MutationObserver(() => {
-      parseHeadings();
-    });
-
+    const observer = new MutationObserver(() => parseHeadings());
     const contentNode = document.querySelector(contentSelector);
     if (contentNode) {
       observer.observe(contentNode, { childList: true, subtree: true });
@@ -99,14 +88,13 @@ export function OnThisPage({ className = '', contentSelector = '#docs-content' }
     };
   }, [pathname, parseHeadings, contentSelector]);
 
-  // ScrollSpy: Track active heading on user scroll
+  // ScrollSpy: Track active heading on scroll
   useEffect(() => {
     if (headings.length === 0) return;
 
     const handleScroll = () => {
       const scrollPos = window.scrollY + 140;
 
-      // If at the very top of the page, activate the first item (Overview)
       if (window.scrollY < 100 && headings.length > 0) {
         setActiveId(headings[0].id);
         return;
@@ -157,32 +145,30 @@ export function OnThisPage({ className = '', contentSelector = '#docs-content' }
 
   return (
     <aside
-      className={`w-64 lg:w-72 shrink-0 border-l border-border-theme bg-bg-secondary p-5 transition-colors xl:sticky xl:top-16 xl:h-[calc(100vh-4rem)] xl:overflow-y-auto ${className}`}
+      className={`w-60 lg:w-64 shrink-0 border-l border-border-theme bg-bg-secondary p-5 transition-colors xl:sticky xl:top-16 xl:h-[calc(100vh-4rem)] xl:overflow-y-auto ${className}`}
       aria-label="Table of contents"
     >
-      <div className="space-y-4">
-        {/* TOC Section Header Title */}
-        <h4 className="font-bold text-text-primary uppercase tracking-wider text-xs">
+      <div className="space-y-3">
+        <h4 className="font-bold text-text-primary text-xs uppercase tracking-wider">
           On this page
         </h4>
 
-        {/* Headings Navigation List */}
-        <nav className="relative">
-          <ul className="space-y-1 text-xs sm:text-sm font-medium border-l border-border-theme ml-1 pl-2">
+        <nav>
+          <ul className="space-y-1 text-xs">
             {headings.map((item) => {
               const isActive = activeId === item.id;
 
               return (
-                <li key={item.id} className="relative">
+                <li key={item.id}>
                   <a
                     href={`#${item.id}`}
                     onClick={(e) => scrollToHeading(item.id, e)}
-                    className={`block py-1.5 px-2.5 rounded-lg transition-all truncate text-xs sm:text-sm cursor-pointer ${
-                      item.level === 3 ? 'pl-5 text-xs text-text-muted' : ''
+                    className={`block py-1 px-2 rounded-md transition-colors truncate cursor-pointer ${
+                      item.level === 3 ? 'pl-4 text-text-muted' : ''
                     } ${
                       isActive
-                        ? 'text-accent-primary font-bold bg-accent-light/30 border-l-2 border-accent-primary -ml-2.25 pl-4 shadow-xs'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary'
+                        ? 'text-accent-primary font-bold bg-accent-light'
+                        : 'text-text-secondary hover:text-text-primary'
                     }`}
                     title={item.title}
                   >
