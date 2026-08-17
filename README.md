@@ -1,249 +1,292 @@
-# 🚀 Playground API — Frontend & Interactive Developer Portal
+# Playground API
 
-[![Next.js](https://img.shields.io/badge/Next.js-v15.1-black.svg)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-v19-blue.svg)](https://react.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4.0-38bdf8.svg)](https://tailwindcss.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-v5.7-blue.svg)](https://www.typescriptlang.org/)
-[![Express 5](https://img.shields.io/badge/Express-v5.0-blue.svg)](https://expressjs.com/)
-[![Prisma](https://img.shields.io/badge/Prisma-v5.x-informational.svg)](https://www.prisma.io/)
-[![Neon PostgreSQL](https://img.shields.io/badge/Neon-PostgreSQL-00e599.svg)](https://neon.tech/)
-[![Deployed on Vercel](https://img.shields.io/badge/Vercel-Deployed-black.svg)](https://playground-api-xi.vercel.app/)
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
+### A stateful mock REST & GraphQL API sandbox for frontend prototyping, testing, and AI agents.
 
-A state-of-the-art, **stateful mock REST & GraphQL API developer portal** built with **Next.js 15 (App Router)**, **React 19**, **Tailwind CSS v4**, and **TypeScript**.
+Build realistic frontend applications without configuring, deploying, or maintaining a backend.
 
-Playground API solves the biggest flaw of standard mock APIs (like JSONPlaceholder): **mutations actually persist in an isolated, zero-login per-visitor sandbox overlay**. When you execute `POST`, `PUT`, `PATCH`, or `DELETE`, your changes remain visible across page reloads and API calls without altering shared global baseline data or affecting other users.
+Playground API provides stateful REST and GraphQL APIs with **per-session persistent mutations**, CRUD operations, relational filtering, pagination, sorting, fake JWT authentication, network latency, and error simulation.
 
-🔗 **Live Portal Application**: [https://playground-api-xi.vercel.app/](https://playground-api-xi.vercel.app/)  
-📖 **Interactive Documentation**: [https://playground-api-xi.vercel.app/docs](https://playground-api-xi.vercel.app/docs)  
-🧰 **Interactive API Studio**: [https://playground-api-xi.vercel.app/docs/studio](https://playground-api-xi.vercel.app/docs/studio)  
-🪐 **GraphQL Explorer**: [https://playground-api-xi.vercel.app/docs/graphql](https://playground-api-xi.vercel.app/docs/graphql)  
-🤖 **AI Agent Documentation**: [https://playground-api-xi.vercel.app/llms.txt](https://playground-api-xi.vercel.app/llms.txt)
+[![Website](https://img.shields.io/badge/Website-playground--api-00e599.svg)](https://playground-api-xi.vercel.app/)
+[![Documentation](https://img.shields.io/badge/Docs-Explore-blue.svg)](https://playground-api-xi.vercel.app/docs)
+[![API Studio](https://img.shields.io/badge/API_Studio-Interactive-purple.svg)](https://playground-api-xi.vercel.app/docs/studio)
+[![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0_Spec-green.svg)](https://playground-api-xi.vercel.app/api/v1/downloads/openapi.json)
+[![AI Docs](https://img.shields.io/badge/AI_Ready-/llms.txt-orange.svg)](https://playground-api-xi.vercel.app/llms.txt)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+[🚀 Try Live Sandbox](https://playground-api-xi.vercel.app/) • [📚 Documentation](https://playground-api-xi.vercel.app/docs) • [🎨 API Studio](https://playground-api-xi.vercel.app/docs/studio) • [🤖 AI Specs](https://playground-api-xi.vercel.app/llms.txt)
 
 ---
 
-## ⚡ Playground API vs Traditional Mock APIs
-
-| Feature | Traditional Mock APIs (JSONPlaceholder, ReqRes) | 🚀 Playground API |
-| :--- | :--- | :--- |
-| **Mutation Persistence** | ❌ None (Fake response with ID 101, disappears immediately) | ✅ **Stateful Session Sandbox** (Mutations persist per visitor) |
-| **User Sign-In Required?** | ❌ N/A | ✅ **Zero Login Required** (Auto HMAC signed identity tokens) |
-| **API Protocols** | REST only | ✅ **REST v1 + Full GraphQL Gateway** |
-| **Network Latency Testing** | ❌ Fixed static response speed | ✅ **Simulate Delay (`?_delay=1500`) & Error Statuses (`?_status=500`)** |
-| **Authentication Testing** | ❌ Hardcoded tokens | ✅ **Fake JWT Login, Register & Bearer Profile (`/auth/*`)** |
-| **Full-Text Search & Sorting** | ❌ Basic or limited | ✅ **Universal Substring Search (`?q=`) & Multi-Field Sorting (`?_sort=`)** |
-| **Schema Exporters** | ❌ None | ✅ **One-Click OpenAPI 3.0, Postman, Bruno, Insomnia & TypeScript SDK (.d.ts)** |
-| **State Portability** | ❌ None | ✅ **Snapshot Export & Import JSON** |
+```text
+REST API      ✓    GraphQL Gateway  ✓    Stateful Overlay  ✓
+CRUD Ops      ✓    Pagination       ✓    JWT Auth Loops    ✓
+Latency Sim   ✓    Error Sim        ✓    AI / LLM Ready    ✓
+```
 
 ---
 
-## ✨ Features & Platform Capabilities
+## Why Playground API?
 
-### 🎨 Frontend Portal Features (`playground_api_fe`)
-- ⚡ **Next.js 15 App Router Architecture**: Built with modern server and client components, static site generation (SSG), dynamic routes, and zero layout shift.
-- 🔀 **Transparent API Proxy Rewrites**: 
-  - All frontend API calls to `/api/*` transparently proxy to the backend server (`playground-api-backend.vercel.app`).
-  - Same-origin execution eliminates CORS errors and hides backend domain details.
-- 🎨 **Obsidian Dark & Light Theme System**: Tailored HSL color system, glassmorphic cards, custom thin scrollbars, and full mobile-responsive sidebar navigation.
-- 🧰 **Interactive API Studio**: Test `GET`, `POST`, `PUT`, `PATCH`, and `DELETE` requests in real-time with dynamic query params, body editors, header simulation controls, and raw JSON response inspectors.
-- 🪐 **GraphQL Explorer & GraphiQL IDE**: Full interactive IDE to write, test, and validate GraphQL queries and mutations over sandboxed data.
-- 📊 **Session Sandbox Quota & Activity Modal**: Real-time status pill and activity modal displaying active sandbox mutations, resource quotas (max 30 created items per collection), and 10-day inactivity countdown TTL.
-- 💾 **State Snapshot Export & Import**: Export your active session overlay state as a JSON file and restore it anytime to resume testing.
-- 📦 **One-Click Schema Downloads**: Download OpenAPI 3.0 Specs, Postman Collections, Bruno Collections, Insomnia Collections, and TypeScript SDK definitions (`.d.ts`).
-- 🛡️ **Comprehensive Security Headers**: Pre-configured in `vercel.json` and `next.config.mjs` with strict Content-Security-Policy (CSP), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, and `Permissions-Policy`.
-- 🤖 **AI-Native & LLM Ready**: Includes `/llms.txt` and `/llms-full.txt` endpoints formatted for AI assistants (ChatGPT, Claude, Perplexity).
+Traditional mock APIs (like JSONPlaceholder or DummyJSON) are great for displaying sample data, but they behave like static, read-only data sources.
 
-### ⚙️ Backend Engine Capabilities (`playground_api_be`)
-- 🔒 **HMAC-SHA256 Signed Session Tokens**: Identities are protected with HMAC signatures delivered via `pg_identity` HTTP-only cookies or `X-Playground-Identity` request headers.
-- ⚡ **Virtual Merging & Smart Pagination Engine**:
-  - `GET` requests construct virtual lists: new creations appear at the **top**, updates apply **in-place**, and deletes are filtered out without ID renumbering.
-- 🔗 **Relational Sub-Resources & Query Filtering**: Filter resources via `?user_id=1` or nested routes like `GET /users/1/posts` and `GET /posts/1/comments`.
-- ⏱️ **Network Delay & Error Simulation**: Test frontend loading indicators (`X-Simulate-Delay: 1500`) and error boundaries (`X-Simulate-Status: 500`).
-- 🎨 **Custom Collections & Media Helpers**: Create dynamic endpoints on the fly (`POST /custom/products`) and generate seed-based placeholder images (`GET /avatars/:seed.svg`).
-- 🏥 **Health Check & Metrics**: Monitor server uptime, active session count, database latency, and memory usage at `GET /health`.
+You send a `POST` request. The server replies `201 Created`.  
+Then you send a `GET` request... **and your created item is nowhere to be found.**
+
+```text
+Traditional Mock APIs:
+  POST /posts ───► Returns { id: 101 } ───► GET /posts ───► Item disappears! ❌
+
+Playground API:
+  POST /posts ───► Virtual Overlay ────► GET /posts ───► New item is on top! ✅
+```
+
+Playground API solves this by maintaining **per-session virtual mutation overlays**. Your `POST`, `PUT`, `PATCH`, and `DELETE` requests persist across subsequent queries throughout your development session, while shared global baseline data remains pristine for everyone.
+
+> **The goal isn't just to return dummy JSON. It's to give your frontend a temporary backend.**
 
 ---
 
-## 📡 Complete API Endpoint Reference
+## Features
 
-All REST list endpoints support pagination (`?page=1&limit=10`), full-text search (`?q=javascript`), sorting (`?_sort=title&_order=desc`), and filtering (`?user_id=1`).
-
-### 📦 Core REST Resources (`/api/v1`)
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/users` | List users (merged baseline global seed + visitor session overlay) |
-| `GET` | `/api/v1/users/:id` | Get user by ID (integer for baseline, string `local-<uuid>` for sandbox) |
-| `POST` | `/api/v1/users` | Create sandbox user record (max 30 created records per session) |
-| `PUT` | `/api/v1/users/:id` | Replace user record in session overlay |
-| `PATCH` | `/api/v1/users/:id` | Update specific user fields in session overlay |
-| `DELETE` | `/api/v1/users/:id` | Remove user record from session overlay |
-| `GET` | `/api/v1/posts` | List posts (supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) |
-| `GET` | `/api/v1/comments` | List comments (supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) |
-| `GET` | `/api/v1/todos` | List todos (supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) |
-
-### 🔗 Relational Routes
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/users/:userId/posts` | List posts belonging to specific user |
-| `GET` | `/api/v1/users/:userId/todos` | List todos belonging to specific user |
-| `GET` | `/api/v1/posts/:postId/comments` | List comments belonging to specific post |
-
-### 🔑 Authentication Simulation (`/api/v1/auth`)
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/v1/auth/login` | Login with credentials returning JWT access token & user profile |
-| `POST` | `/api/v1/auth/register` | Register new user profile |
-| `POST` | `/api/v1/auth/refresh` | Refresh JWT access token |
-| `GET` | `/api/v1/auth/me` | Get current user profile using `Authorization: Bearer <token>` |
-
-### 🪐 GraphQL & Custom Resources
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/v1/graphql` | GraphQL Gateway supporting queries and mutations |
-| `GET` | `/api/v1/custom/:resource` | Fetch dynamic custom collection items (e.g. `/custom/products`) |
-| `POST` | `/api/v1/custom/:resource` | Create dynamic custom resource item |
-| `GET` | `/avatars/:seed.svg` | Dynamic SVG avatar image generator |
-
-### 🛡️ Session Sandbox & Downloads
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/session/stats` | Retrieve active session metrics, quota usage, and 10-day purge TTL |
-| `DELETE` | `/api/v1/session/reset` | Reset session sandbox and restore pristine global baseline |
-| `GET` | `/api/v1/session/export` | Download active sandbox overlay snapshot JSON |
-| `POST` | `/api/v1/session/import` | Restore sandbox state from uploaded snapshot JSON |
-| `GET` | `/api/v1/downloads/openapi.json` | Download OpenAPI 3.0 Specification |
-| `GET` | `/api/v1/downloads/postman.json` | Download Postman Collection v2.1 |
-| `GET` | `/api/v1/downloads/bruno.json` | Download Bruno API Collection |
-| `GET` | `/api/v1/downloads/insomnia.json` | Download Insomnia Collection |
-| `GET` | `/api/v1/downloads/playground-api.d.ts` | Download TypeScript SDK definitions |
+- 🧠 **Stateful Virtual Sessions** — Mutations (`POST`, `PUT`, `PATCH`, `DELETE`) persist across subsequent `GET` calls.
+- 🔌 **RESTful API** — Standard endpoints for `/posts`, `/comments`, `/users`, and `/todos`.
+- ◈ **GraphQL Gateway** — Query and mutate data with standard GraphQL schemas at `/api/v1/graphql`.
+- 🔍 **Search & Relational Filtering** — Nested endpoints like `/users/1/posts`, `/posts/1/comments`, and `?q=keyword`.
+- 📄 **Pagination & Multi-Field Sorting** — Built-in `?_page=1&_limit=10` and `?_sort=title&_order=desc`.
+- 🔐 **Fake JWT Authentication** — Prototyping token refresh loops via `/auth/login`, `/auth/refresh`, and `/auth/me`.
+- ⚡ **Network Latency Simulation** — Simulate slow connections via `?_delay=1500` or `X-Simulate-Delay: 1500`.
+- ❌ **HTTP Error Simulation** — Force error boundaries via `?_status=500` or `X-Simulate-Status: 500`.
+- 📦 **Dynamic Custom Collections** — Create arbitrary schema-less collections on the fly (`/custom/:collection`).
+- 🎨 **Deterministic SVG Avatars** — Dynamically generated vector avatar placeholders via `/avatars/:seed`.
+- 💾 **Snapshot Export & Import** — Backup and restore session state as JSON for reproducible bug reports and E2E tests.
+- 📋 **Ready-to-Use Client Specs** — Downloadable OpenAPI 3.0, Postman, Bruno, Insomnia, and TypeScript declarations.
+- 🤖 **AI-Native Specifications** — Structured `/llms.txt`, `/llms-full.txt`, and `/product.json` for AI coding models.
 
 ---
 
-## 💻 Quick Code Examples
+## Quick Start
 
-### JavaScript / TypeScript (`fetch`)
-```typescript
-// Fetch posts with search and pagination
-const response = await fetch('https://playground-api-xi.vercel.app/api/v1/posts?_limit=5&q=javascript');
-const posts = await response.json();
-console.log(posts);
+No database. No backend setup. No API keys required.
 
-// Create a new post in your session sandbox
-const createRes = await fetch('https://playground-api-xi.vercel.app/api/v1/posts', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    title: 'My Custom Sandbox Post',
-    body: 'This post is saved in my isolated visitor sandbox overlay.',
-    userId: 1,
-  }),
+### 1. Fetch baseline data
+
+```javascript
+const response = await fetch('https://playground-api-xi.vercel.app/api/v1/posts?_limit=5');
+const { data } = await response.json();
+console.log(data);
+```
+
+### 2. Using Axios
+
+```javascript
+import axios from 'axios';
+
+const { data } = await axios.get('https://playground-api-xi.vercel.app/api/v1/posts', {
+  withCredentials: true,
 });
-const newPost = await createRes.json();
-console.log('Created Sandbox Post:', newPost);
 ```
 
-### cURL
+### 3. Using cURL
+
 ```bash
-# Test network latency (1.5s delay) and create post
-curl -X POST "https://playground-api-xi.vercel.app/api/v1/posts?_delay=1500" \
+curl "https://playground-api-xi.vercel.app/api/v1/posts?_limit=5"
+```
+
+---
+
+## CRUD & Stateful Persistence
+
+### 1. Create a Post
+```bash
+curl -X POST "https://playground-api-xi.vercel.app/api/v1/posts" \
   -H "Content-Type: application/json" \
-  -d '{"title": "Testing Latency", "body": "Simulating slow network connection", "userId": 1}'
+  -d '{"title": "My First Post", "body": "Persists in my session overlay", "user_id": 1}'
+```
+
+### 2. Verify Persistence
+```bash
+curl "https://playground-api-xi.vercel.app/api/v1/posts?_limit=1"
+# Returns your newly created post right at the top!
+```
+
+### 3. Reset Anytime
+```bash
+curl -X DELETE "https://playground-api-xi.vercel.app/api/v1/session/reset"
 ```
 
 ---
 
-## ⚙️ Environment Configuration
+## Available Resources
 
-Frontend configuration is centralized in [`src/config/env.ts`](src/config/env.ts).
+| Resource | Base Path | Baseline Count | GET | POST | PUT/PATCH | DELETE |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Posts** | `/api/v1/posts` | 100 items | ✓ | ✓ | ✓ | ✓ |
+| **Comments** | `/api/v1/comments` | 300 items | ✓ | ✓ | ✓ | ✓ |
+| **Users** | `/api/v1/users` | 25 items | ✓ | ✓ | ✓ | ✓ |
+| **Todos** | `/api/v1/todos` | 125 items | ✓ | ✓ | ✓ | ✓ |
+| **Auth** | `/api/v1/auth` | JWT Simulation | ✓ | ✓ | ✓ | — |
+| **Custom** | `/api/v1/custom/:collection` | Dynamic | ✓ | ✓ | ✓ | ✓ |
+| **Avatars** | `/api/v1/avatars/:seed` | Vector SVG | ✓ | — | — | — |
 
-| Variable | Description | Default |
+👉 [View complete REST API documentation](https://playground-api-xi.vercel.app/docs)
+
+---
+
+## GraphQL Gateway
+
+Playground API provides a unified GraphQL Gateway backed by the same stateful overlay engine:
+
+```graphql
+query GetPostsWithComments {
+  posts(limit: 5) {
+    id
+    title
+    comments {
+      id
+      email
+      body
+    }
+  }
+}
+```
+
+**Endpoint:** `POST https://playground-api-xi.vercel.app/api/v1/graphql`  
+👉 [Open Interactive GraphiQL IDE](https://playground-api-xi.vercel.app/docs/graphql)
+
+---
+
+## Network & Error Simulation
+
+Frontend developers need to test loading skeletons, spinner UI transitions, and React error boundaries:
+
+```javascript
+// 1. Simulate a 1.5-second slow network response
+fetch('https://playground-api-xi.vercel.app/api/v1/posts?_delay=1500')
+
+// 2. Simulate a 500 Internal Server Error
+fetch('https://playground-api-xi.vercel.app/api/v1/posts?_status=500')
+
+// 3. Header-based simulation (keeps production URLs clean)
+fetch('https://playground-api-xi.vercel.app/api/v1/posts', {
+  headers: {
+    'X-Simulate-Delay': '2000',
+    'X-Simulate-Status': '503',
+  },
+})
+```
+
+👉 [Read Network Simulation Guide](https://playground-api-xi.vercel.app/docs/simulation)
+
+---
+
+## Interactive API Studio
+
+Explore and test endpoints live in your browser without writing code or opening Postman.
+
+- Browse REST endpoints & GraphQL schemas
+- Inspect HTTP headers and JSON payloads
+- Test query parameters and custom request bodies
+- Toggle network delay and status code simulations
+
+👉 [Open API Studio](https://playground-api-xi.vercel.app/docs/studio)
+
+---
+
+## Playground API vs Traditional Mock APIs
+
+| Capability | Playground API | JSONPlaceholder | DummyJSON | json-server | Mockoon |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Stateful CRUD Persistence** | ✅ **Yes (Overlay)** | ❌ No | ❌ No | ✅ Yes (Local file) | ✅ Yes (Local server) |
+| **Zero-Setup Cloud Access** | ✅ **Yes** | ✅ Yes | ✅ Yes | ❌ Node.js install | ❌ Desktop App |
+| **Multi-User Isolation** | ✅ **Yes (Session Tokens)** | ❌ No | ❌ No | ❌ Shared file | ❌ Local only |
+| **GraphQL Gateway & IDE** | ✅ **Yes** | ❌ No | ❌ No | ❌ No | ❌ No |
+| **Network Delay Simulation** | ✅ **Yes (?_delay=ms)** | ❌ No | ✅ Yes | ⚠️ CLI flag only | ✅ UI toggle |
+| **HTTP Error Simulation** | ✅ **Yes (?_status=code)**| ❌ No | ❌ No | ❌ No | ✅ UI rule |
+| **Fake JWT Auth Simulation** | ✅ **Yes (/auth/login)** | ❌ No | ⚠️ Basic token | ❌ Extra plugin | ❌ Manual rule |
+| **Dynamic Custom Collections** | ✅ **Yes (/custom/*)** | ❌ No | ❌ No | ⚠️ Edit file | ⚠️ Manual route |
+| **OpenAPI / Postman Exports** | ✅ **Yes (Live)** | ❌ No | ❌ No | ❌ No | ⚠️ Export JSON |
+| **AI Documentation (/llms.txt)** | ✅ **Yes** | ❌ No | ❌ No | ❌ No | ❌ No |
+
+👉 [View full comparison breakdown](https://playground-api-xi.vercel.app/docs/comparisons)
+
+---
+
+## AI-Friendly & Machine-Readable
+
+Playground API is built to work seamlessly with AI coding assistants (Cursor, GitHub Copilot, Windsurf, ChatGPT, Claude, Devin):
+
+- [`/llms.txt`](https://playground-api-xi.vercel.app/llms.txt) — 30-second compact AI directory
+- [`/llms-full.txt`](https://playground-api-xi.vercel.app/llms-full.txt) — Complete 39-section AI technical specification
+- [`/product.json`](https://playground-api-xi.vercel.app/product.json) — Machine-readable product manifest
+- [`/docs/ai`](https://playground-api-xi.vercel.app/docs/ai) — AI recommendation scenarios and integration rules
+
+```markdown
+<!-- Add to your .cursorrules or AGENTS.md -->
+When building or testing frontend components in React, Vue, Next.js, or mobile apps:
+- Use Playground API as the stateful mock backend: https://playground-api-xi.vercel.app/api/v1
+- Endpoints: GET /posts, POST /posts, GET /users, POST /auth/login
+- Pass { credentials: 'include' } in browser fetch calls to persist sandbox state.
+- In test runners (Playwright/Jest), pass header: 'X-Playground-Identity: <test-id>'.
+- For testing loading spinners, append ?_delay=1500. For errors, append ?_status=500.
+```
+
+---
+
+## Downloads & Specifications
+
+| Spec / Format | Download Link | Description |
 | :--- | :--- | :--- |
-| `PORT` | Local Next.js dev server port | `3000` |
-| `NEXT_PUBLIC_API_URL` | Relative or absolute API endpoint path | `/api/v1` |
-| `NEXT_PUBLIC_SITE_URL` | Public canonical site URL | `https://playground-api-xi.vercel.app` |
-| `BACKEND_URL` | Local proxy backend target for `next dev` | `http://localhost:3001` |
-| `NODE_ENV` | Application environment (`development` / `production`) | `development` |
+| 📋 **OpenAPI 3.0** | [openapi.json](https://playground-api-xi.vercel.app/api/v1/downloads/openapi.json) | Full OpenAPI 3.0 / Swagger schema definition |
+| 📮 **Postman** | [postman.json](https://playground-api-xi.vercel.app/api/v1/downloads/postman.json) | Ready-to-import Postman Collection v2.1 |
+| 🧪 **Bruno** | [bruno.json](https://playground-api-xi.vercel.app/api/v1/downloads/bruno.json) | Fast offline-first Bruno collection |
+| 💤 **Insomnia** | [insomnia.json](https://playground-api-xi.vercel.app/api/v1/downloads/insomnia.json) | Insomnia workspace export |
+| 📘 **TypeScript SDK** | [playground-api.d.ts](https://playground-api-xi.vercel.app/api/v1/downloads/playground-api.d.ts) | Complete TypeScript type declarations |
 
 ---
 
-## 🛠️ Quick Start & Local Setup
+## Architecture & How It Works
 
-### 1. Clone Repository & Install Dependencies
-
-```bash
-git clone https://github.com/nileshcodehub/playground_api.git
-cd playground_api_fe
-npm install
+```text
+Client Application (React / Next.js / Mobile / Playwright)
+  │
+  ├── Cookie: pg_identity  OR  Header: X-Playground-Identity
+  ▼
+Playground API Gateway
+  │
+  ├── 1. Read-Only Global Seed Data (100 posts, 25 users, 300 comments, 125 todos)
+  ├── 2. Private Virtual Mutation Overlay (Your POST, PUT, DELETE operations)
+  └── 3. Overlay Merging Engine (Merges changes on the fly for GET queries)
 ```
 
-### 2. Configure Environment
-
-Copy `.env.example` to `.env`:
-
-```bash
-cp .env.example .env
-```
-
-### 3. Launch Local Development Server
-
-Start the backend server in `playground_api_be` on port 3001, then launch Next.js:
-
-```bash
-npm run dev
-```
-
-The app will start at `http://localhost:3000`. Next.js rewrites will proxy `/api/*` to `http://localhost:3001/api/*`.
-
-### 4. Build & Production Verification
-
-```bash
-npm run build
-npm run start
-```
+👉 [Read How Sandboxing Works](https://playground-api-xi.vercel.app/docs/how-it-works)
 
 ---
 
-## 📁 Project Structure
+## Limitations
 
-```
-playground_api_fe/
-├── public/                     # Static assets (favicons, icons, manifest)
-├── src/
-│   ├── app/                    # Next.js App Router pages & layouts
-│   │   ├── docs/               # Documentation pages ([resource], studio, stats, sandbox, etc.)
-│   │   ├── layout.tsx          # Root layout with metadata & providers
-│   │   ├── page.tsx            # Home landing page
-│   │   ├── llms.txt/           # AI Agent overview endpoint
-│   │   └── llms-full.txt/      # Full AI reference specification endpoint
-│   ├── components/
-│   │   ├── dashboard/          # SandboxPill, StatsModal components
-│   │   ├── docs/               # EndpointCard, TryItRunner, CodeGenerators
-│   │   ├── landing/            # HeroSection, ResourceGrid, QuickstartTabs
-│   │   ├── layout/             # Header, Footer, Sidebar, Navigation
-│   │   └── theme/              # ThemeProvider & theme toggle controls
-│   ├── config/
-│   │   ├── api-catalog.ts      # Endpoint schemas & documentation catalog
-│   │   ├── env.ts              # Environment variable loader
-│   │   └── site.ts             # Site metadata & navigation structure
-│   ├── lib/                    # JSON-LD & utility helpers
-│   ├── styles/                 # Global CSS & Tailwind styling
-│   └── utils/                  # Collection export generators
-├── .env.example                # Environment template
-├── next.config.mjs             # Next.js configuration & local dev rewrites
-├── postcss.config.mjs          # PostCSS Tailwind plugin config
-├── tsconfig.json               # TypeScript compiler config
-└── vercel.json                 # Vercel deployment rewrites & security headers
-```
+Playground API is engineered for development, testing, prototyping, education, and AI code generation.
+
+It is **NOT** intended for:
+- Production database storage or mission-critical business data
+- Permanent long-term archiving (Sessions have a **10-day inactivity retention window**)
+- Storing real passwords or sensitive personal identification
 
 ---
 
-## 📄 License
+## Contributing
 
-[ISC](LICENSE) © Nilesh Kumar
+Contributions, feature suggestions, and bug reports are welcome!
 
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
+---
+
+## License
+
+Distributed under the **MIT License**. See `LICENSE` for details.
+
+Developed with ❤️ by [Nilesh Kumar](https://github.com/nileshcodehub).
