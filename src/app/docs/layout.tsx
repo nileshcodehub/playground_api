@@ -8,13 +8,18 @@ export default function DocsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)] w-full relative">
-      {/* Sticky Fixed Sidebar for Desktop (Left) */}
+    <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)] w-full relative bg-bg-primary">
+      {/* Sticky Sidebar for Desktop (Left) */}
       <Sidebar className="hidden md:block" />
-      
-      {/* Main Content Area - Scrolls naturally down the page to the footer */}
-      <main id="docs-content" className="flex-1 p-4 sm:p-6 md:p-10 space-y-10 min-w-0 w-full">
-        {children}
+
+      {/* Main Content Area - Optimized Max-Width & Generous Breathing Room */}
+      <main
+        id="docs-content"
+        className="flex-1 min-w-0 w-full px-4 sm:px-8 md:px-12 py-8 md:py-12 flex justify-center"
+      >
+        <div className="w-full max-w-4xl space-y-12 pb-16">
+          {children}
+        </div>
       </main>
 
       {/* Sticky Table of Contents (Right) */}

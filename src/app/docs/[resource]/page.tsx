@@ -170,105 +170,60 @@ export default function ResourcePage({ params }: ResourcePageProps) {
   };
 
   return (
-    <div className="space-y-8 w-full max-w-none">
-      {/* 1. Resource Header */}
-      <div id="overview" className="space-y-4 border-b border-border-theme pb-6 scroll-mt-20">
-        <div className="flex items-center gap-3">
-          <div className="p-3.5 rounded-2xl bg-accent-light text-accent-primary">
+    <div className="space-y-10 w-full max-w-none">
+      {/* 1. Resource Clean Header */}
+      <div id="overview" className="space-y-4 border-b border-border-theme/60 pb-6 scroll-mt-20">
+        <div className="flex items-center gap-3.5">
+          <div className="p-3.5 rounded-2xl bg-accent-light text-accent-primary shrink-0 shadow-xs">
             <Icon icon={res.icon} className="w-8 h-8" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl sm:text-4xl font-black text-text-primary tracking-tight">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
                 {res.name} Collection
               </h1>
-              <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                 {res.itemCount} {typeof res.itemCount === 'number' ? 'records' : ''}
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-text-secondary mt-1 leading-relaxed">
+            <p className="text-xs sm:text-sm text-text-secondary mt-1 leading-relaxed max-w-2xl">
               {res.description}
             </p>
           </div>
         </div>
 
-        {/* 2. Visual 4-Step Lifecycle Workflow Bar */}
-        <div className="p-4 rounded-2xl bg-bg-secondary border border-border-theme space-y-3">
-          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-text-secondary">
-            <span className="flex items-center gap-1.5 text-accent-primary">
-              <Icon icon="ph:git-commit-bold" className="w-4 h-4" />
-              Standard {res.singular} Lifecycle in Your App
-            </span>
-            <span className="text-text-muted font-normal">Zero-setup stateful sandbox</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
-            <div className="p-2.5 rounded-xl bg-bg-tertiary border border-border-theme/60 space-y-1">
-              <div className="font-bold text-text-primary flex items-center gap-1">
-                <span className="w-4 h-4 rounded-full bg-accent-primary text-white text-[10px] flex items-center justify-center font-mono">1</span>
-                <span>List & Filter</span>
-              </div>
-              <p className="text-[11px] text-text-secondary leading-tight">
-                Query baseline records with pagination, search (?q=), and sorting.
-              </p>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-bg-tertiary border border-border-theme/60 space-y-1">
-              <div className="font-bold text-text-primary flex items-center gap-1">
-                <span className="w-4 h-4 rounded-full bg-accent-primary text-white text-[10px] flex items-center justify-center font-mono">2</span>
-                <span>Create & Mutate</span>
-              </div>
-              <p className="text-[11px] text-text-secondary leading-tight">
-                POST, PUT, or PATCH in your private sandbox overlay.
-              </p>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-bg-tertiary border border-border-theme/60 space-y-1">
-              <div className="font-bold text-text-primary flex items-center gap-1">
-                <span className="w-4 h-4 rounded-full bg-accent-primary text-white text-[10px] flex items-center justify-center font-mono">3</span>
-                <span>Isolated View</span>
-              </div>
-              <p className="text-[11px] text-text-secondary leading-tight">
-                Your changes persist only for your session and never alter baseline data.
-              </p>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-bg-tertiary border border-border-theme/60 space-y-1">
-              <div className="font-bold text-text-primary flex items-center gap-1">
-                <span className="w-4 h-4 rounded-full bg-accent-primary text-white text-[10px] flex items-center justify-center font-mono">4</span>
-                <span>Simulate & Reset</span>
-              </div>
-              <p className="text-[11px] text-text-secondary leading-tight">
-                Test ?_delay=2000 & ?_status=500, or reset state anytime via DELETE /session/reset.
-              </p>
-            </div>
-          </div>
+        {/* Subtle Sandbox Persistence Indicator */}
+        <div className="flex items-center gap-2 text-xs text-text-secondary py-1">
+          <Icon icon="ph:shield-check-bold" className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>
+            Mutations on <code className="font-mono text-accent-primary">/{resource}</code> persist in your isolated session overlay without altering global baseline data.
+          </span>
         </div>
 
-        {/* 3. Expandable Data Model Schema Preview */}
+        {/* Expandable Data Model Schema Inspector */}
         {schemaInfo && (
-          <div className="rounded-2xl border border-border-theme bg-bg-secondary/40 overflow-hidden">
+          <div className="rounded-2xl border border-border-theme/60 bg-bg-secondary/30 overflow-hidden">
             <button
               onClick={() => setShowSchema(!showSchema)}
-              className="w-full p-3.5 flex items-center justify-between text-xs sm:text-sm font-bold text-text-primary hover:bg-bg-tertiary/40 transition-colors cursor-pointer"
+              className="w-full px-4 py-3 flex items-center justify-between text-xs font-bold text-text-primary hover:bg-bg-tertiary/40 transition-colors cursor-pointer"
             >
               <span className="flex items-center gap-2">
                 <Icon icon="ph:tree-structure-bold" className="w-4 h-4 text-accent-primary" />
                 <span>{res.singular} Data Model Schema & Fields</span>
               </span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-text-muted font-normal hidden sm:inline">
-                  {showSchema ? 'Hide schema details' : 'Click to inspect fields'}
+              <div className="flex items-center gap-1.5 text-text-muted">
+                <span className="text-[11px] font-normal hidden sm:inline">
+                  {showSchema ? 'Hide fields' : 'Inspect fields'}
                 </span>
                 <Icon
                   icon="ph:caret-down-bold"
-                  className={`w-4 h-4 text-text-muted transition-transform duration-200 ${showSchema ? 'rotate-180' : ''}`}
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${showSchema ? 'rotate-180' : ''}`}
                 />
               </div>
             </button>
 
             {showSchema && (
-              <div className="p-4 border-t border-border-theme bg-bg-secondary/70 space-y-3 animate-in fade-in duration-150">
+              <div className="p-4 border-t border-border-theme/60 bg-bg-secondary/70 space-y-3 animate-in fade-in duration-150">
                 <p className="text-xs text-text-secondary">{schemaInfo.description}</p>
                 <div className="overflow-x-auto rounded-xl border border-border-theme bg-bg-tertiary/60">
                   <table className="w-full text-left text-xs font-mono">
@@ -296,9 +251,9 @@ export default function ResourcePage({ params }: ResourcePageProps) {
         )}
       </div>
 
-      {/* 4. HTTP Method Filter Tabs */}
+      {/* 2. HTTP Method Filter Tabs */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="p-1.5 rounded-2xl bg-bg-secondary border border-border-theme flex items-center gap-1.5 overflow-x-auto">
+        <div className="p-1 rounded-2xl bg-bg-secondary border border-border-theme/60 flex items-center gap-1 overflow-x-auto">
           {(['ALL', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as const).map((method) => {
             const count = getMethodCount(method);
             const isActive = activeMethodFilter === method;
@@ -310,12 +265,12 @@ export default function ResourcePage({ params }: ResourcePageProps) {
                 disabled={count === 0}
                 className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 disabled:opacity-30 disabled:cursor-not-allowed ${
                   isActive
-                    ? 'bg-accent-primary text-white shadow-md'
+                    ? 'bg-accent-primary text-white shadow-xs'
                     : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
                 }`}
               >
                 <span>{method}</span>
-                <span className="text-[11px] px-1.5 py-0.2 rounded-md bg-black/20 font-sans">
+                <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-black/20 font-sans">
                   {count}
                 </span>
               </button>
@@ -328,19 +283,19 @@ export default function ResourcePage({ params }: ResourcePageProps) {
         </div>
       </div>
 
-      {/* 5. Endpoint Cards List */}
-      <div className="space-y-6">
+      {/* 3. Endpoint Cards List with Generous Spacing */}
+      <div className="space-y-8">
         {filteredEndpoints.map((ep) => (
           <EndpointCard key={ep.id} endpoint={ep} />
         ))}
       </div>
 
-      {/* 6. Next / Prev Navigation Links */}
-      <div className="pt-6 border-t border-border-theme flex items-center justify-between gap-4">
+      {/* 4. Next / Prev Navigation Links */}
+      <div className="pt-6 border-t border-border-theme/60 flex items-center justify-between gap-4">
         {res.prevPage ? (
           <Link
             href={res.prevPage.href}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group"
           >
             <Icon icon="ph:arrow-left-bold" className="w-4 h-4 text-accent-primary group-hover:-translate-x-1 transition-transform" />
             <span>Prev: {res.prevPage.title}</span>
@@ -352,7 +307,7 @@ export default function ResourcePage({ params }: ResourcePageProps) {
         {res.nextPage && (
           <Link
             href={res.nextPage.href}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group ml-auto"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group ml-auto"
           >
             <span>Next: {res.nextPage.title}</span>
             <Icon icon="ph:arrow-right-bold" className="w-4 h-4 text-accent-primary group-hover:translate-x-1 transition-transform" />

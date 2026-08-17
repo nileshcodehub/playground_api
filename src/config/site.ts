@@ -21,29 +21,32 @@ export const siteConfig = {
 
   navLinks: [
     { label: 'Overview', href: '/docs/introduction', icon: 'ph:info-bold' },
-    { label: 'Docs', href: '/docs/introduction', icon: 'ph:book-open-text-bold' },
+    { label: 'Quickstart', href: '/docs/quickstart', icon: 'ph:lightning-fill' },
     { label: 'API Studio', href: '/docs/studio', icon: 'ph:code-bold' },
     { label: 'Collections', href: '/docs/collections/openapi', icon: 'ph:folders-bold' },
-    { label: 'GraphQL Explorer', href: '/docs/graphql', icon: 'simple-icons:graphql' },
+    { label: 'GraphQL', href: '/docs/graphql', icon: 'simple-icons:graphql' },
   ],
 
   nestedSidebarGroups: [
     {
-      title: 'About & Overview',
-      icon: 'ph:info-bold',
+      title: 'Getting Started',
+      icon: 'ph:rocket-launch-bold',
       items: [
-        { title: 'Introduction', href: '/docs/introduction', icon: 'ph:sparkle-bold' },
-        { title: 'Showcase', href: '/docs/showcase', icon: 'ph:rocket-launch-bold' },
-        { title: 'Snapshot Import & Export', href: '/docs/export-import', icon: 'ph:cloud-arrow-up-bold' },
+        { title: 'Overview', href: '/docs/introduction', icon: 'ph:sparkle-bold' },
+        { title: '30-Second Quickstart', href: '/docs/quickstart', icon: 'ph:lightning-fill' },
+        { title: 'How Sandboxing Works', href: '/docs/how-it-works', icon: 'ph:shield-check-bold' },
+        { title: 'Framework Recipes', href: '/docs/recipes', icon: 'ph:code-bold' },
       ],
     },
     {
-      title: 'Identity & Sandbox',
-      icon: 'ph:shield-check-bold',
+      title: 'Features & Sandbox Tools',
+      icon: 'ph:gear-six-bold',
       items: [
-        { title: 'Session Architecture', href: '/docs/sandbox', icon: 'ph:key-bold' },
         { title: 'Interactive API Studio', href: '/docs/studio', icon: 'ph:play-circle-bold' },
+        { title: 'Network & Chaos Simulation', href: '/docs/simulation', icon: 'ph:timer-bold' },
+        { title: 'Snapshot Import & Export', href: '/docs/export-import', icon: 'ph:cloud-arrow-up-bold' },
         { title: 'Session Quotas & Stats', href: '/docs/stats', icon: 'ph:chart-bar-bold' },
+        { title: 'Project Showcase', href: '/docs/showcase', icon: 'ph:rocket-launch-bold' },
       ],
     },
     {
