@@ -10,8 +10,10 @@ export const metadata = {
 };
 
 export default function HowItWorksPage() {
+  const publicApiUrl = config.publicApiUrl || 'https://playground-api-xi.vercel.app/api/v1';
+
   const headerSample = `// Header Identification for Mobile / CI Test Runs
-fetch('${config.publicApiUrl}/posts', {
+fetch('${publicApiUrl}/posts', {
   headers: {
     'X-Playground-Identity': 'test-run-session-id',
   },

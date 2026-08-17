@@ -10,17 +10,19 @@ export const metadata = {
 };
 
 export default function SimulationPage() {
+  const publicApiUrl = config.publicApiUrl || 'https://playground-api-xi.vercel.app/api/v1';
+
   const querySample = `// 1. Simulate 1.5-second network latency
-fetch('${config.publicApiUrl}/posts?_delay=1500')
+fetch('${publicApiUrl}/posts?_delay=1500')
 
 // 2. Simulate 500 Internal Server Error
-fetch('${config.publicApiUrl}/posts?_status=500')
+fetch('${publicApiUrl}/posts?_status=500')
 
 // 3. Combined Delay & 404 Not Found
-fetch('${config.publicApiUrl}/users/999?_delay=2000&_status=404')`;
+fetch('${publicApiUrl}/users/999?_delay=2000&_status=404')`;
 
   const headerSample = `// Clean Header-Based Simulation
-fetch('${config.publicApiUrl}/posts', {
+fetch('${publicApiUrl}/posts', {
   headers: {
     'X-Simulate-Delay': '2000', // 2-second delay
     'X-Simulate-Status': '503', // 503 Service Unavailable

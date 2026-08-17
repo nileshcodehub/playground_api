@@ -10,15 +10,17 @@ export const metadata = {
 };
 
 export default function QuickstartPage() {
+  const publicApiUrl = config.publicApiUrl || 'https://playground-api-xi.vercel.app/api/v1';
+
   const getSample = `// 1. Fetch baseline posts
-const res = await fetch('${config.publicApiUrl}/posts?_limit=5', {
+const res = await fetch('${publicApiUrl}/posts?_limit=5', {
   credentials: 'include',
 });
 const { data } = await res.json();
 console.log('Posts:', data);`;
 
   const postSample = `// 2. Create a post in your isolated sandbox
-const res = await fetch('${config.publicApiUrl}/posts', {
+const res = await fetch('${publicApiUrl}/posts', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   credentials: 'include',
@@ -32,7 +34,7 @@ const newPost = await res.json();
 console.log('Created ID:', newPost.id);`;
 
   const fetchUpdatedSample = `// 3. Fetch again — your new post is right at the top
-const res = await fetch('${config.publicApiUrl}/posts?_limit=5', {
+const res = await fetch('${publicApiUrl}/posts?_limit=5', {
   credentials: 'include',
 });
 const { data } = await res.json();

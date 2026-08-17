@@ -9,6 +9,8 @@ export const metadata = {
 };
 
 export default function IntroductionPage() {
+  const publicApiUrl = config.publicApiUrl || 'https://playground-api-xi.vercel.app/api/v1';
+
   const keyFeatures = [
     {
       title: 'Complete CRUD Operations',
@@ -75,7 +77,7 @@ export default function IntroductionPage() {
           <span className="text-emerald-700 dark:text-emerald-400 font-mono font-bold">No API Key Required</span>
         </div>
         <div className="font-mono text-sm sm:text-base text-emerald-700 dark:text-emerald-400 font-bold select-all">
-          {config.publicApiUrl}
+          {publicApiUrl}
         </div>
       </div>
 

@@ -15,7 +15,10 @@ export function EndpointCard({ endpoint }: EndpointCardProps) {
   const [showTryIt, setShowTryIt] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
-  const fullUrl = `${config.publicApiUrl}${endpoint.path}`;
+  const baseApi = config.publicApiUrl || 'https://playground-api-xi.vercel.app/api/v1';
+  const cleanBase = baseApi.replace(/\/+$/, '');
+  const cleanPath = endpoint.path.startsWith('/') ? endpoint.path : `/${endpoint.path}`;
+  const fullUrl = `${cleanBase}${cleanPath}`;
 
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(fullUrl);

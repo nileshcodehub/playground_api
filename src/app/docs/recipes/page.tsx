@@ -10,9 +10,11 @@ export const metadata = {
 };
 
 export default function RecipesPage() {
+  const publicApiUrl = config.publicApiUrl || 'https://playground-api-xi.vercel.app/api/v1';
+
   const reactQuerySnippet = `import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-const API_BASE = '${config.publicApiUrl}';
+const API_BASE = '${publicApiUrl}';
 
 // 1. Fetch Posts List with search
 export function usePosts(query = '') {
@@ -49,7 +51,7 @@ export function useCreatePost() {
 
 // Configured Axios instance with auto-cookies and Bearer tokens
 export const api = axios.create({
-  baseURL: '${config.publicApiUrl}',
+  baseURL: '${publicApiUrl}',
   withCredentials: true,
 });
 
@@ -65,18 +67,18 @@ test('Isolated sandbox CRUD lifecycle in CI', async ({ request }) => {
   const headers = { 'X-Playground-Identity': 'test-' + Date.now() };
 
   // 1. Create a post
-  const res = await request.post('${config.publicApiUrl}/posts', {
+  const res = await request.post('${publicApiUrl}/posts', {
     headers,
     data: { title: 'CI Post', body: 'Testing persistence', user_id: 1 },
   });
   expect(res.status()).toBe(201);
 
   // 2. Verify in list
-  const list = await (await request.get('${config.publicApiUrl}/posts', { headers })).json();
+  const list = await (await request.get('${publicApiUrl}/posts', { headers })).json();
   expect(list.data[0].title).toBe('CI Post');
 
   // 3. Reset sandbox
-  await request.delete('${config.publicApiUrl}/session/reset', { headers });
+  await request.delete('${publicApiUrl}/session/reset', { headers });
 });`;
 
   return (
