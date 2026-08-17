@@ -8,12 +8,12 @@ const config = {
   isDevelopment: process.env.NODE_ENV !== 'production',
   isProduction: process.env.NODE_ENV === 'production',
   port: parseInt(process.env.PORT || '3000', 10),
-  apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  apiUrl: process.env.NEXT_PUBLIC_API_URL || '/api/v1',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://playground-api-xi.vercel.app',
   apiVersion: 'v1',
   jwtSecret: process.env.JWT_SECRET || 'default_playground_jwt_secret_key_2026',
   isVercel: Boolean(process.env.VERCEL),
-  googleAnalyticsId: process.env.NEXT_PUBLIC_GA_ID || ''
+  googleAnalyticsId: process.env.NEXT_PUBLIC_GA_ID || 'G-EN7KJL82XQ'
 };
 
 export default config;

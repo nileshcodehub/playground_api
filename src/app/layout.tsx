@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import React, { Suspense } from 'react';
 import '@/styles/globals.css';
 import Script from 'next/script';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
@@ -7,8 +8,8 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { siteConfig } from '@/config/site';
 import { getWebApiSchema } from '@/lib/json-ld';
-import { GoogleAnalytics } from '@next/third-parties/google';
-import config from '../config/env.js';
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import config from '@/config/env';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -101,9 +102,11 @@ export default function RootLayout({
             <Footer />
           </CountsProvider>
         </ThemeProvider>
+
+        <Suspense fallback={null}>
+          <GoogleAnalytics gaId={config.googleAnalyticsId} />
+        </Suspense>
       </body>
-      <GoogleAnalytics gaId={config.googleAnalyticsId} />
     </html>
   );
 }
-
