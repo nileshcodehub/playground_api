@@ -140,20 +140,19 @@ export function HeroSection() {
               </span>
               <span>Playground API {config.apiVersion}</span>
               <span className="text-text-muted">•</span>
-              <span className="text-text-secondary font-medium">Stateful Mock API Engine</span>
+              <span className="text-text-secondary font-medium">Stateful Mock REST & GraphQL Service</span>
             </div>
 
             {/* Headline */}
             <div className="space-y-3">
               <h1 className="text-3xl sm:text-5xl lg:text-5xl font-black tracking-tight text-text-primary leading-[1.15]">
-                The Mock API That{' '}
+                Free, Stateful Mock REST & GraphQL Backend for{' '}
                 <span className="text-accent-primary underline decoration-accent-primary/30 decoration-wavy underline-offset-4">
-                  Actually Persists
-                </span>{' '}
-                Your Data
+                  Frontend Prototypes
+                </span>
               </h1>
               <p className="text-sm sm:text-base text-text-secondary leading-relaxed max-w-xl">
-                A stateful JSONPlaceholder alternative for web and mobile development. Perform live CRUD mutations in isolated per-visitor sandboxes, simulate network delays, test JWT auth loops, and export state snapshots — zero backend setup required.
+                Build real CRUD applications with working JWT authentication, dynamic custom tables, and network latency simulation — with zero database or server configuration.
               </p>
             </div>
 
@@ -161,7 +160,7 @@ export function HeroSection() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 py-1 text-xs text-text-secondary">
               <div className="flex items-center gap-2">
                 <Icon icon="ph:check-circle-fill" className="w-4 h-4 text-accent-primary shrink-0" />
-                <span>Isolated Per-Session Overlays</span>
+                <span>Real CRUD State Persistence</span>
               </div>
               <div className="flex items-center gap-2">
                 <Icon icon="ph:check-circle-fill" className="w-4 h-4 text-accent-primary shrink-0" />
@@ -169,11 +168,11 @@ export function HeroSection() {
               </div>
               <div className="flex items-center gap-2">
                 <Icon icon="ph:check-circle-fill" className="w-4 h-4 text-accent-primary shrink-0" />
-                <span>Fake JWT Auth & Bearer Tokens</span>
+                <span>Fake JWT Auth & Bearer Loops</span>
               </div>
               <div className="flex items-center gap-2">
                 <Icon icon="ph:check-circle-fill" className="w-4 h-4 text-accent-primary shrink-0" />
-                <span>Network Delay & Chaos Headers</span>
+                <span>Zero Database / API Key Setup</span>
               </div>
             </div>
 

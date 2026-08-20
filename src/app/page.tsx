@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { HeroSection } from '@/components/landing/HeroSection';
+import { ProblemSolution } from '@/components/landing/ProblemSolution';
+import { HowItWorksSteps } from '@/components/landing/HowItWorksSteps';
 import { LiveVisualShowcase } from '@/components/landing/LiveVisualShowcase';
+import { UseCasesSection } from '@/components/landing/UseCasesSection';
 import { FeatureGrid } from '@/components/landing/FeatureGrid';
 import { CompareTable } from '@/components/landing/CompareTable';
 import { QuickstartTabs } from '@/components/landing/QuickstartTabs';
@@ -29,7 +32,10 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <HeroSection />
+      <ProblemSolution />
+      <HowItWorksSteps />
       <LiveVisualShowcase />
+      <UseCasesSection />
       <FeatureGrid />
       <CompareTable />
       <QuickstartTabs />
@@ -38,3 +44,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
