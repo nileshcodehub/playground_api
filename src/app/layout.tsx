@@ -82,9 +82,17 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon', sizes: '48x48', type: 'image/png' },
+    ],
     shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-icon', sizes: '180x180', type: 'image/png' },
+    ],
   },
+  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({
@@ -97,6 +105,11 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/icon" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon" />
+        <link rel="manifest" href="/site.webmanifest" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
