@@ -9,10 +9,23 @@ export function LiveVisualShowcase() {
   const [copiedPost, setCopiedPost] = useState(false);
   const [copiedUser, setCopiedUser] = useState(false);
   const [copiedProduct, setCopiedProduct] = useState(false);
+  const [baseUrl, setBaseUrl] = useState<string>(
+    config.publicApiUrl || `${config.siteUrl}${config.apiUrl}`
+  );
 
-  const postsUrl = `[GET] ${config.publicApiUrl}/posts?_limit=4`;
-  const usersUrl = `[GET] ${config.publicApiUrl}/users?_limit=4`;
-  const customUrl = `[GET] ${config.publicApiUrl}/custom/products`;
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const origin = window.location.origin;
+      const apiPrefix = config.apiUrl?.startsWith('http')
+        ? config.apiUrl
+        : `${origin}${config.apiUrl?.startsWith('/') ? '' : '/'}${config.apiUrl || 'api/v1'}`;
+      setBaseUrl(apiPrefix);
+    }
+  }, []);
+
+  const postsUrl = `[GET] ${baseUrl}/posts?_limit=4`;
+  const usersUrl = `[GET] ${baseUrl}/users?_limit=4`;
+  const customUrl = `[GET] ${baseUrl}/custom/products`;
 
   const handleCopy = (text: string, setter: (val: boolean) => void) => {
     navigator.clipboard.writeText(text.replace('[GET] ', ''));

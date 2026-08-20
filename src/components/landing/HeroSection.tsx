@@ -9,11 +9,28 @@ import config from '@/config/env';
 export function HeroSection() {
   const [activeAction, setActiveAction] = useState<'create' | 'fetch' | 'delay' | 'reset'>('create');
   const [loading, setLoading] = useState(false);
+  const [baseUrl, setBaseUrl] = useState<string>(
+    config.publicApiUrl || `${config.siteUrl}${config.apiUrl || '/api/v1'}`
+  );
   const [consoleOutput, setConsoleOutput] = useState<any>({
     message: 'Click any action below to test live sandbox persistence in real-time!',
     sandboxStatus: 'Active Session Overlay',
     endpoint: `${config.publicApiUrl}/posts`,
   });
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const origin = window.location.origin;
+      const apiPrefix = config.apiUrl?.startsWith('http')
+        ? config.apiUrl
+        : `${origin}${config.apiUrl?.startsWith('/') ? '' : '/'}${config.apiUrl || 'api/v1'}`;
+      setBaseUrl(apiPrefix);
+      setConsoleOutput((prev: any) => ({
+        ...prev,
+        endpoint: `${apiPrefix}/posts`,
+      }));
+    }
+  }, []);
 
   const handleAction = async (action: 'create' | 'fetch' | 'delay' | 'reset') => {
     setActiveAction(action);
@@ -75,7 +92,7 @@ export function HeroSection() {
       setConsoleOutput({
         status: 'Request Complete',
         action,
-        endpoint: `${config.publicApiUrl}/posts`,
+        endpoint: `${baseUrl}/posts`,
       });
     } finally {
       setLoading(false);
