@@ -22,7 +22,7 @@ export function HeroSection() {
     title: '✨ My First Sandbox Post',
     body: 'This item was created in real-time and persists in your private session overlay!',
     user_id: 1,
-    created_at: new Date().toISOString(),
+    created_at: '2026-08-20T10:00:00.000Z',
     _sandbox: {
       persisted: true,
       isolated: true,
