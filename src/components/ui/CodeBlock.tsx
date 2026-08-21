@@ -180,12 +180,18 @@ export function CodeBlock({
   const [copied, setCopied] = useState(false);
   const [showLineNumbers, setShowLineNumbers] = useState(initialShowLineNumbers);
   const [wrapLines, setWrapLines] = useState(initialWrap);
-  const [pinnedLines, setPinnedLines] = useState<Set<number>>(new Set(highlightedLines));
+  const highlightedLinesSet = useMemo(() => new Set(highlightedLines), [highlightedLines]);
   const [activeLineNumber, setActiveLineNumber] = useState(1);
+  const [activeLine, setActiveLine] = useState<number | null>(null);
   const [formatSuccess, setFormatSuccess] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleLineClick = useCallback((lineNum: number) => {
+    if (editable) return;
+    setActiveLine((prev) => (prev === lineNum ? null : lineNum));
+  }, [editable]);
 
   // Determine current active code
   const currentRawCode = useMemo(() => {
@@ -239,19 +245,6 @@ export function CodeBlock({
     setTimeout(() => setCopied(false), 2000);
   }, [formattedCode]);
 
-  const togglePinLine = (lineNum: number) => {
-    if (editable) return;
-    setPinnedLines((prev) => {
-      const next = new Set(prev);
-      if (next.has(lineNum)) {
-        next.delete(lineNum);
-      } else {
-        next.add(lineNum);
-      }
-      return next;
-    });
-  };
-
   // Format JSON Action
   const handleFormatJson = () => {
     if (!formattedCode.trim()) return;
@@ -268,7 +261,7 @@ export function CodeBlock({
     }
   };
 
-  // Cursor tracking to highlight active row
+  // Cursor tracking to highlight active row in editor mode
   const updateCursorLine = (el: HTMLTextAreaElement) => {
     const cursorIndex = el.selectionStart;
     const textBeforeCursor = el.value.substring(0, cursorIndex);
@@ -477,15 +470,25 @@ export function CodeBlock({
           <div
             ref={wrapperRef}
             onScroll={handleScroll}
-            className={cn(styles.editorWrapper, maxHeight, codeClassName)}
+            className={cn(
+              styles.editorWrapper,
+              wrapLines && styles.editorWrapperWrapped,
+              maxHeight,
+              codeClassName
+            )}
           >
             {/* Visual Background Layer: Zebra Striping + Token Highlighting + Line Numbers + Active Line */}
-            <div className={styles.editorLayerBackground}>
+            <div
+              className={cn(
+                styles.editorLayerBackground,
+                wrapLines && styles.editorLayerBackgroundWrapped
+              )}
+            >
               {lines.map((line, index) => {
                 const lineNum = index + 1;
                 const isOdd = index % 2 === 0;
                 const isActiveLine = lineNum === activeLineNumber;
-                const isPinned = pinnedLines.has(lineNum);
+                const isHighlighted = highlightedLinesSet.has(lineNum);
                 const tokens = tokenizeLine(line);
 
                 return (
@@ -493,9 +496,10 @@ export function CodeBlock({
                     key={index}
                     className={cn(
                       styles.lineRow,
+                      wrapLines && styles.lineRowWrapped,
                       oddEvenZebra && (isOdd ? styles.oddLine : styles.evenLine),
                       isActiveLine && styles.activeLineHighlight,
-                      isPinned && styles.pinnedLine
+                      isHighlighted && styles.pinnedLine
                     )}
                   >
                     {/* Line Number Gutter */}
@@ -503,7 +507,7 @@ export function CodeBlock({
                       <div
                         className={cn(
                           styles.lineGutter,
-                          (isActiveLine || isPinned) && styles.lineGutterPinned
+                          (isActiveLine || isHighlighted) && styles.lineGutterPinned
                         )}
                       >
                         {lineNum}
@@ -579,22 +583,36 @@ export function CodeBlock({
             </button>
           )}
 
-          <div className={cn(styles.codeViewport, maxHeight, codeClassName)}>
-            <div className={styles.linesWrapper}>
+          <div
+            className={cn(
+              styles.codeViewport,
+              wrapLines && styles.codeViewportWrapped,
+              maxHeight,
+              codeClassName
+            )}
+          >
+            <div
+              className={cn(
+                styles.linesWrapper,
+                wrapLines && styles.linesWrapperWrapped
+              )}
+            >
               {lines.map((line, index) => {
                 const lineNum = index + 1;
                 const isOdd = index % 2 === 0;
-                const isPinned = pinnedLines.has(lineNum);
+                const isLineActive = activeLine === lineNum;
+                const isHighlighted = highlightedLinesSet.has(lineNum) || isLineActive;
                 const tokens = tokenizeLine(line);
 
                 return (
                   <div
                     key={index}
-                    onClick={() => togglePinLine(lineNum)}
+                    onClick={() => handleLineClick(lineNum)}
                     className={cn(
                       styles.lineRow,
+                      wrapLines && styles.lineRowWrapped,
                       oddEvenZebra && (isOdd ? styles.oddLine : styles.evenLine),
-                      isPinned && styles.pinnedLine
+                      isHighlighted && styles.pinnedLine
                     )}
                   >
                     {/* Line Number Gutter */}
@@ -602,7 +620,7 @@ export function CodeBlock({
                       <div
                         className={cn(
                           styles.lineGutter,
-                          isPinned && styles.lineGutterPinned
+                          isHighlighted && styles.lineGutterPinned
                         )}
                       >
                         {lineNum}

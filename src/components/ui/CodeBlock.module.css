@@ -582,16 +582,26 @@
   }
 }
 
+.codeViewportWrapped {
+  overflow-x: hidden;
+}
+
 .linesWrapper {
   min-width: 100%;
   display: inline-block;
 }
 
+.linesWrapperWrapped {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  min-width: 0;
+}
+
 /* Line Rows & Zebra Striping */
 .lineRow {
   display: flex;
-  align-items: center;
-  height: 1.5rem;
+  align-items: flex-start;
   min-height: 1.5rem;
   line-height: 1.5rem;
   transition: background-color 0.12s ease;
@@ -600,11 +610,16 @@
   box-sizing: border-box;
 }
 
+.lineRowWrapped {
+  width: 100%;
+  max-width: 100%;
+}
+
 /* Line Number Gutter */
 .lineGutter {
   width: 2.875rem;
   min-width: 2.875rem;
-  height: 1.5rem;
+  min-height: 1.5rem;
   line-height: 1.5rem;
   flex-shrink: 0;
   user-select: none;
@@ -623,7 +638,6 @@
     width: 3.25rem;
     min-width: 3.25rem;
     font-size: 0.8125rem;
-    height: 1.5rem;
     line-height: 1.5rem;
   }
 }
@@ -631,7 +645,8 @@
 /* Line Content */
 .lineContent {
   flex: 1;
-  height: 1.5rem;
+  min-width: 0;
+  min-height: 1.5rem;
   line-height: 1.5rem;
   padding-left: 0.875rem;
   padding-right: 1rem;
@@ -644,6 +659,13 @@
 .lineWrapped {
   white-space: pre-wrap !important;
   word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+}
+
+.lineWrapped span {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 /* ==========================================================================
@@ -668,6 +690,10 @@
   }
 }
 
+.editorWrapperWrapped {
+  overflow-x: hidden;
+}
+
 .editorLayerBackground {
   grid-area: 1 / 1 / 2 / 2;
   min-width: 100%;
@@ -675,6 +701,12 @@
   user-select: none;
   padding: 0.625rem 0;
   z-index: 1;
+}
+
+.editorLayerBackgroundWrapped {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .activeLineHighlight {
