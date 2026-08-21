@@ -24,6 +24,7 @@ export interface CodeBlockProps {
   subtitle?: string;
   icon?: string;
   copyable?: boolean;
+  minHeight?: string;
   maxHeight?: string;
   className?: string;
   codeClassName?: string;
@@ -134,6 +135,7 @@ export function CodeBlock({
   subtitle,
   icon,
   copyable = true,
+  minHeight,
   maxHeight = 'max-h-96',
   className,
   codeClassName,
@@ -466,13 +468,14 @@ export function CodeBlock({
 
       {/* Code Area: Editable Editor Mode OR Syntax Highlighted Display Mode */}
       {editable ? (
-        <div className="relative font-mono text-xs sm:text-sm">
+        <div className="relative font-mono text-xs sm:text-sm flex-1 flex flex-col">
           <div
             ref={wrapperRef}
             onScroll={handleScroll}
             className={cn(
               styles.editorWrapper,
               wrapLines && styles.editorWrapperWrapped,
+              minHeight,
               maxHeight,
               codeClassName
             )}
@@ -570,7 +573,7 @@ export function CodeBlock({
           )}
         </div>
       ) : (
-        <div className="relative font-mono text-xs sm:text-sm">
+        <div className="relative font-mono text-xs sm:text-sm flex-1 flex flex-col">
           {!shouldRenderHeader && copyable && (
             <button
               type="button"
@@ -587,6 +590,7 @@ export function CodeBlock({
             className={cn(
               styles.codeViewport,
               wrapLines && styles.codeViewportWrapped,
+              minHeight,
               maxHeight,
               codeClassName
             )}

@@ -137,8 +137,8 @@ export default function GraphqlPage() {
         </div>
 
         {/* Code Query Input & Result Viewer Split Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <div className="flex flex-col h-full space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-secondary">GraphQL Query Editor</label>
               <span className="text-xs sm:text-sm font-mono text-text-muted">Interactive</span>
@@ -147,16 +147,18 @@ export default function GraphqlPage() {
               code={queryText}
               language="graphql"
               title="Query Source"
-              maxHeight="max-h-[350px]"
+              minHeight="min-h-[350px]"
+              maxHeight="max-h-[420px]"
+              className="flex-1 flex flex-col"
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col h-full space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-secondary">GraphQL JSON Output</label>
               {timeMs !== null && (
                 <span className="text-xs sm:text-sm font-mono text-text-muted flex items-center gap-1">
-                  <Icon icon="ph:timer-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <Icon icon="ph:timer-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent-primary" />
                   {timeMs} ms
                 </span>
               )}
@@ -164,7 +166,10 @@ export default function GraphqlPage() {
             <CodeBlock
               code={result ? result : '# Hit Execute Query to run GraphQL query'}
               language="json"
-              maxHeight="max-h-[350px]"
+              title="JSON Output"
+              minHeight="min-h-[350px]"
+              maxHeight="max-h-[420px]"
+              className="flex-1 flex flex-col"
             />
           </div>
         </div>

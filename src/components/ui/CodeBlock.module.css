@@ -12,6 +12,8 @@
   background-color: #060a12;
   border: 1px solid #1f2937;
   color: #e5e7eb;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ==========================================================================
@@ -573,6 +575,7 @@
   padding: 0.625rem 0;
   font-size: 0.8125rem;
   line-height: 1.5rem;
+  flex: 1;
 }
 
 @media (min-width: 640px) {
@@ -681,6 +684,7 @@
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
+  flex: 1;
 }
 
 @media (min-width: 640px) {

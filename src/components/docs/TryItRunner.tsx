@@ -530,13 +530,6 @@ export function TryItRunner({ endpoint, defaultExpanded = false }: TryItRunnerPr
                 <Icon icon="ph:timer-bold" className="w-3.5 h-3.5 text-accent-primary" />
                 <span>{response.timeMs} ms</span>
               </div>
-              <button
-                onClick={handleCopyResponse}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-bg-tertiary hover:bg-border-theme text-text-secondary text-xs font-medium transition-colors cursor-pointer"
-              >
-                <Icon icon={copied ? 'ph:check-bold' : 'ph:copy-bold'} className="w-3.5 h-3.5 text-accent-primary" />
-                <span>{copied ? 'Copied' : 'Copy'}</span>
-              </button>
             </div>
           </div>
 
