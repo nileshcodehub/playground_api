@@ -17,7 +17,7 @@ export const getCommentsEndpoints = (sampleRecord = null) => {
         { name: "q", in: "query", type: "string", description: "Full-text search query term across name, email, body, etc." },
         { name: "post_id", in: "query", type: "integer", description: "Filter comments by parent post ID (e.g. post_id=1)." },
         { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
-        { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." },
+        { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 200)." },
         { name: "_sort", in: "query", type: "string", description: "Field name to sort results by (e.g. name, email, id)." },
         { name: "_order", in: "query", type: "string", description: "Sort direction: asc (default) or desc." }
       ],

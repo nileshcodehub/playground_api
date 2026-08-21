@@ -19,7 +19,7 @@ export const getUsersEndpoints = (sampleRecord = null) => {
       params: [
         { name: "q", in: "query", type: "string", description: "Full-text search query term across name, username, email, etc." },
         { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
-        { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." },
+        { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 200)." },
         { name: "_sort", in: "query", type: "string", description: "Field name to sort results by (e.g. name, id, username, email)." },
         { name: "_order", in: "query", type: "string", description: "Sort direction: asc (default) or desc." }
       ],

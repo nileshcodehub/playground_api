@@ -7,7 +7,7 @@ window.ALL_ENDPOINTS_CATALOG = [
     summary: 'Retrieve a paginated list of users. Results merge shared global user records with session sandbox overlays (newly created users appear at the top).',
     params: [
       { name: 'page', in: 'query', type: 'integer', description: 'Page number (1-indexed, default 1).' },
-      { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 30).' }
+      { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 200).' }
     ],
     bodyExample: null,
     responseExample: JSON.stringify({
@@ -136,7 +136,7 @@ window.ALL_ENDPOINTS_CATALOG = [
     summary: 'Retrieve a paginated list of posts. Results merge shared global post records with session sandbox overlays (newly created posts appear at the top).',
     params: [
       { name: 'page', in: 'query', type: 'integer', description: 'Page number (1-indexed, default 1).' },
-      { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 30).' }
+      { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 200).' }
     ],
     bodyExample: null,
     responseExample: JSON.stringify({
@@ -246,7 +246,7 @@ window.ALL_ENDPOINTS_CATALOG = [
     summary: 'Retrieve a paginated list of comments. Results merge shared global comment records with session sandbox overlays (newly created comments appear at the top).',
     params: [
       { name: 'page', in: 'query', type: 'integer', description: 'Page number (1-indexed, default 1).' },
-      { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 30).' }
+      { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 200).' }
     ],
     bodyExample: null,
     responseExample: JSON.stringify({
@@ -363,7 +363,7 @@ window.ALL_ENDPOINTS_CATALOG = [
     summary: 'Retrieve a paginated list of todos. Results merge shared global todo records with session sandbox overlays (newly created todos appear at the top).',
     params: [
       { name: 'page', in: 'query', type: 'integer', description: 'Page number (1-indexed, default 1).' },
-      { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 30).' }
+      { name: 'limit', in: 'query', type: 'integer', description: 'Number of records per page (default 10, max 200).' }
     ],
     bodyExample: null,
     responseExample: JSON.stringify({

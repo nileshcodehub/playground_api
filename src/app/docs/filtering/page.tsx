@@ -71,7 +71,7 @@ fetch('${publicApiUrl}/posts?user_id=1')`;
               <tr>
                 <td className="p-3 font-bold text-accent-primary">_limit</td>
                 <td className="p-3 text-text-muted">10</td>
-                <td className="p-3 font-sans text-text-secondary">Number of items per page (max 30)</td>
+                <td className="p-3 font-sans text-text-secondary">Number of items per page (max 200)</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-accent-primary">_sort</td>

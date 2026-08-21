@@ -54,7 +54,7 @@ export const apiCatalog: ResourceCatalogDef[] = [
         description: 'Retrieve a paginated list of users. Results merge shared global user records with session sandbox overlays (newly created users appear at the top).',
         queryParams: [
           { name: 'page', type: 'integer', required: false, defaultVal: '1', description: 'Page number (1-indexed).' },
-          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Number of records per page (default 10, max 30).' },
+          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Number of records per page (default 10, max 200).' },
           { name: 'q', type: 'string', required: false, defaultVal: '-', description: 'Full-text search query term across name, username, email.' },
           { name: '_sort', type: 'string', required: false, defaultVal: 'id', description: 'Field name to sort results by (name, username, email).' },
           { name: '_order', type: 'string', required: false, defaultVal: 'asc', description: 'Sort direction: asc or desc.' },
@@ -247,7 +247,7 @@ export const apiCatalog: ResourceCatalogDef[] = [
         description: 'Retrieve a paginated list of posts. Results merge shared global posts with session sandbox overlays (newly created posts appear at the top).',
         queryParams: [
           { name: 'page', type: 'integer', required: false, defaultVal: '1', description: 'Page number (1-indexed).' },
-          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Number of records per page (default 10, max 30).' },
+          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Number of records per page (default 10, max 200).' },
           { name: 'user_id', type: 'integer', required: false, defaultVal: '-', description: 'Filter posts authored by user ID (e.g. user_id=1).' },
           { name: 'q', type: 'string', required: false, defaultVal: '-', description: 'Full-text search query term across title and body.' },
           { name: '_sort', type: 'string', required: false, defaultVal: 'id', description: 'Field name to sort results by (title, id, created_at).' },
@@ -398,7 +398,7 @@ export const apiCatalog: ResourceCatalogDef[] = [
         queryParams: [
           { name: 'post_id', type: 'integer', required: false, defaultVal: '-', description: 'Filter comments linked to post ID.' },
           { name: 'page', type: 'integer', required: false, defaultVal: '1', description: 'Page number.' },
-          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Items per page (max 30).' },
+          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Items per page (max 200).' },
           { name: 'q', type: 'string', required: false, defaultVal: '-', description: 'Search term across name, email, body.' },
           { name: '_sort', type: 'string', required: false, defaultVal: 'id', description: 'Field name to sort by (name, email, id).' },
           { name: '_order', type: 'string', required: false, defaultVal: 'asc', description: 'Sort direction: asc or desc.' },
@@ -524,7 +524,7 @@ export const apiCatalog: ResourceCatalogDef[] = [
           { name: 'user_id', type: 'integer', required: false, defaultVal: '-', description: 'Filter by owner user ID.' },
           { name: 'completed', type: 'boolean', required: false, defaultVal: '-', description: 'Filter by completion state (true/false).' },
           { name: 'page', type: 'integer', required: false, defaultVal: '1', description: 'Page number.' },
-          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Items per page (max 30).' },
+          { name: 'limit', type: 'integer', required: false, defaultVal: '10', description: 'Items per page (max 200).' },
           { name: 'q', type: 'string', required: false, defaultVal: '-', description: 'Full-text search query term across title.' },
           { name: '_sort', type: 'string', required: false, defaultVal: 'id', description: 'Field name to sort by (title, id, completed).' },
           { name: '_order', type: 'string', required: false, defaultVal: 'asc', description: 'Sort direction: asc or desc.' },

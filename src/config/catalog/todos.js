@@ -17,7 +17,7 @@ export const getTodosEndpoints = (sampleRecord = null) => {
         { name: "user_id", in: "query", type: "integer", description: "Filter todos by owner user ID (e.g. user_id=1)." },
         { name: "completed", in: "query", type: "boolean", description: "Filter todos by completion status (true or false)." },
         { name: "page", in: "query", type: "integer", description: "Page number (1-indexed, default 1)." },
-        { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 30)." },
+        { name: "limit", in: "query", type: "integer", description: "Number of records per page (default 10, max 200)." },
         { name: "_sort", in: "query", type: "string", description: "Field name to sort results by (e.g. title, id, completed)." },
         { name: "_order", in: "query", type: "string", description: "Sort direction: asc (default) or desc." }
       ],

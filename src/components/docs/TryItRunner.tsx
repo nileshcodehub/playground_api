@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import { EndpointDef, QueryParamDef } from '@/config/api-catalog';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { useLiveCounts } from '@/context/CountsContext';
+import { cn } from '@/lib/utils';
 import config from '@/config/env';
 
 interface TryItRunnerProps {
@@ -27,7 +28,7 @@ function sanitizeSvg(rawSvg: string): string {
 const DEFAULT_GET_QUERY_PARAMS: QueryParamDef[] = [
   { name: 'q', type: 'string', description: 'Full-text search query term across fields.' },
   { name: 'page', type: 'integer', defaultVal: '1', description: 'Page number (1-indexed, default 1).' },
-  { name: 'limit', type: 'integer', defaultVal: '10', description: 'Number of records per page (default 10, max 30).' },
+  { name: 'limit', type: 'integer', defaultVal: '10', description: 'Number of records per page (default 10, max 200).' },
   { name: '_sort', type: 'string', description: 'Field name to sort results by (e.g. id, name, title, createdAt).' },
   { name: '_order', type: 'string', defaultVal: 'asc', description: 'Sort direction: asc (default) or desc.' },
 ];
@@ -144,7 +145,67 @@ export function TryItRunner({ endpoint, defaultExpanded = false }: TryItRunnerPr
     return `${config.apiUrl}${substitutedPath}${queryString}`;
   }, [endpoint.path, pathParamsList, pathValues, queryValues, simulateDelay, simulateStatus]);
 
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    // 1. Validate Path Parameters
+    pathParamsList.forEach((param) => {
+      const val = (pathValues[param] ?? '').trim();
+      if (!val) {
+        errors[`path_${param}`] = `Parameter :${param} is required`;
+      }
+    });
+
+    // 2. Validate Query Parameters
+    Object.entries(queryValues).forEach(([key, rawVal]) => {
+      const val = (rawVal || '').trim();
+      if (!val) return; // Optional when empty
+
+      if (key === 'page') {
+        if (!/^\d+$/.test(val) || parseInt(val, 10) < 1) {
+          errors[`query_${key}`] = 'Page must be a positive integer >= 1';
+        }
+      } else if (key === 'limit') {
+        if (!/^\d+$/.test(val) || parseInt(val, 10) < 1 || parseInt(val, 10) > 200) {
+          errors[`query_${key}`] = 'Limit must be an integer between 1 and 200';
+        }
+      } else if (key === '_order') {
+        const lower = val.toLowerCase();
+        if (lower !== 'asc' && lower !== 'desc') {
+          errors[`query_${key}`] = "Order must be 'asc' or 'desc'";
+        }
+      } else if (key === 'completed') {
+        const lower = val.toLowerCase();
+        if (lower !== 'true' && lower !== 'false') {
+          errors[`query_${key}`] = "Must be 'true' or 'false'";
+        }
+      } else if (key.endsWith('_id') || key === 'user_id' || key === 'post_id') {
+        if (!val.startsWith('local-') && !/^-?\d+$/.test(val)) {
+          errors[`query_${key}`] = 'Must be a valid integer ID';
+        }
+      }
+    });
+
+    // 3. Validate JSON payload on POST/PUT/PATCH
+    if (['POST', 'PUT', 'PATCH'].includes(endpoint.method) && requestBody.trim()) {
+      try {
+        JSON.parse(requestBody);
+      } catch (err: any) {
+        errors['body'] = `Invalid JSON payload: ${err.message}`;
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleExecute = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
     const startTime = performance.now();
 
@@ -334,18 +395,41 @@ export function TryItRunner({ endpoint, defaultExpanded = false }: TryItRunnerPr
             Path Parameters
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {pathParamsList.map((param) => (
-              <div key={param} className="space-y-1">
-                <div className="text-[11px] font-mono text-text-muted">:{param}</div>
-                <input
-                  type="text"
-                  value={pathValues[param] ?? ''}
-                  onChange={(e) => setPathValues((prev) => ({ ...prev, [param]: e.target.value }))}
-                  placeholder={`Value for :${param}`}
-                  className="w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none focus:border-accent-primary"
-                />
-              </div>
-            ))}
+            {pathParamsList.map((param) => {
+              const hasError = Boolean(formErrors[`path_${param}`]);
+              return (
+                <div key={param} className="space-y-1">
+                  <div className="text-[11px] font-mono text-text-muted">:{param}</div>
+                  <input
+                    type="text"
+                    value={pathValues[param] ?? ''}
+                    onChange={(e) => {
+                      setPathValues((prev) => ({ ...prev, [param]: e.target.value }));
+                      if (formErrors[`path_${param}`]) {
+                        setFormErrors((prev) => {
+                          const next = { ...prev };
+                          delete next[`path_${param}`];
+                          return next;
+                        });
+                      }
+                    }}
+                    placeholder={`Value for :${param}`}
+                    className={cn(
+                      "w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border text-text-primary focus:outline-none transition-colors",
+                      hasError
+                        ? "border-rose-500/80 focus:border-rose-500 ring-1 ring-rose-500/30"
+                        : "border-border-theme focus:border-accent-primary"
+                    )}
+                  />
+                  {hasError && (
+                    <div className="text-[11px] text-rose-400 flex items-center gap-1 font-sans animate-in fade-in duration-150">
+                      <Icon icon="ph:warning-circle-fill" className="w-3.5 h-3.5 shrink-0" />
+                      <span>{formErrors[`path_${param}`]}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -357,18 +441,116 @@ export function TryItRunner({ endpoint, defaultExpanded = false }: TryItRunnerPr
             Query Filters & Options
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            {activeQueryParams.map((qp) => (
-              <div key={qp.name} className="space-y-1">
-                <div className="text-[11px] font-mono text-text-muted">{qp.name}</div>
-                <input
-                  type="text"
-                  value={queryValues[qp.name] || ''}
-                  onChange={(e) => setQueryValues((prev) => ({ ...prev, [qp.name]: e.target.value }))}
-                  placeholder={qp.defaultVal ? `Default: ${qp.defaultVal}` : qp.description}
-                  className="w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border border-border-theme text-text-primary focus:outline-none focus:border-accent-primary"
-                />
-              </div>
-            ))}
+            {activeQueryParams.map((qp) => {
+              const hasError = Boolean(formErrors[`query_${qp.name}`]);
+              const isPageOrLimit = qp.name === 'page' || qp.name === '_page' || qp.name === 'limit' || qp.name === '_limit';
+              const isLimit = qp.name === 'limit' || qp.name === '_limit';
+              const isOrder = qp.name === '_order';
+              const isSort = qp.name === '_sort';
+
+              // Dynamic sort fields based on current resource endpoint
+              const sortOptions = (() => {
+                const p = endpoint.path.toLowerCase();
+                if (p.includes('user')) return ['id', 'name', 'username', 'email'];
+                if (p.includes('post')) return ['id', 'title', 'user_id'];
+                if (p.includes('comment')) return ['id', 'name', 'email', 'post_id'];
+                if (p.includes('todo')) return ['id', 'title', 'user_id', 'completed'];
+                return ['id', 'title', 'name', 'username', 'email', 'user_id'];
+              })();
+
+              const handleValueChange = (val: string) => {
+                setQueryValues((prev) => ({ ...prev, [qp.name]: val }));
+                if (formErrors[`query_${qp.name}`]) {
+                  setFormErrors((prev) => {
+                    const next = { ...prev };
+                    delete next[`query_${qp.name}`];
+                    return next;
+                  });
+                }
+              };
+
+              return (
+                <div key={qp.name} className="space-y-1">
+                  <div className="text-[11px] font-mono text-text-muted">{qp.name}</div>
+                  
+                  {isOrder ? (
+                    <select
+                      value={queryValues[qp.name] || ''}
+                      onChange={(e) => handleValueChange(e.target.value)}
+                      className={cn(
+                        "w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border text-text-primary focus:outline-none transition-colors cursor-pointer",
+                        hasError
+                          ? "border-rose-500/80 focus:border-rose-500 ring-1 ring-rose-500/30"
+                          : "border-border-theme focus:border-accent-primary"
+                      )}
+                    >
+                      <option value="">Default: asc</option>
+                      <option value="asc">asc (Ascending)</option>
+                      <option value="desc">desc (Descending)</option>
+                    </select>
+                  ) : isSort ? (
+                    <select
+                      value={queryValues[qp.name] || ''}
+                      onChange={(e) => handleValueChange(e.target.value)}
+                      className={cn(
+                        "w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border text-text-primary focus:outline-none transition-colors cursor-pointer",
+                        hasError
+                          ? "border-rose-500/80 focus:border-rose-500 ring-1 ring-rose-500/30"
+                          : "border-border-theme focus:border-accent-primary"
+                      )}
+                    >
+                      <option value="">Default: id</option>
+                      {sortOptions.map((field) => (
+                        <option key={field} value={field}>
+                          {field}
+                        </option>
+                      ))}
+                    </select>
+                  ) : isPageOrLimit ? (
+                    <input
+                      type="number"
+                      min={1}
+                      max={isLimit ? 200 : undefined}
+                      step={1}
+                      onKeyDown={(e) => {
+                        if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      value={queryValues[qp.name] || ''}
+                      onChange={(e) => handleValueChange(e.target.value)}
+                      placeholder={qp.defaultVal ? `Default: ${qp.defaultVal}` : qp.description}
+                      className={cn(
+                        "w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border text-text-primary focus:outline-none transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+                        hasError
+                          ? "border-rose-500/80 focus:border-rose-500 ring-1 ring-rose-500/30"
+                          : "border-border-theme focus:border-accent-primary"
+                      )}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={queryValues[qp.name] || ''}
+                      onChange={(e) => handleValueChange(e.target.value)}
+                      placeholder={qp.defaultVal ? `Default: ${qp.defaultVal}` : qp.description}
+                      className={cn(
+                        "w-full font-mono text-xs p-2.5 rounded-lg bg-bg-tertiary border text-text-primary focus:outline-none transition-colors",
+                        hasError
+                          ? "border-rose-500/80 focus:border-rose-500 ring-1 ring-rose-500/30"
+                          : "border-border-theme focus:border-accent-primary"
+                      )}
+                    />
+                  )}
+
+                  {hasError && (
+                    <div className="text-[11px] text-rose-400 flex items-center gap-1 font-sans animate-in fade-in duration-150">
+                      <Icon icon="ph:warning-circle-fill" className="w-3.5 h-3.5 shrink-0" />
+                      <span>{formErrors[`query_${qp.name}`]}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -411,8 +593,23 @@ export function TryItRunner({ endpoint, defaultExpanded = false }: TryItRunnerPr
             title="Request Payload"
             maxHeight="max-h-52"
             editable={true}
-            onChange={(newVal) => setRequestBody(newVal)}
+            onChange={(newVal) => {
+              setRequestBody(newVal);
+              if (formErrors['body']) {
+                setFormErrors((prev) => {
+                  const next = { ...prev };
+                  delete next['body'];
+                  return next;
+                });
+              }
+            }}
           />
+          {formErrors['body'] && (
+            <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2 font-sans animate-in fade-in duration-150">
+              <Icon icon="ph:warning-circle-fill" className="w-4 h-4 shrink-0" />
+              <span>{formErrors['body']}</span>
+            </div>
+          )}
         </div>
       )}
 
