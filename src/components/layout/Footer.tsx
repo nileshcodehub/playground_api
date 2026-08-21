@@ -185,9 +185,9 @@ export function Footer() {
               href={siteConfig.healthUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-mono font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-success-bg border border-status-success-border text-status-success text-xs font-mono font-semibold hover:bg-accent-light transition-colors"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
               API: Operational
             </a>
 

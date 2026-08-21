@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import { themeColors } from '@/config/theme';
 
 export const runtime = 'edge';
 
@@ -10,6 +11,8 @@ export const size = {
 export const contentType = 'image/png';
 
 export default function Icon() {
+  const { brand, dark } = themeColors;
+
   return new ImageResponse(
     (
       <div
@@ -19,9 +22,9 @@ export default function Icon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)',
+          background: `linear-gradient(135deg, ${dark.bgObsidian} 0%, ${brand.dark} 50%, ${brand.darkest} 100%)`,
           borderRadius: 12,
-          border: '2px solid #10b981',
+          border: `2px solid ${brand.primary}`,
           position: 'relative',
         }}
       >
@@ -34,7 +37,7 @@ export default function Icon() {
           {/* Left Bracket < */}
           <path
             d="M 180 160 L 100 256 L 180 352"
-            stroke="#10b981"
+            stroke={brand.accent}
             strokeWidth="48"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -42,7 +45,7 @@ export default function Icon() {
           {/* Right Bracket > */}
           <path
             d="M 332 160 L 412 256 L 332 352"
-            stroke="#10b981"
+            stroke={brand.accent}
             strokeWidth="48"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -50,8 +53,8 @@ export default function Icon() {
           {/* Center Play Icon Triangle ▶ */}
           <path
             d="M 220 185 L 310 256 L 220 327 Z"
-            fill="#38bdf8"
-            stroke="#10b981"
+            fill={brand.accent}
+            stroke={brand.primary}
             strokeWidth="18"
             strokeLinejoin="round"
           />

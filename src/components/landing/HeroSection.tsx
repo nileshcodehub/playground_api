@@ -234,9 +234,9 @@ export function HeroSection() {
               {/* Window Titlebar */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-border-theme bg-bg-tertiary/60">
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block" />
-                  <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
-                  <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-status-error/80 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-status-warning/80 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-status-success/80 inline-block" />
                   <span className="ml-2 font-mono text-xs font-bold text-text-primary">
                     sandbox-session.json
                   </span>
@@ -247,7 +247,7 @@ export function HeroSection() {
                       ⚡ {latencyMs}ms
                     </span>
                   )}
-                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-status-success-bg text-status-success border border-status-success-border">
                     ● Live Sandbox
                   </span>
                 </div>
@@ -287,7 +287,7 @@ export function HeroSection() {
                     disabled={loading}
                     className={`px-2.5 py-2 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer text-left border flex flex-col gap-0.5 ${
                       activeAction === 'delay'
-                        ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
+                        ? 'bg-badge-patch text-white border-badge-patch shadow-xs'
                         : 'bg-bg-secondary hover:bg-bg-tertiary text-text-secondary border-border-theme'
                     }`}
                   >
@@ -300,7 +300,7 @@ export function HeroSection() {
                     disabled={loading}
                     className={`px-2.5 py-2 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer text-left border flex flex-col gap-0.5 ${
                       activeAction === 'reset'
-                        ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                        ? 'bg-badge-delete text-white border-badge-delete shadow-xs'
                         : 'bg-bg-secondary hover:bg-bg-tertiary text-text-secondary border-border-theme'
                     }`}
                   >

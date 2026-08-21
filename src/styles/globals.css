@@ -6,44 +6,144 @@
     --bg-primary: #12141a;
     --bg-secondary: #181b24;
     --bg-tertiary: #202430;
+    --bg-overlay: rgba(18, 20, 26, 0.85);
+
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
+    --text-accent: #34d399;
+
     --border-theme: rgba(255, 255, 255, 0.08);
     --border-hover: rgba(255, 255, 255, 0.16);
+    --border-focus: rgba(16, 185, 129, 0.5);
+
     --accent-primary: #10b981;
     --accent-hover: #059669;
     --accent-light: rgba(16, 185, 129, 0.12);
+    --accent-muted: rgba(16, 185, 129, 0.25);
+
+    --brand-primary: #10b981;
+    --brand-secondary: #059669;
+    --brand-teal: #0d9488;
+    --brand-cyan: #06b6d4;
+    --brand-glow: rgba(16, 185, 129, 0.35);
+
     --card-bg: #181b24;
     --card-border: rgba(255, 255, 255, 0.06);
+
     --code-bg: #0f1219;
+    --code-header-bg: #151922;
+    --code-border: #1f2937;
+    --code-gutter: #4b5563;
+    --code-active-line: rgba(16, 185, 129, 0.12);
+
     --badge-get: #10b981;
+    --badge-get-bg: rgba(16, 185, 129, 0.15);
+    --badge-get-border: rgba(16, 185, 129, 0.3);
+
     --badge-post: #3b82f6;
+    --badge-post-bg: rgba(59, 130, 246, 0.15);
+    --badge-post-border: rgba(59, 130, 246, 0.3);
+
     --badge-put: #f59e0b;
+    --badge-put-bg: rgba(245, 158, 11, 0.15);
+    --badge-put-border: rgba(245, 158, 11, 0.3);
+
     --badge-patch: #8b5cf6;
+    --badge-patch-bg: rgba(139, 92, 246, 0.15);
+    --badge-patch-border: rgba(139, 92, 246, 0.3);
+
     --badge-delete: #ef4444;
+    --badge-delete-bg: rgba(239, 68, 68, 0.15);
+    --badge-delete-border: rgba(239, 68, 68, 0.3);
+
+    --status-success: #10b981;
+    --status-success-bg: rgba(16, 185, 129, 0.12);
+    --status-success-border: rgba(16, 185, 129, 0.25);
+
+    --status-warning: #f59e0b;
+    --status-warning-bg: rgba(245, 158, 11, 0.12);
+    --status-warning-border: rgba(245, 158, 11, 0.25);
+
+    --status-error: #ef4444;
+    --status-error-bg: rgba(239, 68, 68, 0.12);
+    --status-error-border: rgba(239, 68, 68, 0.25);
+
+    --status-info: #3b82f6;
+    --status-info-bg: rgba(59, 130, 246, 0.12);
+    --status-info-border: rgba(59, 130, 246, 0.25);
   }
 
   [data-theme="light"] {
     --bg-primary: #ffffff;
     --bg-secondary: #f8fafc;
     --bg-tertiary: #f1f5f9;
+    --bg-overlay: rgba(255, 255, 255, 0.9);
+
     --text-primary: #0f172a;
     --text-secondary: #334155;
     --text-muted: #64748b;
+    --text-accent: #059669;
+
     --border-theme: #e2e8f0;
     --border-hover: #cbd5e1;
+    --border-focus: rgba(5, 150, 105, 0.5);
+
     --accent-primary: #059669;
     --accent-hover: #047857;
     --accent-light: #ecfdf5;
+    --accent-muted: rgba(5, 150, 105, 0.2);
+
+    --brand-primary: #059669;
+    --brand-secondary: #047857;
+    --brand-teal: #0f766e;
+    --brand-cyan: #0284c7;
+    --brand-glow: rgba(5, 150, 105, 0.25);
+
     --card-bg: #ffffff;
     --card-border: #e2e8f0;
+
     --code-bg: #f8fafc;
+    --code-header-bg: #f1f5f9;
+    --code-border: #e2e8f0;
+    --code-gutter: #94a3b8;
+    --code-active-line: rgba(5, 150, 105, 0.08);
+
     --badge-get: #059669;
+    --badge-get-bg: #ecfdf5;
+    --badge-get-border: #a7f3d0;
+
     --badge-post: #2563eb;
+    --badge-post-bg: #eff6ff;
+    --badge-post-border: #bfdbfe;
+
     --badge-put: #d97706;
+    --badge-put-bg: #fffbeb;
+    --badge-put-border: #fde68a;
+
     --badge-patch: #7c3aed;
+    --badge-patch-bg: #f5f3ff;
+    --badge-patch-border: #ddd6fe;
+
     --badge-delete: #dc2626;
+    --badge-delete-bg: #fef2f2;
+    --badge-delete-border: #fecaca;
+
+    --status-success: #059669;
+    --status-success-bg: #ecfdf5;
+    --status-success-border: #a7f3d0;
+
+    --status-warning: #d97706;
+    --status-warning-bg: #fffbeb;
+    --status-warning-border: #fde68a;
+
+    --status-error: #dc2626;
+    --status-error-bg: #fef2f2;
+    --status-error-border: #fecaca;
+
+    --status-info: #2563eb;
+    --status-info-bg: #eff6ff;
+    --status-info-border: #bfdbfe;
   }
 }
 
@@ -51,17 +151,73 @@
   --color-bg-primary: var(--bg-primary);
   --color-bg-secondary: var(--bg-secondary);
   --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-overlay: var(--bg-overlay);
+
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
+  --color-text-accent: var(--text-accent);
+
   --color-border-theme: var(--border-theme);
   --color-border-hover: var(--border-hover);
+  --color-border-focus: var(--border-focus);
+
   --color-accent-primary: var(--accent-primary);
   --color-accent-hover: var(--accent-hover);
   --color-accent-light: var(--accent-light);
+  --color-accent-muted: var(--accent-muted);
+
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-cyan: var(--brand-cyan);
+  --color-brand-glow: var(--brand-glow);
+
   --color-card-bg: var(--card-bg);
   --color-card-border: var(--card-border);
+
   --color-code-bg: var(--code-bg);
+  --color-code-header-bg: var(--code-header-bg);
+  --color-code-border: var(--code-border);
+  --color-code-gutter: var(--code-gutter);
+  --color-code-active-line: var(--code-active-line);
+
+  --color-badge-get: var(--badge-get);
+  --color-badge-get-bg: var(--badge-get-bg);
+  --color-badge-get-border: var(--badge-get-border);
+
+  --color-badge-post: var(--badge-post);
+  --color-badge-post-bg: var(--badge-post-bg);
+  --color-badge-post-border: var(--badge-post-border);
+
+  --color-badge-put: var(--badge-put);
+  --color-badge-put-bg: var(--badge-put-bg);
+  --color-badge-put-border: var(--badge-put-border);
+
+  --color-badge-patch: var(--badge-patch);
+  --color-badge-patch-bg: var(--badge-patch-bg);
+  --color-badge-patch-border: var(--badge-patch-border);
+
+  --color-badge-delete: var(--badge-delete);
+  --color-badge-delete-bg: var(--badge-delete-bg);
+  --color-badge-delete-border: var(--badge-delete-border);
+
+  --color-status-success: var(--status-success);
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-success-border: var(--status-success-border);
+
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-warning-border: var(--status-warning-border);
+
+  --color-status-error: var(--status-error);
+  --color-status-error-bg: var(--status-error-bg);
+  --color-status-error-border: var(--status-error-border);
+
+  --color-status-info: var(--status-info);
+  --color-status-info-bg: var(--status-info-bg);
+  --color-status-info-border: var(--status-info-border);
+
   --font-comic: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
 }
 

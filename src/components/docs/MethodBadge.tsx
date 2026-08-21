@@ -8,11 +8,11 @@ interface MethodBadgeProps {
 
 export function MethodBadge({ method, className }: MethodBadgeProps) {
   const methodStyles = {
-    GET: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
-    POST: 'bg-blue-500/15 text-blue-500 border-blue-500/30',
-    PUT: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
-    PATCH: 'bg-purple-500/15 text-purple-500 border-purple-500/30',
-    DELETE: 'bg-rose-500/15 text-rose-500 border-rose-500/30',
+    GET: 'bg-badge-get-bg text-badge-get border-badge-get-border',
+    POST: 'bg-badge-post-bg text-badge-post border-badge-post-border',
+    PUT: 'bg-badge-put-bg text-badge-put border-badge-put-border',
+    PATCH: 'bg-badge-patch-bg text-badge-patch border-badge-patch-border',
+    DELETE: 'bg-badge-delete-bg text-badge-delete border-badge-delete-border',
   };
 
   return (
