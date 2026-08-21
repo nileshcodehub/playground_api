@@ -795,31 +795,6 @@ export default async function GraphqlSchemaPage({ params }: GraphqlSchemaPagePro
           </table>
         </div>
       </div>
-
-      {/* 5. Next / Prev Page Navigation Links */}
-      <div className="pt-8 border-t border-border-theme flex items-center justify-between gap-4">
-        {item.prevPage ? (
-          <Link
-            href={item.prevPage.href}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs font-bold text-text-primary transition-all group"
-          >
-            <Icon icon="ph:arrow-left-bold" className="w-4 h-4 text-accent-primary group-hover:-translate-x-1 transition-transform" />
-            <span>Prev: {item.prevPage.title}</span>
-          </Link>
-        ) : (
-          <div />
-        )}
-
-        {item.nextPage && (
-          <Link
-            href={item.nextPage.href}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs font-bold text-text-primary transition-all group ml-auto"
-          >
-            <span>Next: {item.nextPage.title}</span>
-            <Icon icon="ph:arrow-right-bold" className="w-4 h-4 text-accent-primary group-hover:translate-x-1 transition-transform" />
-          </Link>
-        )}
-      </div>
     </div>
   );
 }

@@ -68,37 +68,6 @@ export default function ResourcePage({ params }: ResourcePageProps) {
           <EndpointCard key={ep.id} endpoint={ep} />
         ))}
       </div>
-
-      {/* 3. Next / Prev Navigation Links */}
-      <div className="pt-8 border-t border-border-theme flex items-center justify-between gap-4">
-        {res.prevPage ? (
-          <Link
-            href={res.prevPage.href}
-            className="p-4 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group flex items-center gap-3"
-          >
-            <Icon icon="ph:arrow-left-bold" className="w-4 h-4 text-accent-primary group-hover:-translate-x-1 transition-transform" />
-            <div>
-              <span className="text-[10px] text-text-muted block uppercase font-mono">Previous</span>
-              <span>{res.prevPage.title}</span>
-            </div>
-          </Link>
-        ) : (
-          <div />
-        )}
-
-        {res.nextPage && (
-          <Link
-            href={res.nextPage.href}
-            className="p-4 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group flex items-center gap-3 text-right ml-auto"
-          >
-            <div>
-              <span className="text-[10px] text-text-muted block uppercase font-mono">Next</span>
-              <span>{res.nextPage.title}</span>
-            </div>
-            <Icon icon="ph:arrow-right-bold" className="w-4 h-4 text-accent-primary group-hover:translate-x-1 transition-transform" />
-          </Link>
-        )}
-      </div>
     </div>
   );
 }

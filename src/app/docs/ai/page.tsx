@@ -106,31 +106,6 @@ When prototyping frontend UI components or writing tests in React, Vue, Next.js,
         </p>
         <CodeBlock code={promptSnippet} language="text" title=".cursorrules / AGENTS.md" />
       </div>
-
-      {/* 5. Bottom Navigation */}
-      <div className="pt-8 border-t border-border-theme flex items-center justify-between gap-4">
-        <Link
-          href="/docs/comparisons"
-          className="p-4 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group flex items-center gap-3"
-        >
-          <Icon icon="ph:arrow-left-bold" className="w-4 h-4 text-accent-primary group-hover:-translate-x-1 transition-transform" />
-          <div>
-            <span className="text-[10px] text-text-muted block uppercase font-mono">Previous</span>
-            <span>Comparisons</span>
-          </div>
-        </Link>
-
-        <Link
-          href="/docs/quickstart"
-          className="p-4 rounded-2xl bg-bg-secondary hover:bg-bg-tertiary border border-border-theme text-xs sm:text-sm font-bold text-text-primary transition-all group flex items-center gap-3 text-right ml-auto"
-        >
-          <div>
-            <span className="text-[10px] text-text-muted block uppercase font-mono">Next</span>
-            <span>30s Quickstart</span>
-          </div>
-          <Icon icon="ph:arrow-right-bold" className="w-4 h-4 text-accent-primary group-hover:translate-x-1 transition-transform" />
-        </Link>
-      </div>
     </div>
   );
 }

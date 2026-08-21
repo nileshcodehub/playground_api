@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { OnThisPage } from '@/components/docs/OnThisPage';
+import { DocPagination } from '@/components/docs/DocPagination';
 
 export default function DocsLayout({
   children,
@@ -19,6 +20,7 @@ export default function DocsLayout({
       >
         <div className="w-full max-w-4xl space-y-12 pb-16">
           {children}
+          <DocPagination />
         </div>
       </main>
 
